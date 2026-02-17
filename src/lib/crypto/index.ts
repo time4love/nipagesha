@@ -94,29 +94,44 @@ export async function decrypt(
 }
 
 /**
- * Encrypts a message using the security answer as the secret.
- * Returns { encryptedPayload, salt } so the salt can be stored for decryption.
+ * Encrypts a message using the password (e.g. security answer) as the secret.
+ * Returns a single string: "saltBase64:payloadBase64" where payload is iv|ciphertext.
+ * Use this for create-card; store only this string (never the raw message or password).
  */
 export async function encryptMessage(
-  message: string,
-  securityAnswer: string
-): Promise<{ encryptedPayload: string; salt: string }> {
+  text: string,
+  password: string
+): Promise<string> {
   const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
-  const key = await deriveKeyFromAnswer(securityAnswer, salt);
-  const encryptedPayload = await encrypt(message, key);
+  const key = await deriveKeyFromAnswer(password, salt);
+  const payload = await encrypt(text, key);
   const saltB64 = btoa(String.fromCharCode(...salt));
-  return { encryptedPayload, salt: saltB64 };
+  return `${saltB64}:${payload}`;
 }
 
 /**
- * Decrypts a message using the security answer and the stored salt.
+ * Decrypts a message from the combined "saltBase64:payloadBase64" format.
+ * Used when the child enters the security answer to reveal the message.
  */
 export async function decryptMessage(
-  encryptedPayload: string,
-  saltB64: string,
-  securityAnswer: string
+  combined: string,
+  password: string
 ): Promise<string> {
+  const [saltB64, payloadB64] = combined.split(":");
+  if (!saltB64 || !payloadB64) {
+    throw new Error("Invalid encrypted message format");
+  }
   const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0));
-  const key = await deriveKeyFromAnswer(securityAnswer, salt);
-  return decrypt(encryptedPayload, key);
+  const key = await deriveKeyFromAnswer(password, salt);
+  return decrypt(payloadB64, key);
+}
+
+/** Legacy: encrypt returning separate payload and salt (for DBs that store them in two columns). */
+export async function encryptMessageWithSalt(
+  message: string,
+  securityAnswer: string
+): Promise<{ encryptedPayload: string; salt: string }> {
+  const combined = await encryptMessage(message, securityAnswer);
+  const [saltB64, encryptedPayload] = combined.split(":");
+  return { encryptedPayload: encryptedPayload ?? "", salt: saltB64 ?? "" };
 }
