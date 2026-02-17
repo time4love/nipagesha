@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { encryptMessage } from "@/lib/crypto";
 import { createChildCard } from "./actions";
 
@@ -42,7 +43,6 @@ const createCardSchema = z.object({
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
 
 export default function CreateCardPage() {
-  const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<CreateCardFormValues>({
@@ -88,11 +88,7 @@ export default function CreateCardPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} dir="rtl">
             <CardContent className="space-y-6">
-              {submitError && (
-                <p className="text-sm text-destructive bg-destructive/10 rounded-md p-3" role="alert">
-                  {submitError}
-                </p>
-              )}
+              {submitError && <ErrorMessage message={submitError} />}
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}

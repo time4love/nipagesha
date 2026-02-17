@@ -1,18 +1,16 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import type { ChildCardInsert } from "@/lib/supabase/types";
 import { redirect } from "next/navigation";
 
 export type CreateCardResult = { error?: string };
 
+/** Payload from client: child details + encrypted_message (never raw message or security answer). */
+export type CreateChildCardPayload = Omit<ChildCardInsert, "user_id">;
+
 export async function createChildCard(
-  payload: {
-    child_first_name: string;
-    child_last_name: string;
-    birth_year: number;
-    security_question: string;
-    encrypted_message: string;
-  }
+  payload: CreateChildCardPayload
 ): Promise<CreateCardResult> {
   const supabase = await createClient();
   const {
@@ -23,14 +21,16 @@ export async function createChildCard(
     redirect("/login");
   }
 
-  const { error } = await supabase.from("child_cards").insert({
+  const row: ChildCardInsert = {
     user_id: user.id,
     child_first_name: payload.child_first_name.trim(),
     child_last_name: payload.child_last_name.trim(),
     birth_year: payload.birth_year,
     security_question: payload.security_question.trim(),
     encrypted_message: payload.encrypted_message,
-  });
+  };
+
+  const { error } = await supabase.from("child_cards").insert(row);
 
   if (error) {
     console.error("createChildCard error:", error.message);

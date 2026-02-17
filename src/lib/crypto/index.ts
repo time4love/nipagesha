@@ -43,7 +43,7 @@ export async function deriveKeyFromAnswer(
 }
 
 /**
- * Encrypts plaintext with the given key. Returns base64( salt | iv | ciphertext ).
+ * Encrypts plaintext with the given key. Returns base64( iv | ciphertext ).
  */
 export async function encrypt(
   plaintext: string,

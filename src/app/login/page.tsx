@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { login, signup } from "@/app/auth/actions";
 
 export default function LoginPage() {
@@ -44,11 +45,7 @@ export default function LoginPage() {
         </CardHeader>
         <form action={handleSubmit}>
           <CardContent className="space-y-4" dir="rtl">
-            {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md p-3" role="alert">
-                {error}
-              </p>
-            )}
+            {error && <ErrorMessage message={error} />}
             <div className="space-y-2">
               <Label htmlFor="auth-email">אימייל</Label>
               <Input
