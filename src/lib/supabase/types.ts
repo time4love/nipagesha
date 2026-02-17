@@ -22,3 +22,12 @@ export interface ChildCardInsert {
   security_question: string;
   encrypted_message: string;
 }
+
+/** Subset of child_cards used for the public message unlock page (no auth). */
+export interface MessagePageCard {
+  id: string;
+  child_first_name: string;
+  child_last_name: string;
+  security_question: string;
+  encrypted_message: string;
+}

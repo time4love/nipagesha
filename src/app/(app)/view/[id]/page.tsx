@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { formatChildName } from "@/lib/child-card";
 import { getCardForReveal } from "../actions";
 import { RevealMessageClient } from "./RevealMessageClient";
 
@@ -11,7 +12,7 @@ export default async function ViewCardPage({
   const card = await getCardForReveal(id);
   if (!card) notFound();
 
-  const childName = [card.child_first_name, card.child_last_name].filter(Boolean).join(" ");
+  const childName = formatChildName(card.child_first_name, card.child_last_name);
 
   return (
     <RevealMessageClient

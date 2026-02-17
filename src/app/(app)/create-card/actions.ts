@@ -33,7 +33,6 @@ export async function createChildCard(
   const { error } = await supabase.from("child_cards").insert(row);
 
   if (error) {
-    console.error("createChildCard error:", error.message);
     return { error: "שגיאה בשמירת הכרטיס. נסו שוב." };
   }
 

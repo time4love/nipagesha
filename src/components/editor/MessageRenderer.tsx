@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DOMPurify from "dompurify";
+import DOMPurify, { type Config as DOMPurifyConfig } from "dompurify";
 import { getSignedUrl } from "@/app/(app)/view/actions";
 
 const PRIVATE_PREFIX = "private://";
+
+const SANITIZE_CONFIG: DOMPurifyConfig = {
+  ALLOWED_TAGS: ["p", "br", "strong", "em", "u", "h1", "h2", "h3", "ul", "ol", "li", "a", "img"],
+  ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "title"],
+};
 
 export interface MessageRendererProps {
   /** Decrypted HTML from the card message (may contain private:// image srcs). */
@@ -46,10 +51,7 @@ export function MessageRenderer({ html, className }: MessageRendererProps) {
   }, [html]);
 
   const toShow = resolvedHtml ?? html;
-  const sanitized = DOMPurify.sanitize(toShow, {
-    ALLOWED_TAGS: ["p", "br", "strong", "em", "u", "h1", "h2", "h3", "ul", "ol", "li", "a", "img"],
-    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "title"],
-  });
+  const sanitized = DOMPurify.sanitize(toShow, SANITIZE_CONFIG);
 
   return (
     <div

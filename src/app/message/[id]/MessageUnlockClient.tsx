@@ -2,21 +2,23 @@
 
 import { useState } from "react";
 import { decryptMessage } from "@/lib/crypto";
+import { formatChildName } from "@/lib/child-card";
 import { MessageCard } from "@/components/message/MessageCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorMessage } from "@/components/ui/error-message";
-import type { MessagePageCard } from "./page";
+import type { MessagePageCard } from "@/lib/supabase/types";
 
 const WRONG_ANSWER_MESSAGE = "התשובה אינה נכונה, נסה שוב";
+const FALLBACK_CHILD_LABEL = "הילד";
 
 export function MessageUnlockClient({ card }: { card: MessagePageCard }) {
   const [answer, setAnswer] = useState("");
   const [decryptedHtml, setDecryptedHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const childName = [card.child_first_name, card.child_last_name].filter(Boolean).join(" ").trim();
+  const childName = formatChildName(card.child_first_name, card.child_last_name);
 
   async function handleUnlock(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +44,7 @@ export function MessageUnlockClient({ card }: { card: MessagePageCard }) {
       <Card className="border-amber-200/80 dark:border-amber-800/50 shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
-            נמצא מסר עבור {childName || "הילד"}
+            נמצא מסר עבור {childName || FALLBACK_CHILD_LABEL}
           </CardTitle>
         </CardHeader>
         <CardContent>

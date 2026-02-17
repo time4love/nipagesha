@@ -7,6 +7,7 @@ export type SearchResult =
   | { success: false; error: string };
 
 const NOT_FOUND_MESSAGE = "לא נמצא כרטיס תואם לפרטים אלו";
+const FILL_ALL_FIELDS_MESSAGE = "נא למלא את כל השדות.";
 
 export async function searchChild(formData: FormData): Promise<SearchResult> {
   const firstName = (formData.get("firstName") as string | null)?.trim() ?? "";
@@ -18,7 +19,7 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
       : null;
 
   if (!firstName || !lastName || birthYear == null || Number.isNaN(birthYear)) {
-    return { success: false, error: "נא למלא את כל השדות." };
+    return { success: false, error: FILL_ALL_FIELDS_MESSAGE };
   }
 
   const supabase = createAdminClient();
@@ -32,7 +33,6 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
     .maybeSingle();
 
   if (error) {
-    console.error("searchChild error:", error.message);
     return { success: false, error: NOT_FOUND_MESSAGE };
   }
 

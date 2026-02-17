@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
 
 const currentYear = new Date().getFullYear();
 const birthYearOptions = Array.from(
@@ -39,10 +40,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen" dir="rtl">
-      <div
-        className="absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/80 via-orange-50/50 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background"
-        aria-hidden
-      />
+      <div className={CHILD_PAGE_GRADIENT} aria-hidden />
       <div className="container mx-auto px-4 py-12 sm:py-20">
         <div className="mx-auto max-w-md">
           <div className="text-center mb-10">

@@ -33,10 +33,12 @@ import {
 import { ErrorMessage } from "@/components/ui/error-message";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { MessageCard } from "@/components/message/MessageCard";
+import { formatChildName, hasHtmlContent } from "@/lib/child-card";
 import { encryptMessage } from "@/lib/crypto";
 import { createChildCard } from "./actions";
 import { toast } from "sonner";
 import { Eye } from "lucide-react";
+import type { UseFormReturn } from "react-hook-form";
 
 /** Replaces signed img URLs with private:// paths so we store paths, not temporary URLs. */
 function htmlWithPrivateImagePaths(html: string): string {
@@ -58,10 +60,7 @@ const createCardSchema = z.object({
   message: z
     .string()
     .min(1, "נא להזין את המסר")
-    .refine(
-      (html) => html.replace(/<[^>]*>/g, "").trim().length > 0,
-      "נא להזין את המסר"
-    ),
+    .refine(hasHtmlContent, "נא להזין את המסר"),
 });
 
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
@@ -263,14 +262,13 @@ export default function CreateCardPage() {
   );
 }
 
-function PreviewContent({ form }: { form: ReturnType<typeof useForm<CreateCardFormValues>> }) {
+function PreviewContent({ form }: { form: UseFormReturn<CreateCardFormValues> }) {
   const firstName = form.watch("child_first_name") ?? "";
   const lastName = form.watch("child_last_name") ?? "";
   const htmlContent = form.watch("message") ?? "";
-  const childName = [firstName, lastName].filter(Boolean).join(" ").trim();
+  const childName = formatChildName(firstName, lastName);
 
-  const hasContent = htmlContent.replace(/<[^>]*>/g, "").trim().length > 0;
-  if (!hasContent) {
+  if (!hasHtmlContent(htmlContent)) {
     return (
       <p className="text-muted-foreground text-sm text-right py-8">
         הוסיפו מסר בשדה &quot;המסר לילד&quot; כדי לראות תצוגה מקדימה.
