@@ -4,9 +4,10 @@
  */
 
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY } from "@/lib/config";
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
@@ -48,4 +49,15 @@ export async function createClientForRouteHandler(request: Request) {
   });
 
   return { client, pendingCookies };
+}
+
+/**
+ * Admin client (service role). Use only for server-side, unauthenticated flows:
+ * child search and message-by-id. Never expose to the client.
+ */
+export function createAdminClient() {
+  if (!SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for admin operations");
+  }
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 }

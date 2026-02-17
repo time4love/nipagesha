@@ -1,0 +1,44 @@
+"use server";
+
+import { createAdminClient } from "@/lib/supabase/server";
+
+export type SearchResult =
+  | { success: true; redirectUrl: string }
+  | { success: false; error: string };
+
+const NOT_FOUND_MESSAGE = "לא נמצא כרטיס תואם לפרטים אלו";
+
+export async function searchChild(formData: FormData): Promise<SearchResult> {
+  const firstName = (formData.get("firstName") as string | null)?.trim() ?? "";
+  const lastName = (formData.get("lastName") as string | null)?.trim() ?? "";
+  const birthYearRaw = formData.get("birthYear");
+  const birthYear =
+    birthYearRaw !== null && birthYearRaw !== ""
+      ? Number(birthYearRaw)
+      : null;
+
+  if (!firstName || !lastName || birthYear == null || Number.isNaN(birthYear)) {
+    return { success: false, error: "נא למלא את כל השדות." };
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("child_cards")
+    .select("id")
+    .ilike("child_first_name", firstName)
+    .ilike("child_last_name", lastName)
+    .eq("birth_year", birthYear)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("searchChild error:", error.message);
+    return { success: false, error: NOT_FOUND_MESSAGE };
+  }
+
+  if (!data?.id) {
+    return { success: false, error: NOT_FOUND_MESSAGE };
+  }
+
+  return { success: true, redirectUrl: `/message/${data.id}` };
+}
