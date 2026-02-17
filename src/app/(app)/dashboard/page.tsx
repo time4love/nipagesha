@@ -79,10 +79,13 @@ export default async function DashboardPage() {
                   שנת לידה: {card.birth_year} • שאלת אבטחה מוגדרת
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex flex-col gap-2">
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   ההודעה מוצפנת ומוגנת. רק הילד יוכל לפתוח אותה עם תשובת האבטחה.
                 </p>
+                <Button variant="outline" size="sm" asChild className="w-fit">
+                  <Link href={`/view/${card.id}`}>צפה במסר</Link>
+                </Button>
               </CardContent>
             </Card>
           ))}

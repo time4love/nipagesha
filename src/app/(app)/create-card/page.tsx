@@ -15,7 +15,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -25,8 +31,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { MessageCard } from "@/components/message/MessageCard";
 import { encryptMessage } from "@/lib/crypto";
 import { createChildCard } from "./actions";
+import { toast } from "sonner";
+import { Eye } from "lucide-react";
+
+/** Replaces signed img URLs with private:// paths so we store paths, not temporary URLs. */
+function htmlWithPrivateImagePaths(html: string): string {
+  return html.replace(
+    /src="([^"]*\/sign\/secure-media\/([^"?]+)[^"]*)"/g,
+    'src="private://$2"'
+  );
+}
 
 const currentYear = new Date().getFullYear();
 const birthYearOptions = Array.from({ length: 30 }, (_, i) => currentYear - 5 - i);
@@ -37,13 +55,20 @@ const createCardSchema = z.object({
   birth_year: z.coerce.number().min(1950).max(currentYear),
   security_question: z.string().min(1, "נא להזין שאלת אבטחה"),
   security_answer: z.string().min(1, "נא להזין תשובה לסוד"),
-  message: z.string().min(1, "נא להזין את המסר"),
+  message: z
+    .string()
+    .min(1, "נא להזין את המסר")
+    .refine(
+      (html) => html.replace(/<[^>]*>/g, "").trim().length > 0,
+      "נא להזין את המסר"
+    ),
 });
 
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
 
 export default function CreateCardPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const form = useForm<CreateCardFormValues>({
     resolver: zodResolver(createCardSchema),
@@ -60,7 +85,11 @@ export default function CreateCardPage() {
   async function onSubmit(values: CreateCardFormValues) {
     setSubmitError(null);
     try {
-      const encryptedMessage = await encryptMessage(values.message, values.security_answer);
+      const htmlToEncrypt = htmlWithPrivateImagePaths(values.message);
+      const encryptedMessage = await encryptMessage(
+        htmlToEncrypt,
+        values.security_answer
+      );
       const result = await createChildCard({
         child_first_name: values.child_first_name,
         child_last_name: values.child_last_name,
@@ -174,10 +203,11 @@ export default function CreateCardPage() {
                   <FormItem>
                     <FormLabel>המסר לילד</FormLabel>
                     <FormControl>
-                      <textarea
-                        className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      <RichTextEditor
+                        value={field.value}
+                        onChange={field.onChange}
                         placeholder="כתבו כאן את המסר. הוא יוצפן לפני שליחה."
-                        {...field}
+                        onUploadError={(msg) => toast.error(msg)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -193,6 +223,16 @@ export default function CreateCardPage() {
               >
                 {form.formState.isSubmitting ? "שומר..." : "שמור כרטיס"}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setPreviewOpen(true)}
+                aria-label="תצוגה מקדימה"
+              >
+                <Eye className="size-4 ml-2 rtl:ml-0 rtl:mr-2" aria-hidden />
+                תצוגה מקדימה
+              </Button>
               <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
                 <Link href="/dashboard">ביטול</Link>
               </Button>
@@ -200,6 +240,51 @@ export default function CreateCardPage() {
           </form>
         </Form>
       </Card>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen} dir="rtl">
+        <DialogContent
+          className="max-w-2xl w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto"
+          showClose={true}
+        >
+          <DialogHeader className="text-right">
+            <DialogTitle>תצוגה מקדימה</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <PreviewContent form={form} />
+          </div>
+          <DialogFooter className="sm:justify-start flex-row-reverse">
+            <Button type="button" variant="outline" onClick={() => setPreviewOpen(false)}>
+              סגור תצוגה מקדימה
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function PreviewContent({ form }: { form: ReturnType<typeof useForm<CreateCardFormValues>> }) {
+  const firstName = form.watch("child_first_name") ?? "";
+  const lastName = form.watch("child_last_name") ?? "";
+  const htmlContent = form.watch("message") ?? "";
+  const childName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+  const hasContent = htmlContent.replace(/<[^>]*>/g, "").trim().length > 0;
+  if (!hasContent) {
+    return (
+      <p className="text-muted-foreground text-sm text-right py-8">
+        הוסיפו מסר בשדה &quot;המסר לילד&quot; כדי לראות תצוגה מקדימה.
+      </p>
+    );
+  }
+
+  return (
+    <div className="container max-w-2xl mx-auto">
+      <MessageCard
+        childName={childName}
+        htmlContent={htmlContent}
+        isPreview
+      />
     </div>
   );
 }
