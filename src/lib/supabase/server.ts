@@ -4,19 +4,21 @@
  */
 
 import { createServerClient } from "@supabase/ssr";
+import type { CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getSupabaseEnv } from "@/lib/env";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
+
+type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 export async function createClient() {
   const cookieStore = await cookies();
-  const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseEnv();
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: CookieToSet[]) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
@@ -27,4 +29,23 @@ export async function createClient() {
       },
     },
   });
+}
+
+/** For Route Handlers: returns client + cookies to attach to the response so redirect sends session. */
+export async function createClientForRouteHandler(request: Request) {
+  const cookieStore = await cookies();
+  const pendingCookies: CookieToSet[] = [];
+
+  const client = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet: CookieToSet[]) {
+        pendingCookies.push(...cookiesToSet);
+      },
+    },
+  });
+
+  return { client, pendingCookies };
 }

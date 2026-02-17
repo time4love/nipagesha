@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -14,20 +15,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorMessage } from "@/components/ui/error-message";
-import { login, signup } from "@/app/auth/actions";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(formData: FormData) {
-    setError(null);
-    const result = isSignUp
-      ? await signup(formData)
-      : await login(formData);
-    if (result?.error) {
-      setError(result.error);
-    }
+  useEffect(() => {
+    const err = searchParams.get("error");
+    if (err) setError(decodeURIComponent(err));
+  }, [searchParams]);
+
+  function getAction() {
+    return isSignUp ? "/api/auth/signup" : "/api/auth/login";
   }
 
   return (
@@ -43,7 +43,7 @@ export default function LoginPage() {
               : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
           </CardDescription>
         </CardHeader>
-        <form action={handleSubmit}>
+        <form action={getAction()} method="post">
           <CardContent className="space-y-4" dir="rtl">
             {error && <ErrorMessage message={error} />}
             <div className="space-y-2">
