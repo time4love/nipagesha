@@ -111,7 +111,7 @@ export async function updateChildCard(
     return { error: "הכרטיס לא נמצא או שאין הרשאה לערוך אותו." };
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("child_cards")
     .update({
       child_first_name: payload.child_first_name.trim(),
@@ -122,9 +122,11 @@ export async function updateChildCard(
       updated_at: new Date().toISOString(),
     })
     .eq("id", cardId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !updated) {
     return { error: "שגיאה בעדכון הכרטיס. נסו שוב." };
   }
 

@@ -8,6 +8,8 @@ export interface MessageCardProps {
   childName: string;
   /** Rich text HTML (may contain private:// image srcs; resolved via getSignedUrl). */
   htmlContent: string;
+  /** When set (child view), images are resolved via getSignedUrlsForCard so they work without auth. */
+  cardId?: string;
   /** When true, indicates preview mode (styling can match child page 1:1). */
   isPreview?: boolean;
 }
@@ -19,6 +21,7 @@ export interface MessageCardProps {
 export function MessageCard({
   childName,
   htmlContent,
+  cardId,
   isPreview = false,
 }: MessageCardProps) {
   const title = childName.trim() ? `המסר ל${childName.trim()}` : "המסר שלך";
@@ -33,7 +36,7 @@ export function MessageCard({
         <CardTitle className="text-xl">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <MessageRenderer html={htmlContent} className="min-h-[120px]" />
+        <MessageRenderer html={htmlContent} cardId={cardId} className="min-h-[120px]" />
       </CardContent>
     </Card>
   );

@@ -60,3 +60,9 @@ export async function signup(formData: FormData): Promise<AuthActionResult> {
 
   redirect("/dashboard");
 }
+
+export async function signOut(): Promise<void> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/");
+}

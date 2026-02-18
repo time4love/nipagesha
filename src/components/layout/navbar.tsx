@@ -1,15 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
+import { NavbarNav } from "./navbar-nav";
 
-const navLinks = [
-  { href: "/", label: "בית" },
-  { href: "/about", label: "אודות" },
-  { href: "/articles", label: "מאמרים" },
-] as const;
+export async function Navbar() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-export function Navbar() {
   return (
     <header
       className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -25,23 +23,7 @@ export function Navbar() {
         >
           ניפגשה
         </Link>
-        <div className="flex items-center gap-4" dir="rtl">
-          <ul className="flex gap-6">
-            {navLinks.map(({ href, label }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <Button asChild size="sm" className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">
-            <Link href="/login">התחבר / הרשם</Link>
-          </Button>
-        </div>
+        <NavbarNav hasUser={!!user} />
       </nav>
     </header>
   );

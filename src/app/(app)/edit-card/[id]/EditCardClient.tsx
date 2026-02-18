@@ -29,12 +29,28 @@ import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { hasHtmlContent } from "@/lib/child-card";
 import { decryptMessage, encryptMessage } from "@/lib/crypto";
 import { updateChildCard } from "@/app/(app)/create-card/actions";
+import { getSignedUrl } from "@/app/(app)/view/actions";
 import { toast } from "sonner";
 import { Lock, Pencil } from "lucide-react";
 import type { EditCardData } from "@/app/(app)/create-card/actions";
 
 const WRONG_ANSWER_MESSAGE = "התשובה שגויה, לא ניתן לפענח את המסר";
+const PRIVATE_PREFIX = "private://";
 const currentYear = new Date().getFullYear();
+
+/** Resolves img src="private://path" to signed URLs so the editor can display images. */
+async function resolvePrivateImagesInHtml(html: string): Promise<string> {
+  const pathRegex = /private:\/\/([^"'\s]+)/g;
+  const paths = Array.from(new Set([...html.matchAll(pathRegex)].map((m) => m[1])));
+  if (paths.length === 0) return html;
+  const results = await Promise.all(paths.map((path) => getSignedUrl(path)));
+  let result = html;
+  paths.forEach((path, i) => {
+    const url = results[i]?.url;
+    if (path && url) result = result.replaceAll(`${PRIVATE_PREFIX}${path}`, url);
+  });
+  return result;
+}
 const birthYearOptions = Array.from({ length: 30 }, (_, i) => currentYear - 5 - i);
 
 function htmlWithPrivateImagePaths(html: string): string {
@@ -258,7 +274,8 @@ export function EditCardClient({ card }: EditCardClientProps) {
     setIsUnlocking(true);
     try {
       const html = await decryptMessage(card.encrypted_message, answer);
-      setDecryptedHtml(html);
+      const htmlWithResolvedImages = await resolvePrivateImagesInHtml(html);
+      setDecryptedHtml(htmlWithResolvedImages);
     } catch {
       setUnlockError(WRONG_ANSWER_MESSAGE);
     } finally {

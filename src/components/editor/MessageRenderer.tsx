@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import DOMPurify, { type Config as DOMPurifyConfig } from "dompurify";
 import { getSignedUrl } from "@/app/(app)/view/actions";
+import { getSignedUrlsForCard } from "@/app/message/actions";
 
 const PRIVATE_PREFIX = "private://";
 
@@ -14,14 +15,17 @@ const SANITIZE_CONFIG: DOMPurifyConfig = {
 export interface MessageRendererProps {
   /** Decrypted HTML from the card message (may contain private:// image srcs). */
   html: string;
+  /** When set (child view), uses admin-signed URLs so images work without auth. */
+  cardId?: string;
   className?: string;
 }
 
 /**
- * Renders decrypted message HTML. Replaces img src="private://..." with signed URLs
- * via getSignedUrl (1h expiry), then sanitizes and renders.
+ * Renders decrypted message HTML. Replaces img src="private://..." with signed URLs:
+ * - If cardId is set (child view): getSignedUrlsForCard (service role, no auth).
+ * - Otherwise: getSignedUrl per path (authenticated parent view).
  */
-export function MessageRenderer({ html, className }: MessageRendererProps) {
+export function MessageRenderer({ html, className, cardId }: MessageRendererProps) {
   const [resolvedHtml, setResolvedHtml] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +34,24 @@ export function MessageRenderer({ html, className }: MessageRendererProps) {
 
     if (paths.length === 0) {
       setResolvedHtml(html);
+      return;
+    }
+
+    if (cardId) {
+      getSignedUrlsForCard(cardId, paths)
+        .then((res) => {
+          if (!res.success || !res.urls) {
+            setResolvedHtml(html);
+            return;
+          }
+          let result = html;
+          paths.forEach((path) => {
+            const url = res.urls[path];
+            if (path && url) result = result.replaceAll(`${PRIVATE_PREFIX}${path}`, url);
+          });
+          setResolvedHtml(result);
+        })
+        .catch(() => setResolvedHtml(html));
       return;
     }
 
@@ -48,7 +70,7 @@ export function MessageRenderer({ html, className }: MessageRendererProps) {
       .catch(() => {
         setResolvedHtml(html);
       });
-  }, [html]);
+  }, [html, cardId]);
 
   const toShow = resolvedHtml ?? html;
   const sanitized = DOMPurify.sanitize(toShow, SANITIZE_CONFIG);

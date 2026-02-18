@@ -42,3 +42,14 @@ export interface MessagePageCard {
   security_question: string;
   encrypted_message: string;
 }
+
+/** One row from child_replies (child's message back to parent). */
+export interface ChildReplyRow {
+  id: string;
+  card_id: string;
+  parent_id: string;
+  content: string;
+  contact_info: string | null;
+  created_at: string;
+  is_read: boolean;
+}
