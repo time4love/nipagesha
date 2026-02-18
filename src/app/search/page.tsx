@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { Search, Heart } from "lucide-react";
-import { toast } from "sonner";
 import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
 
 const currentYear = new Date().getFullYear();
@@ -20,11 +20,13 @@ const birthYearOptions = Array.from(
 export default function SearchPage() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    setError(null);
     setPending(true);
     try {
       const result = await searchChild(formData);
@@ -32,7 +34,7 @@ export default function SearchPage() {
         router.push(result.redirectUrl);
         return;
       }
-      toast.error(result.error);
+      setError(result.error);
     } finally {
       setPending(false);
     }
@@ -64,6 +66,7 @@ export default function SearchPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
+                {error && <ErrorMessage message={error} />}
                 <div className="space-y-2">
                   <Label htmlFor="firstName">שם פרטי</Label>
                   <Input
