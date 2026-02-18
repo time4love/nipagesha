@@ -240,7 +240,7 @@ export default function CreateCardPage() {
         </Form>
       </Card>
 
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen} dir="rtl">
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent
           className="max-w-2xl w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto"
           showClose={true}
@@ -248,7 +248,7 @@ export default function CreateCardPage() {
           <DialogHeader className="text-right">
             <DialogTitle>תצוגה מקדימה</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4" dir="rtl">
             <PreviewContent form={form} />
           </div>
           <DialogFooter className="sm:justify-start flex-row-reverse">

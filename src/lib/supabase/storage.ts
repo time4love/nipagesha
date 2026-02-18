@@ -55,15 +55,12 @@ export async function getSignedUrl(
   path: string
 ): Promise<{ url?: string; error?: string }> {
   const supabase = await createClient();
-  const {
-    data: { signedUrl },
-    error,
-  } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from(BUCKET_SECURE_MEDIA)
     .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
 
   if (error) {
     return { error: error.message };
   }
-  return { url: signedUrl ?? undefined };
+  return { url: data?.signedUrl ?? undefined };
 }

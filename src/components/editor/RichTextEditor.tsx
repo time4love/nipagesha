@@ -141,6 +141,7 @@ export function RichTextEditor({
   onUploadError,
 }: RichTextEditorProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<Editor | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,
@@ -157,17 +158,19 @@ export function RichTextEditor({
           "min-h-[140px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none prose prose-sm max-w-none dark:prose-invert",
         dir: "rtl",
       },
-      handleDrop(currentEditor, event) {
+      handleDrop(_view, event) {
         const files = event.dataTransfer?.files;
-        if (files?.length && files[0].type.startsWith("image/")) {
+        const currentEditor = editorRef.current;
+        if (files?.length && files[0].type.startsWith("image/") && currentEditor) {
           event.preventDefault();
           handleFile(files[0], currentEditor, onUploadError, setUploadInProgress);
           return true;
         }
       },
-      handlePaste(currentEditor, event) {
+      handlePaste(_view, event) {
         const files = event.clipboardData?.files;
-        if (files?.length && files[0].type.startsWith("image/")) {
+        const currentEditor = editorRef.current;
+        if (files?.length && files[0].type.startsWith("image/") && currentEditor) {
           event.preventDefault();
           handleFile(files[0], currentEditor, onUploadError, setUploadInProgress);
           return true;
@@ -177,9 +180,16 @@ export function RichTextEditor({
   });
 
   useEffect(() => {
+    editorRef.current = editor;
+    return () => {
+      editorRef.current = null;
+    };
+  }, [editor]);
+
+  useEffect(() => {
     if (!editor) return;
     if (value !== editor.getHTML()) {
-      editor.commands.setContent(value || "", false);
+      editor.commands.setContent(value || "", { emitUpdate: false });
     }
   }, [value, editor]);
 
@@ -187,7 +197,9 @@ export function RichTextEditor({
     if (!editor) return;
     const handler = () => onChange(editor.getHTML());
     editor.on("update", handler);
-    return () => editor.off("update", handler);
+    return () => {
+      editor.off("update", handler);
+    };
   }, [editor, onChange]);
 
   const handleImageClick = useCallback(() => {

@@ -28,10 +28,11 @@ export async function deriveKeyFromAnswer(
     ["deriveBits", "deriveKey"]
   );
 
+  const saltBuffer = new Uint8Array(salt);
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: saltBuffer,
       iterations: ITERATIONS,
       hash: "SHA-256",
     },
