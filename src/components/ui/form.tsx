@@ -54,7 +54,7 @@ const useFormField = () => {
     throw new Error("useFormField should be used within FormItem");
   }
 
-  const { id } = itemContext;
+  const id = itemContext.id;
 
   return {
     id,
