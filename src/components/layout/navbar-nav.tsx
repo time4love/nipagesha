@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/", label: "בית", match: (path: string) => path === "/" },
   { href: "/about", label: "אודות", match: (path: string) => path.startsWith("/about") },
   { href: "/articles", label: "מאמרים", match: (path: string) => path.startsWith("/articles") },
+  { href: "/songs", label: "שירים", match: (path: string) => path.startsWith("/songs") },
 ] as const;
 
 function isAppRoute(path: string): boolean {

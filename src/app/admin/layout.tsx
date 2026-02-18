@@ -1,0 +1,39 @@
+import Link from "next/link";
+import { requireAdmin } from "./actions";
+import { Navbar } from "@/components/layout/navbar";
+import { LayoutDashboard, Music } from "lucide-react";
+
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await requireAdmin();
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <div className="flex flex-1 container mx-auto px-4 py-6" dir="rtl">
+        <aside className="w-48 shrink-0 border-l pl-6">
+          <nav className="flex flex-col gap-2" aria-label="ניווט ניהול">
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <LayoutDashboard className="size-4" aria-hidden />
+              דשבורד
+            </Link>
+            <Link
+              href="/admin/songs"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <Music className="size-4" aria-hidden />
+              ניהול שירים
+            </Link>
+          </nav>
+        </aside>
+        <main className="flex-1 min-w-0 pr-6">{children}</main>
+      </div>
+    </div>
+  );
+}
