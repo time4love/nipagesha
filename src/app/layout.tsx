@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" className="light" suppressHydrationWarning>
       <body className={`${heebo.variable} font-sans antialiased overflow-x-hidden`}>
         {children}
         <Toaster />

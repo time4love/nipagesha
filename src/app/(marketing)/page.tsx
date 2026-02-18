@@ -12,7 +12,7 @@ export default function HomePage() {
         aria-labelledby="hero-heading"
       >
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-teal-50/80 via-sky-50/50 to-background dark:from-teal-950/30 dark:via-sky-950/20 dark:to-background"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-teal-50/80 via-sky-50/50 to-background"
           aria-hidden
         />
         <div className="container mx-auto max-w-4xl text-center">
@@ -38,7 +38,7 @@ export default function HomePage() {
               asChild
               size="lg"
               variant="outline"
-              className="border-teal-200 text-teal-700 hover:bg-teal-50 dark:border-teal-800 dark:text-teal-300 dark:hover:bg-teal-950/50"
+              className="bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700"
             >
               <Link href="/search">אני מחפש מסר</Link>
             </Button>
@@ -116,7 +116,7 @@ export default function HomePage() {
             ניכור הורי הוא פגיעה נפשית בילד. הילד הופך לכלי במאבק רגשי או משפטי, מאבד דמות הורית אחת, ולרוב גם את האמון במבוגרים בכלל. זהו סוג של התעללות רגשית, גם אם היא נעשית מתוך רצון &quot;להגן על הילד&quot; כביכול.
           </p>
           <div className="mt-10 text-right">
-            <Button asChild variant="outline" size="lg" className="gap-2">
+            <Button asChild variant="outline" size="lg" className="gap-2 bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700">
               <Link href="/articles">
                 <BookOpen className="size-4" aria-hidden />
                 למתחם המאמרים
@@ -143,7 +143,7 @@ export default function HomePage() {
             <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
               <Link href="/dashboard">אני הורה</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700">
               <Link href="/search">אני מחפש מסר</Link>
             </Button>
           </div>
