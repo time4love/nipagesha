@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Force class-based dark mode so we never use system preference; app stays light. */
 @custom-variant dark (&:where(.dark, .dark *));

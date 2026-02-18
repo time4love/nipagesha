@@ -205,6 +205,7 @@ export default function CreateCardPage() {
                       <RichTextEditor
                         value={field.value}
                         onChange={field.onChange}
+                        mode="private"
                         placeholder="כתבו כאן את המסר. הוא יוצפן לפני שליחה."
                         onUploadError={(msg) => toast.error(msg)}
                       />

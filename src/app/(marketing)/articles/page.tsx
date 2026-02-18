@@ -1,29 +1,12 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Scale, Heart } from "lucide-react";
-
-const articles = [
-  {
-    title: "מהו ניכור הורי?",
-    icon: BookOpen,
-    description: "הבנת התופעה, הסימנים וההשלכות על הילד וההורה.",
-  },
-  {
-    title: "היבטים משפטיים",
-    icon: Scale,
-    description: "זכויות, נהלים ודרכי פעולה בבתי המשפט.",
-  },
-  {
-    title: "תמיכה נפשית",
-    icon: Heart,
-    description: "כיצד לשמור על החוסן הנפשי בתקופה מורכבת זו.",
-  },
-];
+import { ArticleCard } from "@/components/articles/ArticleCard";
+import { getPublishedArticles } from "@/lib/articles";
 
 export const metadata = {
   title: "מאמרים | מידע וכלים להתמודדות | ניפגשה",
@@ -31,7 +14,9 @@ export const metadata = {
     "מאמרים על ניכור הורי, היבטים משפטיים ותמיכה נפשית. כלים להבנה ולהתמודדות.",
 };
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
+  const articles = await getPublishedArticles();
+
   return (
     <div className="min-h-screen" dir="rtl">
       <div className="container mx-auto px-4 py-16">
@@ -44,34 +29,43 @@ export default function ArticlesPage() {
               מאמרים וכלים שיעזרו לכם להבין, להתמודד ולפעול.
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => {
-              const Icon = article.icon;
-              return (
-                <Card
-                  key={article.title}
-                  className="group border-border bg-card hover:border-teal-200 hover:shadow-md dark:hover:border-teal-800 transition-all duration-200"
-                >
-                  <CardHeader>
-                    <div className="flex size-11 items-center justify-center rounded-lg bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400 mb-1">
-                      <Icon className="size-5" aria-hidden />
-                    </div>
-                    <CardTitle className="text-right text-lg">
-                      {article.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-right">
-                      {article.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-          <p className="mt-8 text-center text-muted-foreground text-sm">
-            תוכן מפורט לכל נושא יופיע כאן בהמשך.
-          </p>
+          {articles.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              אין מאמרים לפרסום כרגע.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {articles.map((article) => (
+                <Link key={article.id} href={`/articles/${article.id}`}>
+                  <Card className="group border-border bg-card hover:border-teal-200 hover:shadow-md dark:hover:border-teal-800 transition-all duration-200 overflow-hidden h-full">
+                    <ArticleCard
+                      title={article.title}
+                      mediaType={article.media_type}
+                      mediaUrl={article.media_url}
+                      imageAlt={article.title}
+                      className="rounded-t-xl rounded-b-none"
+                    />
+                    <CardHeader>
+                      <CardTitle className="text-right text-lg">
+                        {article.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {article.content && (() => {
+                        const plain = article.content.replace(/<[^>]*>/g, "");
+                        return (
+                          <p className="text-right text-sm text-muted-foreground line-clamp-3">
+                            {plain.slice(0, 200)}
+                            {plain.length > 200 ? "..." : ""}
+                          </p>
+                        );
+                      })()}
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>

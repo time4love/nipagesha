@@ -232,6 +232,7 @@ function EditForm({
                       <RichTextEditor
                         value={field.value}
                         onChange={field.onChange}
+                        mode="private"
                         placeholder="כתבו כאן את המסר. הוא יוצפן לפני שמירה."
                         onUploadError={(msg) => toast.error(msg)}
                       />

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { uploadToSecureMedia } from "@/lib/supabase/storage";
+import { uploadPublicFile } from "@/lib/supabase/public-storage";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -18,6 +19,17 @@ export async function POST(request: Request) {
   }
   if (!file.type.startsWith("image/")) {
     return NextResponse.json({ error: "File must be an image" }, { status: 400 });
+  }
+
+  const mode = (formData.get("mode") as string) ?? "";
+  const isPublic = mode === "public";
+
+  if (isPublic) {
+    const result = await uploadPublicFile(file, "articles");
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+    return NextResponse.json({ url: result.url });
   }
 
   const result = await uploadToSecureMedia(file);
