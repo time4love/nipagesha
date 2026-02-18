@@ -1,44 +1,12 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  KeyRound,
-  Shield,
-  Lock,
-  MessageCircle,
-} from "lucide-react";
-
-const steps = [
-  {
-    icon: MessageCircle,
-    title: "הורה יוצר כרטיס פרטי",
-    description:
-      "הורה משאיר הודעה מוצפנת לילד, עם שאלת אבטחה שרק הילד יכול לדעת את התשובה לה.",
-  },
-  {
-    icon: Search,
-    title: "הילד מחפש את שמו",
-    description: "הילד מחפש את שמו במערכת. אם נמצא כרטיס עבורו, הוא יראה הודעה שיש מסר.",
-  },
-  {
-    icon: KeyRound,
-    title: "תשובה לסוד וחשיפת המסר",
-    description:
-      "הילד עונה על שאלת האבטחה. רק תשובה נכונה תפענח את ההודעה — ואף אחד אחר לא יראה אותה.",
-  },
-] as const;
+import { ChevronLeft, Music, BookOpen } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
+    <div className="min-h-screen" dir="rtl">
+      {/* Section 1: Hero - מחברים מחדש את הקשר */}
       <section
         className="relative overflow-hidden px-4 py-20 sm:py-28 md:py-36"
         aria-labelledby="hero-heading"
@@ -58,7 +26,7 @@ export default function HomePage() {
             ניפגשה מאפשרת להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח ופרטי.
             רק הילד יוכל לפתוח אותו — באמצעות תשובה לסוד שרק הוא מכיר.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-4" dir="rtl">
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-4">
             <Button
               asChild
               size="lg"
@@ -78,87 +46,92 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it Works */}
+      {/* Section 2: Songs of Connection (Video) */}
       <section
-        className="border-t bg-muted/30 px-4 py-16 sm:py-20"
-        aria-labelledby="how-it-works-heading"
+        className="relative min-h-[28rem] sm:min-h-[32rem] md:min-h-[36rem] flex items-center justify-center overflow-hidden bg-gradient-to-b from-amber-950/90 to-slate-950"
+        aria-labelledby="songs-section-heading"
       >
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-12">
-            <h2
-              id="how-it-works-heading"
-              className="text-3xl font-bold text-foreground sm:text-4xl"
-            >
-              איך זה עובד
-            </h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-              שלושה צעדים פשוטים לחיבור מחדש
-            </p>
-          </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3" dir="rtl">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <Card
-                  key={step.title}
-                  className="border-teal-100 dark:border-teal-900/50 bg-card/80 backdrop-blur"
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400"
-                        aria-hidden
-                      >
-                        <Icon className="size-5" />
-                      </span>
-                      <span className="text-sm font-medium text-muted-foreground">
-                        שלב {index + 1}
-                      </span>
-                    </div>
-                    <CardTitle className="text-right">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-right">
-                      {step.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="object-cover w-full h-full absolute inset-0 z-0"
+          aria-hidden
+        >
+          <source src="/videos/songs-bg.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 z-[1] bg-black/50" aria-hidden />
+        <div className="relative z-10 container mx-auto px-4 py-16 text-center">
+          <h2
+            id="songs-section-heading"
+            className="text-3xl font-bold text-white drop-shadow-md sm:text-4xl md:text-5xl"
+          >
+            קולות של געגוע
+          </h2>
+          <p className="mt-4 max-w-xl mx-auto text-lg text-white/90 drop-shadow">
+            שירים שנכתבו במיוחד על ידי הורים לילדיהם. להקשיב, להתרגש, להתחבר.
+          </p>
+          <Button
+            asChild
+            size="lg"
+            className="mt-8 bg-white/20 hover:bg-white/30 text-white border border-white/40 backdrop-blur gap-2"
+          >
+            <Link href="/songs">
+              <Music className="size-4" aria-hidden />
+              למתחם השירים
+            </Link>
+          </Button>
         </div>
       </section>
 
-      {/* Security & Privacy */}
+      {/* Section 3: מהו ניכור הורי? + link to articles */}
       <section
-        className="px-4 py-16 sm:py-20"
-        aria-labelledby="security-heading"
+        className="border-t bg-muted/20 px-4 py-16 sm:py-20"
+        aria-labelledby="alienation-heading"
       >
         <div className="container mx-auto max-w-3xl">
-          <Card className="border-teal-200 bg-gradient-to-b from-teal-50/50 to-card dark:border-teal-800 dark:from-teal-950/20 dark:to-card">
-            <CardHeader className="text-center sm:text-right">
-              <div className="mx-auto sm:mx-0 flex size-12 items-center justify-center rounded-full bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400 mb-2">
-                <Shield className="size-6" aria-hidden />
-              </div>
-              <CardTitle id="security-heading" className="text-2xl">
-                אבטחה ופרטיות
-              </CardTitle>
-              <CardDescription className="text-base text-right max-w-none">
-                ההודעה מוצפנת אצלכם בדפדפן לפני שליחה. השרת לא רואה את תוכן
-                ההודעה או את תשובת האבטחה. רק מי שיודע את התשובה הנכונה יכול
-                לפענח את המסר — אנחנו לא יכולים ואף אחד אחר לא יכול.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center gap-2 text-muted-foreground text-sm" dir="rtl">
-              <Lock className="size-4 shrink-0" aria-hidden />
-              <span>הצפנה מקצה לקצה • ללא שמירת תוכן רגיש בשרת</span>
-            </CardContent>
-          </Card>
+          <h2
+            id="alienation-heading"
+            className="text-3xl font-bold text-foreground sm:text-4xl text-right"
+          >
+            מהו ניכור הורי?
+          </h2>
+          <p className="mt-6 text-foreground/90 leading-relaxed text-right">
+            ניכור הורי הוא מצב בו אחד ההורים (ההורה המנכר) פועל באופן פעיל ולעיתים מתמשך כדי לנתק את הקשר הרגשי, הפיזי והתקשורתי של הילד עם ההורה השני (ההורה המנוכר). זהו תהליך של שטיפת מוח, הסתה רגשית ונפשית, ולעיתים גם יצירת מצגי שווא של סכנה או &quot;אמת&quot; מדומה, שנועדו לגרום לילד להאמין שההורה השני מסוכן, רע, פגום או לא רלוונטי.
+          </p>
+          <h3 className="mt-8 text-xl font-semibold text-foreground text-right">
+            סימנים בולטים לניכור הורי:
+          </h3>
+          <ul className="mt-3 list-disc list-inside text-foreground/90 leading-relaxed text-right space-y-2">
+            <li>הילד מסרב לראות או לדבר עם אחד ההורים ללא סיבה הגיונית.</li>
+            <li>הילד משמיע טענות &quot;בוגרות מדי&quot; או מדקלם מילים שאינן תואמות את גילו.</li>
+            <li>הילד חוזר על טענות של ההורה המשמורן בלי שברור שהוא חווה אותן בעצמו.</li>
+            <li>הילד לא מרגיש רגשות אשמה על הניתוק מההורה המנוכר.</li>
+          </ul>
+          <h3 className="mt-8 text-xl font-semibold text-foreground text-right">
+            חשוב להבין:
+          </h3>
+          <p className="mt-3 text-foreground/90 leading-relaxed text-right">
+            ניכור הורי הוא פגיעה נפשית בילד. הילד הופך לכלי במאבק רגשי או משפטי, מאבד דמות הורית אחת, ולרוב גם את האמון במבוגרים בכלל. זהו סוג של התעללות רגשית, גם אם היא נעשית מתוך רצון &quot;להגן על הילד&quot; כביכול.
+          </p>
+          <div className="mt-10 text-right">
+            <Button asChild variant="outline" size="lg" className="gap-2">
+              <Link href="/articles">
+                <BookOpen className="size-4" aria-hidden />
+                למתחם המאמרים
+                <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Soft CTA strip */}
-      <section className="border-t bg-muted/20 px-4 py-12" aria-labelledby="cta-heading">
+      <section
+        className="border-t bg-muted/20 px-4 py-12"
+        aria-labelledby="cta-heading"
+      >
         <div className="container mx-auto max-w-2xl text-center">
           <h2 id="cta-heading" className="text-xl font-semibold text-foreground">
             מוכנים להתחיל?
@@ -166,7 +139,7 @@ export default function HomePage() {
           <p className="mt-2 text-muted-foreground">
             בין אם אתם הורה שמחפש לשלוח מסר או מישהו שמחפש מסר — אנחנו כאן.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3" dir="rtl">
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
               <Link href="/dashboard">אני הורה</Link>
             </Button>
