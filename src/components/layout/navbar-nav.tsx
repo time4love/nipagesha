@@ -35,16 +35,14 @@ const linkBase = "text-sm font-medium transition-colors hover:text-foreground";
 const linkActive = "text-foreground font-semibold border-b-2 border-foreground pb-0.5";
 const linkInactive = "text-foreground/80";
 
-/** Single nav link for desktop list */
-function NavLink({
-  href,
-  label,
-  isActive,
-}: {
+interface NavLinkProps {
   href: string;
   label: string;
   isActive: boolean;
-}) {
+}
+
+/** Single nav link for desktop list */
+function NavLink({ href, label, isActive }: NavLinkProps) {
   return (
     <li>
       <Link
@@ -58,18 +56,15 @@ function NavLink({
   );
 }
 
-/** Large tap-friendly link for mobile sheet */
-function MobileNavLink({
-  href,
-  label,
-  isActive,
-  onClose,
-}: {
+interface MobileNavLinkProps {
   href: string;
   label: string;
   isActive: boolean;
   onClose: () => void;
-}) {
+}
+
+/** Large tap-friendly link for mobile sheet */
+function MobileNavLink({ href, label, isActive, onClose }: MobileNavLinkProps) {
   return (
     <li>
       <Link
@@ -87,7 +82,12 @@ function MobileNavLink({
   );
 }
 
-export function NavbarNav({ hasUser, isAdmin }: { hasUser: boolean; isAdmin: boolean }) {
+export interface NavbarNavProps {
+  hasUser: boolean;
+  isAdmin: boolean;
+}
+
+export function NavbarNav({ hasUser, isAdmin }: NavbarNavProps) {
   const pathname = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
 

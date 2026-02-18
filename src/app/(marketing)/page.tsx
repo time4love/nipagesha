@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { OUTLINE_BUTTON_TEAL_CLASS } from "@/lib/constants";
 import { ChevronLeft, Music, BookOpen } from "lucide-react";
 
 export default function HomePage() {
@@ -38,7 +39,7 @@ export default function HomePage() {
               asChild
               size="lg"
               variant="outline"
-              className="bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700"
+              className={OUTLINE_BUTTON_TEAL_CLASS}
             >
               <Link href="/search">אני מחפש מסר</Link>
             </Button>
@@ -116,7 +117,7 @@ export default function HomePage() {
             ניכור הורי הוא פגיעה נפשית בילד. הילד הופך לכלי במאבק רגשי או משפטי, מאבד דמות הורית אחת, ולרוב גם את האמון במבוגרים בכלל. זהו סוג של התעללות רגשית, גם אם היא נעשית מתוך רצון &quot;להגן על הילד&quot; כביכול.
           </p>
           <div className="mt-10 text-right">
-            <Button asChild variant="outline" size="lg" className="gap-2 bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700">
+            <Button asChild variant="outline" size="lg" className={`gap-2 ${OUTLINE_BUTTON_TEAL_CLASS}`}>
               <Link href="/articles">
                 <BookOpen className="size-4" aria-hidden />
                 למתחם המאמרים
@@ -143,7 +144,7 @@ export default function HomePage() {
             <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
               <Link href="/dashboard">אני הורה</Link>
             </Button>
-            <Button asChild variant="outline" className="bg-white border-teal-200 text-teal-600 hover:bg-teal-50 hover:text-teal-700">
+            <Button asChild variant="outline" className={OUTLINE_BUTTON_TEAL_CLASS}>
               <Link href="/search">אני מחפש מסר</Link>
             </Button>
           </div>

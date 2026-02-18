@@ -1,7 +1,16 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
 import { NavbarNav } from "./navbar-nav";
+
+const LOGO = {
+  src: "/logo.avif",
+  alt: "ניפגשה",
+  width: 160,
+  height: 50,
+  className: "h-10 w-auto object-contain",
+} as const;
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -22,9 +31,16 @@ export async function Navbar() {
       >
         <Link
           href="/"
-          className="shrink-0 text-xl font-semibold hover:opacity-80 transition-opacity"
+          className="shrink-0 hover:opacity-80 transition-opacity"
         >
-          ניפגשה
+          <Image
+            src={LOGO.src}
+            alt={LOGO.alt}
+            width={LOGO.width}
+            height={LOGO.height}
+            className={LOGO.className}
+            priority
+          />
         </Link>
         <NavbarNav hasUser={!!user} isAdmin={admin} />
       </nav>
