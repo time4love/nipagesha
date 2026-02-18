@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="he" dir="rtl">
-      <body className={`${heebo.variable} font-sans antialiased`}>
+      <body className={`${heebo.variable} font-sans antialiased overflow-x-hidden`}>
         {children}
         <Toaster />
       </body>
