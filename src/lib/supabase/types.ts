@@ -11,6 +11,17 @@ export interface ChildCardRow {
   birth_year: number;
   security_question: string;
   encrypted_message: string;
+  is_read: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+/** One row from card_access_logs (for dashboard activity). */
+export interface CardAccessLogRow {
+  id: string;
+  card_id: string;
+  attempt_type: "success" | "failure";
+  anonymized_ip: string;
   created_at: string;
 }
 

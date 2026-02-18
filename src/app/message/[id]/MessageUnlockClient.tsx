@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { logAccessAttempt } from "@/app/message/actions";
 import type { MessagePageCard } from "@/lib/supabase/types";
 
 const WRONG_ANSWER_MESSAGE = "התשובה אינה נכונה, נסה שוב";
@@ -26,8 +27,10 @@ export function MessageUnlockClient({ card }: { card: MessagePageCard }) {
     try {
       const html = await decryptMessage(card.encrypted_message, answer.trim());
       setDecryptedHtml(html);
+      await logAccessAttempt(card.id, true);
     } catch {
       setError(WRONG_ANSWER_MESSAGE);
+      await logAccessAttempt(card.id, false);
     }
   }
 
