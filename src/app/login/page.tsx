@@ -2,7 +2,9 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -16,19 +18,73 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorMessage } from "@/components/ui/error-message";
 
+const AUTH_ERRORS: Record<string, string> = {
+  "Invalid login credentials": "אימייל או סיסמה שגויים",
+  "Email not confirmed": "נא לאשר את האימייל לפני ההתחברות",
+};
+
+function getErrorMessage(message: string): string {
+  return AUTH_ERRORS[message] ?? message;
+}
+
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const supabase = createClient();
 
   useEffect(() => {
     const err = searchParams.get("error");
     if (err) setError(decodeURIComponent(err));
   }, [searchParams]);
 
-  function getAction() {
-    return isSignUp ? "/api/auth/signup" : "/auth/login";
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (isSignUp) {
+        if (password.length < 6) {
+          setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+          return;
+        }
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) {
+          setError(
+            signUpError.message.includes("already registered")
+              ? "כתובת האימייל כבר רשומה. נסו להתחבר."
+              : getErrorMessage(signUpError.message)
+          );
+          return;
+        }
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) {
+          setError(getErrorMessage(signInError.message));
+          return;
+        }
+      }
+
+      router.refresh();
+      router.push("/dashboard");
+    } catch {
+      setError("אירעה שגיאה בלתי צפויה");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="container mx-auto flex min-h-[80vh] items-center justify-center px-4 py-12">
@@ -43,15 +99,16 @@ function LoginForm() {
               : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
           </CardDescription>
         </CardHeader>
-        <form action={getAction()} method="post" className="space-y-4">
-          <CardContent className="space-y-4" dir="rtl">
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4" dir="rtl">
             {error && <ErrorMessage message={error} />}
             <div className="space-y-2">
               <Label htmlFor="auth-email">אימייל</Label>
               <Input
                 id="auth-email"
-                name="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 autoComplete="email"
                 required
@@ -62,8 +119,9 @@ function LoginForm() {
               <Label htmlFor="auth-password">סיסמה</Label>
               <Input
                 id="auth-password"
-                name="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete={isSignUp ? "new-password" : "current-password"}
                 required
@@ -71,34 +129,40 @@ function LoginForm() {
                 minLength={isSignUp ? 6 : undefined}
               />
               {isSignUp && (
-                <p className="text-xs text-muted-foreground">
-                  לפחות 6 תווים
-                </p>
+                <p className="text-xs text-muted-foreground">לפחות 6 תווים</p>
               )}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-3 sm:flex-row-reverse sm:justify-between">
             <Button
               type="submit"
-              className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white sm:w-auto"
+              disabled={isLoading}
             >
-              {isSignUp ? "הירשם" : "התחבר"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden />
+                  {isSignUp ? "נרשם..." : "מתחבר..."}
+                </>
+              ) : (
+                isSignUp ? "הירשם" : "התחבר"
+              )}
             </Button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp((v) => !v);
-                setError(null);
-              }}
-              className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
-            >
-              {isSignUp ? "כבר יש לכם חשבון? התחברו" : "אין לכם חשבון? הירשמו"}
-            </button>
-            <Button type="button" variant="outline" asChild className="w-full sm:w-auto order-last sm:order-none">
-              <Link href="/">ביטול</Link>
-            </Button>
-          </CardFooter>
-        </form>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-3 sm:flex-row-reverse sm:justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp((v) => !v);
+              setError(null);
+            }}
+            className="text-sm text-teal-600 underline dark:text-teal-400 hover:no-underline"
+          >
+            {isSignUp ? "כבר יש לכם חשבון? התחברו" : "אין לכם חשבון? הירשמו"}
+          </button>
+          <Button type="button" variant="outline" asChild className="w-full sm:w-auto order-last sm:order-none">
+            <Link href="/">ביטול</Link>
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );
@@ -106,7 +170,14 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto flex min-h-[80vh] items-center justify-center" aria-hidden />}>
+    <Suspense
+      fallback={
+        <div
+          className="container mx-auto flex min-h-[80vh] items-center justify-center"
+          aria-hidden
+        />
+      }
+    >
       <LoginForm />
     </Suspense>
   );
