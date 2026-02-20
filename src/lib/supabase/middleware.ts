@@ -1,7 +1,9 @@
 /**
- * Supabase client for Next.js Middleware (Edge).
- * Ensures refreshed session cookies are written back with production-safe options
- * so the browser sends them on subsequent requests (Vercel, HTTPS).
+ * Supabase session refresh for Next.js Middleware (Edge).
+ * Matches official pattern: https://github.com/supabase/supabase/blob/master/examples/auth/nextjs/lib/supabase/proxy.ts
+ *
+ * Critical: use getClaims() (not getUser()) and update both request and response cookies,
+ * or "your users may be randomly logged out" (Supabase docs).
  */
 
 import type { CookieOptions } from "@supabase/ssr";
@@ -17,17 +19,12 @@ function mergeProductionCookieOptions(
     path: "/",
     sameSite: "lax",
     ...options,
-    // Required in production: browser only sends cookie over HTTPS when secure is true
     ...(isHttps && { secure: true }),
   };
 }
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,17 +35,22 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
-          response = NextResponse.next({ request });
+          // 1) Update REQUEST so Server Components see refreshed cookies in this same request
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          // 2) New response carrying the same (now updated) request
+          supabaseResponse = NextResponse.next({ request });
+          // 3) Write cookies to RESPONSE so the browser receives them
           cookiesToSet.forEach(({ name, value, options }) => {
             const merged = mergeProductionCookieOptions(request, options);
-            response.cookies.set(name, value, merged as Record<string, unknown>);
+            supabaseResponse.cookies.set(name, value, merged as Record<string, unknown>);
           });
         },
       },
     }
   );
 
-  await supabase.auth.getUser();
+  // Do not run code between createServerClient and getClaims() – avoids random logouts (Supabase docs).
+  await supabase.auth.getClaims();
 
-  return response;
+  return supabaseResponse;
 }
