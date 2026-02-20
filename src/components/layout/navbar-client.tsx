@@ -30,13 +30,15 @@ export function NavbarClient({ user }: { user: User | null }) {
     router.push('/')
   }
 
-  const NavLinks = () => (
+  const closeSheet = () => setIsOpen(false)
+
+  const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
-      <Link href="/about" className="text-sm font-medium hover:text-primary">אודות</Link>
-      <Link href="/articles" className="text-sm font-medium hover:text-primary">מאמרים</Link>
-      <Link href="/songs" className="text-sm font-medium hover:text-primary">שירים</Link>
-      <Link href="/help" className="text-sm font-medium hover:text-primary">לוח עזרה</Link>
-      <Link href="/contact" className="text-sm font-medium hover:text-primary">צור קשר</Link>
+      <Link href="/about" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>אודות</Link>
+      <Link href="/articles" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>מאמרים</Link>
+      <Link href="/songs" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>שירים</Link>
+      <Link href="/help" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>לוח עזרה</Link>
+      <Link href="/contact" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>צור קשר</Link>
     </>
   )
 
@@ -52,12 +54,10 @@ export function NavbarClient({ user }: { user: User | null }) {
             </SheetTrigger>
             <SheetContent side="right">
               <SheetTitle className="sr-only">תפריט ניווט</SheetTitle>
-              <div className="flex flex-col gap-4 mt-8">
-                <NavLinks />
-                {user ? (
-                   <Button onClick={() => router.push('/dashboard')}>לוח בקרה</Button>
-                ) : (
-                   <Button onClick={() => router.push('/login')}>התחברות</Button>
+              <div className="flex flex-col gap-1 mt-8">
+                <NavLinks onNavigate={closeSheet} />
+                {!user && (
+                   <Button className="min-h-[44px] text-base mt-4 rounded-sm px-3 font-normal" variant="ghost" onClick={() => { closeSheet(); router.push('/login'); }}>התחברות</Button>
                 )}
               </div>
             </SheetContent>
