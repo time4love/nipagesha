@@ -1,28 +1,12 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/middleware";
+import { type NextRequest } from "next/server";
 
-// Only require authenticated user in middleware. Admin check runs in layout (server)
-// so the session is read with full cookies; Edge can have incomplete session (e.g. missing email).
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  if (!pathname.startsWith("/admin")) {
-    return NextResponse.next();
-  }
-
-  const { supabase, response } = await createClient(request);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return Response.redirect(loginUrl);
-  }
-
-  return response;
+// Admin protection is done only in src/app/admin/layout.tsx via requireAdmin() (server).
+// We do NOT protect /admin in middleware: Edge runtime can fail to read the full session
+// from cookies (getUser() returns null even for logged-in admins), causing false redirect to login.
+export async function middleware(_request: NextRequest) {
+  return (await import("next/server")).NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [],
 };
