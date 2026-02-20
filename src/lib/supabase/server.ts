@@ -32,25 +32,6 @@ export async function createClient() {
   });
 }
 
-/** For Route Handlers: returns client + cookies to attach to the response so redirect sends session. */
-export async function createClientForRouteHandler(request: Request) {
-  const cookieStore = await cookies();
-  const pendingCookies: CookieToSet[] = [];
-
-  const client = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet: CookieToSet[]) {
-        pendingCookies.push(...cookiesToSet);
-      },
-    },
-  });
-
-  return { client, pendingCookies };
-}
-
 /**
  * Admin client (service role). Use only for server-side, unauthenticated flows:
  * child search and message-by-id. Never expose to the client.

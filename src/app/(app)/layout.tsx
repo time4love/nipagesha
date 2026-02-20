@@ -11,10 +11,7 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    console.log("[Auth] App layout: no user, redirecting to /login");
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
   return (
     <div className="flex min-h-screen flex-col">
