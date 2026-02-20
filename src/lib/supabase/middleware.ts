@@ -38,5 +38,13 @@ export async function updateSession(request: NextRequest) {
 
   await supabase.auth.getUser();
 
+  const path = request.nextUrl.pathname;
+  if ((path.startsWith("/dashboard") || path.startsWith("/profile")) && path !== "/login") {
+    const sbCookies = request.cookies.getAll().filter((c) => c.name.startsWith("sb-"));
+    if (sbCookies.length === 0) {
+      console.log("[Auth] Middleware: protected path", path, "has no sb-* cookies");
+    }
+  }
+
   return response;
 }

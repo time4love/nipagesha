@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    console.error("[Auth] Login failed:", error.message);
     const message =
       error.message.includes("Invalid login credentials")
         ? "אימייל או סיסמה שגויים"
@@ -32,5 +33,6 @@ export async function POST(request: Request) {
   pendingCookies.forEach(({ name, value, options }) =>
     response.cookies.set(name, value, (options ?? {}) as Record<string, unknown>)
   );
+  console.log("[Auth] Login OK, cookies set:", pendingCookies.length, pendingCookies.map((c) => `${c.name}(size=${c.value.length})`).join(", "));
   return response;
 }
