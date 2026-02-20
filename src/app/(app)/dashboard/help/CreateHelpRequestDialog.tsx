@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CitySelect } from "@/components/ui/city-select";
 import { createHelpRequest } from "@/app/help/actions";
 
 interface CreateHelpRequestDialogProps {
@@ -33,6 +34,7 @@ export function CreateHelpRequestDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(defaultIsAnonymous);
+  const [location, setLocation] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -56,6 +58,7 @@ export function CreateHelpRequestDialog({
       onSuccess();
       onOpenChange(false);
       (e.target as HTMLFormElement).reset();
+      setLocation("");
     }
   }
 
@@ -105,11 +108,13 @@ export function CreateHelpRequestDialog({
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="create_location">אזור (אופציונלי)</Label>
-            <Input
+            <CitySelect
               id="create_location"
               name="location"
-              placeholder="עיר או אזור"
+              value={location}
+              onChange={setLocation}
+              label="אזור (אופציונלי)"
+              clearable
             />
           </div>
           <div className="flex items-center gap-2">

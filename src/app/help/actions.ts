@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import type { HelpRequestRow } from "@/lib/supabase/types";
 import { getRequesterDisplay } from "@/lib/help";
 import { HELP_CATEGORIES } from "@/lib/constants";
+import { REGIONS, CITY_TO_REGION_MAP } from "@/lib/israel-cities";
 import { sendEmail } from "@/lib/email";
 
 export interface HelpRequestWithRequester extends HelpRequestRow {
@@ -101,8 +102,16 @@ export async function getHelpRequests(filters: {
   if (filters.category) {
     query = query.eq("category", filters.category);
   }
-  if (filters.location) {
-    query = query.ilike("location", `%${filters.location}%`);
+  if (filters.location && filters.location !== "כל הארץ") {
+    const isRegion = (REGIONS as readonly string[]).includes(filters.location);
+    if (isRegion) {
+      const citiesInRegion = Object.entries(CITY_TO_REGION_MAP)
+        .filter(([, region]) => region === filters.location)
+        .map(([city]) => city);
+      query = query.in("location", [filters.location, ...citiesInRegion]);
+    } else {
+      query = query.eq("location", filters.location);
+    }
   }
 
   const { data: requests, error } = await query;

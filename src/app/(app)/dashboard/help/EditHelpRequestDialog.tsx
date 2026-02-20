@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CitySelect } from "@/components/ui/city-select";
 import { updateHelpRequest } from "./actions";
 import type { HelpRequestRow } from "@/lib/supabase/types";
 
@@ -33,10 +34,12 @@ export function EditHelpRequestDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(true);
+  const [location, setLocation] = useState("");
 
   useEffect(() => {
     if (open && request) {
       setIsAnonymous(request.is_anonymous);
+      setLocation(request.location ?? "");
     }
   }, [open, request]);
 
@@ -110,12 +113,13 @@ export function EditHelpRequestDialog({
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit_location">אזור (אופציונלי)</Label>
-            <Input
+            <CitySelect
               id="edit_location"
               name="location"
-              placeholder="עיר או אזור"
-              defaultValue={request.location}
+              value={location}
+              onChange={setLocation}
+              label="אזור (אופציונלי)"
+              clearable
             />
           </div>
           <div className="flex items-center gap-2">

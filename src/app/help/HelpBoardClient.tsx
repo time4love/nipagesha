@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HelpRequestCard } from "./HelpRequestCard";
 import { OfferHelpDialog } from "./OfferHelpDialog";
+import { CitySelect } from "@/components/ui/city-select";
 import type { HelpRequestWithRequester } from "./actions";
 
 interface HelpBoardClientProps {
@@ -29,6 +30,11 @@ export function HelpBoardClient({
 
   const categoryParam = searchParams.get("category") ?? "";
   const locationParam = searchParams.get("location") ?? "";
+  const [location, setLocation] = useState(locationParam);
+
+  useEffect(() => {
+    setLocation(locationParam);
+  }, [locationParam]);
 
   function handleOfferHelp(request: HelpRequestWithRequester) {
     setSelectedRequest(request);
@@ -39,10 +45,10 @@ export function HelpBoardClient({
     e.preventDefault();
     const form = e.currentTarget;
     const category = (form.elements.namedItem("category") as HTMLSelectElement)?.value ?? "";
-    const location = (form.elements.namedItem("location") as HTMLInputElement)?.value?.trim() ?? "";
+    const locationValue = (form.elements.namedItem("location") as HTMLInputElement)?.value?.trim() ?? "";
     const params = new URLSearchParams();
     if (category) params.set("category", category);
-    if (location) params.set("location", location);
+    if (locationValue) params.set("location", locationValue);
     router.push(`/help?${params.toString()}`);
   }
 
@@ -67,17 +73,15 @@ export function HelpBoardClient({
             ))}
           </select>
         </div>
-        <div className="space-y-1">
-          <label htmlFor="filter_location" className="text-sm font-medium">
-            אזור
-          </label>
-          <input
+        <div className="space-y-1 min-w-[180px]">
+          <CitySelect
             id="filter_location"
             name="location"
-            type="text"
-            className="flex h-9 w-full min-w-[160px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder="עיר או אזור"
-            defaultValue={locationParam}
+            value={location}
+            onChange={setLocation}
+            label="אזור"
+            clearable
+            className="min-w-0"
           />
         </div>
         <button
