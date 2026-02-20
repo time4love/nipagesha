@@ -27,7 +27,7 @@ function LoginForm() {
   }, [searchParams]);
 
   function getAction() {
-    return isSignUp ? "/api/auth/signup" : "/api/auth/login";
+    return isSignUp ? "/api/auth/signup" : "/auth/login";
   }
 
   return (
@@ -43,7 +43,7 @@ function LoginForm() {
               : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
           </CardDescription>
         </CardHeader>
-        <form action={getAction()} method="post">
+        <form action={getAction()} method="post" className="space-y-4">
           <CardContent className="space-y-4" dir="rtl">
             {error && <ErrorMessage message={error} />}
             <div className="space-y-2">
