@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { requireAdmin } from "./actions";
-import { Navbar } from "@/components/layout/navbar";
 import { LayoutDashboard, Music, FileText, HandHeart, Inbox } from "lucide-react";
 
 export default async function AdminLayout({
@@ -12,7 +11,6 @@ export default async function AdminLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <div className="flex flex-1 container mx-auto px-4 py-6" dir="rtl">
         <aside className="w-48 shrink-0 border-l pl-6">
           <nav className="flex flex-col gap-2" aria-label="ניווט ניהול">

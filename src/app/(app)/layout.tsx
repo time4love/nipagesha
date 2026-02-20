@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/layout/navbar";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -18,7 +17,6 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">{children}</main>
     </div>
   );
