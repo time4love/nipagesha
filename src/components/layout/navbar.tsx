@@ -1,13 +1,11 @@
+import { unstable_noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { isAdmin } from "@/lib/admin";
 import { NavbarClient } from "./navbar-client";
 
 export async function Navbar() {
+  unstable_noStore();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const admin = isAdmin(user?.email ?? undefined);
+  const { data: { user } } = await supabase.auth.getUser();
 
-  return <NavbarClient user={user} isAdmin={admin} />;
+  return <NavbarClient user={user} />;
 }
