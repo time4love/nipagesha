@@ -1,13 +1,19 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { OUTLINE_BUTTON_TEAL_CLASS } from "@/lib/constants";
-import { ChevronLeft, Music, BookOpen } from "lucide-react";
+import { ChevronLeft, Music, BookOpen, LayoutDashboard } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen" dir="rtl">
-      {/* Section 1: Hero - מחברים מחדש את הקשר */}
+      {/* Section 1: Hero */}
       <section
         className="relative overflow-hidden px-4 py-20 sm:py-28 md:py-36"
         aria-labelledby="hero-heading"
@@ -17,32 +23,53 @@ export default function HomePage() {
           aria-hidden
         />
         <div className="container mx-auto max-w-4xl text-center">
-          <h1
-            id="hero-heading"
-            className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl"
-          >
-            מחברים מחדש את הקשר
+          <h1 id="hero-heading" className="sr-only">
+            מחברים מחדש את הקשר - ניפגשה
           </h1>
+          <Image
+            src="/hero.png"
+            alt="מחברים מחדש את הקשר - ניפגשה"
+            width={896}
+            height={504}
+            className="w-full max-w-3xl mx-auto object-contain"
+            priority
+          />
           <p className="mt-6 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            ניפגשה מאפשרת להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח ופרטי.
-            רק הילד יוכל לפתוח אותו — באמצעות תשובה לסוד שרק הוא מכיר.
+            {user
+              ? "ברוך שובך. כאן תוכל לנהל את כרטיסי הילדים ולשלוח מסרים מאובטחים."
+              : "ניפגשה מאפשרת להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח ופרטי. רק הילד יוכל לפתוח אותו — באמצעות תשובה לסוד שרק הוא מכיר."}
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-4">
-            <Button
-              asChild
-              size="lg"
-              className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
-            >
-              <Link href="/dashboard">אני הורה</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className={OUTLINE_BUTTON_TEAL_CLASS}
-            >
-              <Link href="/search">אני מחפש מסר</Link>
-            </Button>
+            {user ? (
+              <Button
+                asChild
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-md gap-2"
+              >
+                <Link href="/dashboard">
+                  <LayoutDashboard className="size-4" aria-hidden />
+                  ניהול כרטיסי הילדים שלי
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
+                >
+                  <Link href="/dashboard">אני הורה</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className={OUTLINE_BUTTON_TEAL_CLASS}
+                >
+                  <Link href="/search">אני מחפש מסר</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>
