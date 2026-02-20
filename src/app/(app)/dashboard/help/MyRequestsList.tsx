@@ -62,7 +62,7 @@ export function MyRequestsList({
     }
   }
 
-  async function handleStatus(requestId: string, status: HelpRequestRow["status"]) {
+  async function handleStatus(requestId: string, status: "closed") {
     setError(null);
     const res = await updateRequestStatus(requestId, status);
     if (res.error) setError(res.error);
