@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid } from "lucide-react";
+import { Plus, LayoutGrid, HandHeart } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
 
 const FAILURE_DAYS = 7;
@@ -75,12 +75,20 @@ export default async function DashboardPage() {
     <section className="space-y-8" dir="rtl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold text-foreground">לוח בקרה</h1>
-        <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">
-          <Link href="/create-card" className="inline-flex items-center gap-2">
-            <Plus className="size-4" aria-hidden />
-            צור כרטיס חדש
-          </Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Link href="/dashboard/help" className="inline-flex items-center gap-2">
+              <HandHeart className="size-4" aria-hidden />
+              הבקשות שלי
+            </Link>
+          </Button>
+          <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">
+            <Link href="/create-card" className="inline-flex items-center gap-2">
+              <Plus className="size-4" aria-hidden />
+              צור כרטיס חדש
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {isEmpty ? (

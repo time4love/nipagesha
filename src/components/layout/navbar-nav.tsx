@@ -20,6 +20,7 @@ const navLinks = [
   { href: "/about", label: "אודות", match: (path: string) => path.startsWith("/about") },
   { href: "/articles", label: "מאמרים", match: (path: string) => path.startsWith("/articles") },
   { href: "/songs", label: "שירים", match: (path: string) => path.startsWith("/songs") },
+  { href: "/help", label: "לוח עזרה", match: (path: string) => path.startsWith("/help") },
 ] as const;
 
 function isAppRoute(path: string): boolean {
@@ -27,7 +28,8 @@ function isAppRoute(path: string): boolean {
     path.startsWith("/dashboard") ||
     path.startsWith("/create-card") ||
     path.startsWith("/edit-card") ||
-    path.startsWith("/view")
+    path.startsWith("/view") ||
+    path.startsWith("/profile")
   );
 }
 
@@ -126,6 +128,11 @@ export function NavbarNav({ hasUser, isAdmin }: NavbarNavProps) {
             <span className="text-sm text-muted-foreground" aria-hidden>
               מחובר
             </span>
+            <Button asChild size="sm" variant="ghost" className="shrink-0 text-foreground/80 hover:text-foreground">
+              <Link href="/profile" aria-current={pathname.startsWith("/profile") ? "page" : undefined}>
+                פרופיל
+              </Link>
+            </Button>
             <Button
               asChild
               size="sm"
@@ -194,12 +201,20 @@ export function NavbarNav({ hasUser, isAdmin }: NavbarNavProps) {
                   />
                 ))}
                 {hasUser && (
-                  <MobileNavLink
-                    href="/dashboard"
-                    label="לוח בקרה"
-                    isActive={isAppRoute(pathname)}
-                    onClose={closeSheet}
-                  />
+                  <>
+                    <MobileNavLink
+                      href="/profile"
+                      label="פרופיל"
+                      isActive={pathname.startsWith("/profile")}
+                      onClose={closeSheet}
+                    />
+                    <MobileNavLink
+                      href="/dashboard"
+                      label="לוח בקרה"
+                      isActive={isAppRoute(pathname)}
+                      onClose={closeSheet}
+                    />
+                  </>
                 )}
                 {isAdmin && (
                   <MobileNavLink

@@ -16,7 +16,13 @@ const FALLBACK_CHILD_LABEL = "הילד";
 const REPLY_SUCCESS_MESSAGE =
   "ההודעה נשלחה בהצלחה! תודה שיצרת קשר.";
 
-function ChildReplySection({ cardId }: { cardId: string }) {
+function ChildReplySection({
+  cardId,
+  parentReplyLabel,
+}: {
+  cardId: string;
+  parentReplyLabel: string;
+}) {
   const [showForm, setShowForm] = useState(false);
   const [content, setContent] = useState("");
   const [contactInfo, setContactInfo] = useState("");
@@ -68,7 +74,7 @@ function ChildReplySection({ cardId }: { cardId: string }) {
             className="w-full border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-950/50"
             onClick={() => setShowForm(true)}
           >
-            שלח תגובה לאבא/אמא
+            שלח תגובה ל{parentReplyLabel}
           </Button>
         ) : (
           <form onSubmit={handleSubmitReply} className="space-y-4" dir="rtl">
@@ -119,7 +125,13 @@ function ChildReplySection({ cardId }: { cardId: string }) {
   );
 }
 
-export function MessageUnlockClient({ card }: { card: MessagePageCard }) {
+export function MessageUnlockClient({
+  card,
+  parentReplyLabel,
+}: {
+  card: MessagePageCard;
+  parentReplyLabel: string;
+}) {
   const [answer, setAnswer] = useState("");
   const [decryptedHtml, setDecryptedHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -143,7 +155,7 @@ export function MessageUnlockClient({ card }: { card: MessagePageCard }) {
     return (
       <div className="container max-w-2xl mx-auto px-4 py-12 space-y-6">
         <MessageCard childName={childName} htmlContent={decryptedHtml} cardId={card.id} />
-        <ChildReplySection cardId={card.id} />
+        <ChildReplySection cardId={card.id} parentReplyLabel={parentReplyLabel} />
       </div>
     );
   }
