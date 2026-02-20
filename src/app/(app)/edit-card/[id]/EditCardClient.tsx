@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -34,7 +35,6 @@ import { toast } from "sonner";
 import { Lock, Pencil } from "lucide-react";
 import type { EditCardData } from "@/app/(app)/create-card/actions";
 
-const WRONG_ANSWER_MESSAGE = "התשובה שגויה, לא ניתן לפענח את המסר";
 const PRIVATE_PREFIX = "private://";
 const currentYear = new Date().getFullYear();
 
@@ -61,15 +61,19 @@ function htmlWithPrivateImagePaths(html: string): string {
 }
 
 const editCardSchema = z.object({
-  child_first_name: z.string().min(1, "נא להזין שם פרטי"),
-  child_last_name: z.string().min(1, "נא להזין שם משפחה"),
-  birth_year: z.coerce.number().min(1950).max(currentYear),
-  security_question: z.string().min(1, "נא להזין שאלת אבטחה"),
-  security_answer: z.string().min(1, "נא להזין תשובה לסוד"),
+  child_first_name: z.string().min(1, "validation.childFirstName.required"),
+  child_last_name: z.string().min(1, "validation.childLastName.required"),
+  birth_year: z
+    .coerce
+    .number()
+    .min(1950, "validation.birthYear.range")
+    .max(currentYear, "validation.birthYear.range"),
+  security_question: z.string().min(1, "validation.securityQuestion.required"),
+  security_answer: z.string().min(1, "validation.securityAnswer.required"),
   message: z
     .string()
-    .min(1, "נא להזין את המסר")
-    .refine(hasHtmlContent, "נא להזין את המסר"),
+    .min(1, "validation.message.required")
+    .refine(hasHtmlContent, "validation.message.hasContent"),
 });
 
 type EditCardFormValues = z.infer<typeof editCardSchema>;
@@ -87,6 +91,7 @@ function EditForm({
   decryptedHtml: string;
   unlockAnswer: string;
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -101,6 +106,19 @@ function EditForm({
       message: decryptedHtml,
     },
   });
+
+  function translateError(message: string | undefined): string {
+    if (!message) return "";
+    if (message === "validation.birthYear.range") {
+      return t(message, { min: 1950, max: currentYear });
+    }
+    return t(message);
+  }
+
+  function onInvalid() {
+    const count = Object.keys(form.formState.errors).length;
+    toast.error(t("validationToast", { count }));
+  }
 
   async function onSubmit(values: EditCardFormValues) {
     setSubmitError(null);
@@ -120,11 +138,11 @@ function EditForm({
       if (result?.error) {
         setSubmitError(result.error);
       } else {
-        toast.success("הכרטיס נשמר בהצלחה.");
+        toast.success(t("editCard.saveSuccess"));
         router.push("/dashboard");
       }
     } catch {
-      setSubmitError("שגיאה בהצפנה או בשליחה. נסו שוב.");
+      setSubmitError(t("editCard.encryptionError"));
     }
   }
 
@@ -134,14 +152,12 @@ function EditForm({
         <CardHeader className="text-right">
           <div className="flex items-center gap-2">
             <Pencil className="size-5 text-teal-600 dark:text-teal-400" aria-hidden />
-            <CardTitle className="text-2xl">עריכת כרטיס</CardTitle>
+            <CardTitle className="text-2xl">{t("editCard.title")}</CardTitle>
           </div>
-          <CardDescription>
-            ערכו את פרטי הכרטיס והמסר. המסר יוצפן מחדש עם תשובת האבטחה לפני השמירה.
-          </CardDescription>
+          <CardDescription>{t("editCard.description")}</CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
             <CardContent className="space-y-6">
               {submitError && <ErrorMessage message={submitError} />}
               <div className="grid gap-4 sm:grid-cols-2">
@@ -150,11 +166,14 @@ function EditForm({
                   name="child_first_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>שם פרטי של הילד</FormLabel>
+                      <FormLabel>{t("createCard.childFirstNameLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="למשל דני" {...field} />
+                        <Input placeholder={t("createCard.childFirstNamePlaceholder")} {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage>
+                        {form.formState.errors.child_first_name?.message &&
+                          translateError(form.formState.errors.child_first_name.message)}
+                      </FormMessage>
                     </FormItem>
                   )}
                 />
@@ -163,11 +182,14 @@ function EditForm({
                   name="child_last_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>שם משפחה של הילד</FormLabel>
+                      <FormLabel>{t("createCard.childLastNameLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="למשל כהן" {...field} />
+                        <Input placeholder={t("createCard.childLastNamePlaceholder")} {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage>
+                        {form.formState.errors.child_last_name?.message &&
+                          translateError(form.formState.errors.child_last_name.message)}
+                      </FormMessage>
                     </FormItem>
                   )}
                 />
@@ -177,7 +199,7 @@ function EditForm({
                 name="birth_year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>שנת לידה</FormLabel>
+                    <FormLabel>{t("createCard.birthYearLabel")}</FormLabel>
                     <FormControl>
                       <select
                         className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -192,7 +214,10 @@ function EditForm({
                         ))}
                       </select>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.birth_year?.message &&
+                        translateError(form.formState.errors.birth_year.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -201,11 +226,14 @@ function EditForm({
                 name="security_question"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>שאלת אבטחה (רק הילד יודע את התשובה)</FormLabel>
+                    <FormLabel>{t("createCard.securityQuestionLabel")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="למשל: מה היה שם הכלב הראשון שלנו?" {...field} />
+                      <Input placeholder={t("createCard.securityQuestionPlaceholder")} {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.security_question?.message &&
+                        translateError(form.formState.errors.security_question.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -214,11 +242,19 @@ function EditForm({
                 name="security_answer"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>תשובה לסוד (משמשת כמפתח הצפנה — אל תשתפו)</FormLabel>
+                    <FormLabel>{t("createCard.securityAnswerLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" autoComplete="off" {...field} />
+                      <Input
+                        type="password"
+                        placeholder={t("createCard.securityAnswerPlaceholder")}
+                        autoComplete="off"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.security_answer?.message &&
+                        translateError(form.formState.errors.security_answer.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -227,17 +263,20 @@ function EditForm({
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>המסר לילד</FormLabel>
+                    <FormLabel>{t("createCard.messageLabel")}</FormLabel>
                     <FormControl>
                       <RichTextEditor
                         value={field.value}
                         onChange={field.onChange}
                         mode="private"
-                        placeholder="כתבו כאן את המסר. הוא יוצפן לפני שמירה."
+                        placeholder={t("createCard.messagePlaceholder")}
                         onUploadError={(msg) => toast.error(msg)}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.message?.message &&
+                        translateError(form.formState.errors.message.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -248,10 +287,10 @@ function EditForm({
                 disabled={form.formState.isSubmitting}
                 className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
               >
-                {form.formState.isSubmitting ? "שומר..." : "שמור שינויים"}
+                {form.formState.isSubmitting ? t("editCard.submitting") : t("editCard.submit")}
               </Button>
               <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
-                <Link href="/dashboard">ביטול</Link>
+                <Link href="/dashboard">{t("common.cancel")}</Link>
               </Button>
             </CardFooter>
           </form>
@@ -262,6 +301,7 @@ function EditForm({
 }
 
 export function EditCardClient({ card }: EditCardClientProps) {
+  const { t } = useTranslation();
   const [unlockAnswer, setUnlockAnswer] = useState("");
   const [unlockError, setUnlockError] = useState<string | null>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
@@ -278,7 +318,7 @@ export function EditCardClient({ card }: EditCardClientProps) {
       const htmlWithResolvedImages = await resolvePrivateImagesInHtml(html);
       setDecryptedHtml(htmlWithResolvedImages);
     } catch {
-      setUnlockError(WRONG_ANSWER_MESSAGE);
+      setUnlockError(t("editCard.wrongAnswer"));
     } finally {
       setIsUnlocking(false);
     }
@@ -292,24 +332,24 @@ export function EditCardClient({ card }: EditCardClientProps) {
             <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 mb-2">
               <Lock className="size-6" aria-hidden />
             </div>
-            <CardTitle className="text-xl text-center">עריכת כרטיס</CardTitle>
+            <CardTitle className="text-xl text-center">{t("editCard.unlockTitle")}</CardTitle>
             <CardDescription className="text-center">
-              כדי לערוך את המסר, יש להזין את תשובת האבטחה הנוכחית.
+              {t("editCard.unlockDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleUnlock} className="space-y-4">
               {unlockError && <ErrorMessage message={unlockError} />}
               <label className="block text-sm font-medium text-right">
-                תשובת האבטחה
+                {t("editCard.securityAnswerLabel")}
                 <Input
                   type="password"
                   value={unlockAnswer}
                   onChange={(e) => setUnlockAnswer(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t("createCard.securityAnswerPlaceholder")}
                   autoComplete="off"
                   className="mt-2 text-right"
-                  aria-label="תשובת האבטחה"
+                  aria-label={t("editCard.securityAnswerLabel")}
                   disabled={isUnlocking}
                 />
               </label>
@@ -318,7 +358,7 @@ export function EditCardClient({ card }: EditCardClientProps) {
                 className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                 disabled={isUnlocking}
               >
-                {isUnlocking ? "מפענח..." : "פענח וערוך"}
+                {isUnlocking ? t("editCard.unlocking") : t("editCard.unlockSubmit")}
               </Button>
             </form>
           </CardContent>

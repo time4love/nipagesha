@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { I18nProvider } from "@/components/providers/I18nProvider";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -23,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" className="light" suppressHydrationWarning>
       <body className={cn(heebo.variable, "font-sans antialiased overflow-x-hidden")}>
-        {children}
-        <Toaster />
+        <I18nProvider>
+          {children}
+          <Toaster />
+        </I18nProvider>
       </body>
     </html>
   );

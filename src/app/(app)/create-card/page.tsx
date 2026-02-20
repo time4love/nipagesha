@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -40,6 +41,24 @@ import { toast } from "sonner";
 import { Eye } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
+const currentYear = new Date().getFullYear();
+
+const createCardSchema = z.object({
+  child_first_name: z.string().min(1, "validation.childFirstName.required"),
+  child_last_name: z.string().min(1, "validation.childLastName.required"),
+  birth_year: z
+    .coerce
+    .number()
+    .min(1950, "validation.birthYear.range")
+    .max(currentYear, "validation.birthYear.range"),
+  security_question: z.string().min(1, "validation.securityQuestion.required"),
+  security_answer: z.string().min(1, "validation.securityAnswer.required"),
+  message: z
+    .string()
+    .min(1, "validation.message.required")
+    .refine(hasHtmlContent, "validation.message.hasContent"),
+});
+
 /** Replaces signed img URLs with private:// paths so we store paths, not temporary URLs. */
 function htmlWithPrivateImagePaths(html: string): string {
   return html.replace(
@@ -48,24 +67,12 @@ function htmlWithPrivateImagePaths(html: string): string {
   );
 }
 
-const currentYear = new Date().getFullYear();
 const birthYearOptions = Array.from({ length: 30 }, (_, i) => currentYear - 5 - i);
-
-const createCardSchema = z.object({
-  child_first_name: z.string().min(1, "נא להזין שם פרטי"),
-  child_last_name: z.string().min(1, "נא להזין שם משפחה"),
-  birth_year: z.coerce.number().min(1950).max(currentYear),
-  security_question: z.string().min(1, "נא להזין שאלת אבטחה"),
-  security_answer: z.string().min(1, "נא להזין תשובה לסוד"),
-  message: z
-    .string()
-    .min(1, "נא להזין את המסר")
-    .refine(hasHtmlContent, "נא להזין את המסר"),
-});
 
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
 
 export default function CreateCardPage() {
+  const { t } = useTranslation();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -80,6 +87,14 @@ export default function CreateCardPage() {
       message: "",
     },
   });
+
+  function translateError(message: string | undefined): string {
+    if (!message) return "";
+    if (message === "validation.birthYear.range") {
+      return t(message, { min: 1950, max: currentYear });
+    }
+    return t(message);
+  }
 
   async function onSubmit(values: CreateCardFormValues) {
     setSubmitError(null);
@@ -99,22 +114,28 @@ export default function CreateCardPage() {
       if (result?.error) {
         setSubmitError(result.error);
       }
-    } catch (err) {
-      setSubmitError("שגיאה בהצפנה או בשליחה. נסו שוב.");
+    } catch {
+      setSubmitError(t("createCard.encryptionError"));
     }
+  }
+
+  function onInvalid() {
+    const count = Object.keys(form.formState.errors).length;
+    toast.error(t("validationToast", { count }));
   }
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
       <Card className="border-teal-200 dark:border-teal-800">
         <CardHeader className="text-right">
-          <CardTitle className="text-2xl">יצירת כרטיס ילד</CardTitle>
-          <CardDescription>
-            המסר והתשובה לסוד מוצפנים בדפדפן — השרת לא רואה אותם. רק הילד יוכל לפתוח את המסר עם התשובה הנכונה.
-          </CardDescription>
+          <CardTitle className="text-2xl">{t("createCard.title")}</CardTitle>
+          <CardDescription>{t("createCard.description")}</CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} dir="rtl">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+            dir="rtl"
+          >
             <CardContent className="space-y-6">
               {submitError && <ErrorMessage message={submitError} />}
               <div className="grid gap-4 sm:grid-cols-2">
@@ -123,11 +144,14 @@ export default function CreateCardPage() {
                   name="child_first_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>שם פרטי של הילד</FormLabel>
+                      <FormLabel>{t("createCard.childFirstNameLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="למשל דני" {...field} />
+                        <Input placeholder={t("createCard.childFirstNamePlaceholder")} {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage>
+                        {form.formState.errors.child_first_name?.message &&
+                          translateError(form.formState.errors.child_first_name.message)}
+                      </FormMessage>
                     </FormItem>
                   )}
                 />
@@ -136,11 +160,14 @@ export default function CreateCardPage() {
                   name="child_last_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>שם משפחה של הילד</FormLabel>
+                      <FormLabel>{t("createCard.childLastNameLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="למשל כהן" {...field} />
+                        <Input placeholder={t("createCard.childLastNamePlaceholder")} {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage>
+                        {form.formState.errors.child_last_name?.message &&
+                          translateError(form.formState.errors.child_last_name.message)}
+                      </FormMessage>
                     </FormItem>
                   )}
                 />
@@ -150,7 +177,7 @@ export default function CreateCardPage() {
                 name="birth_year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>שנת לידה</FormLabel>
+                    <FormLabel>{t("createCard.birthYearLabel")}</FormLabel>
                     <FormControl>
                       <select
                         className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -165,7 +192,10 @@ export default function CreateCardPage() {
                         ))}
                       </select>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.birth_year?.message &&
+                        translateError(form.formState.errors.birth_year.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -174,11 +204,14 @@ export default function CreateCardPage() {
                 name="security_question"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>שאלת אבטחה (רק הילד יודע את התשובה)</FormLabel>
+                    <FormLabel>{t("createCard.securityQuestionLabel")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="למשל: מה היה שם הכלב הראשון שלנו?" {...field} />
+                      <Input placeholder={t("createCard.securityQuestionPlaceholder")} {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.security_question?.message &&
+                        translateError(form.formState.errors.security_question.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -187,11 +220,19 @@ export default function CreateCardPage() {
                 name="security_answer"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>תשובה לסוד (משמשת כמפתח הצפנה — אל תשתפו)</FormLabel>
+                    <FormLabel>{t("createCard.securityAnswerLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" autoComplete="off" {...field} />
+                      <Input
+                        type="password"
+                        placeholder={t("createCard.securityAnswerPlaceholder")}
+                        autoComplete="off"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.security_answer?.message &&
+                        translateError(form.formState.errors.security_answer.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -200,17 +241,20 @@ export default function CreateCardPage() {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>המסר לילד</FormLabel>
+                    <FormLabel>{t("createCard.messageLabel")}</FormLabel>
                     <FormControl>
                       <RichTextEditor
                         value={field.value}
                         onChange={field.onChange}
                         mode="private"
-                        placeholder="כתבו כאן את המסר. הוא יוצפן לפני שליחה."
+                        placeholder={t("createCard.messagePlaceholder")}
                         onUploadError={(msg) => toast.error(msg)}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.message?.message &&
+                        translateError(form.formState.errors.message.message)}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -221,20 +265,20 @@ export default function CreateCardPage() {
                 disabled={form.formState.isSubmitting}
                 className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
               >
-                {form.formState.isSubmitting ? "שומר..." : "שמור כרטיס"}
+                {form.formState.isSubmitting ? t("createCard.submitting") : t("createCard.submit")}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 className="w-full sm:w-auto"
                 onClick={() => setPreviewOpen(true)}
-                aria-label="תצוגה מקדימה"
+                aria-label={t("createCard.previewAria")}
               >
                 <Eye className="size-4 ml-2 rtl:ml-0 rtl:mr-2" aria-hidden />
-                תצוגה מקדימה
+                {t("createCard.preview")}
               </Button>
               <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
-                <Link href="/dashboard">ביטול</Link>
+                <Link href="/dashboard">{t("common.cancel")}</Link>
               </Button>
             </CardFooter>
           </form>
@@ -247,14 +291,14 @@ export default function CreateCardPage() {
           showClose={true}
         >
           <DialogHeader className="text-right">
-            <DialogTitle>תצוגה מקדימה</DialogTitle>
+            <DialogTitle>{t("createCard.previewTitle")}</DialogTitle>
           </DialogHeader>
           <div className="py-4" dir="rtl">
             <PreviewContent form={form} />
           </div>
           <DialogFooter className="sm:justify-start flex-row-reverse">
             <Button type="button" variant="outline" onClick={() => setPreviewOpen(false)}>
-              סגור תצוגה מקדימה
+              {t("createCard.closePreview")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -264,6 +308,7 @@ export default function CreateCardPage() {
 }
 
 function PreviewContent({ form }: { form: UseFormReturn<CreateCardFormValues> }) {
+  const { t } = useTranslation();
   const firstName = form.watch("child_first_name") ?? "";
   const lastName = form.watch("child_last_name") ?? "";
   const htmlContent = form.watch("message") ?? "";
@@ -272,7 +317,7 @@ function PreviewContent({ form }: { form: UseFormReturn<CreateCardFormValues> })
   if (!hasHtmlContent(htmlContent)) {
     return (
       <p className="text-muted-foreground text-sm text-right py-8">
-        הוסיפו מסר בשדה &quot;המסר לילד&quot; כדי לראות תצוגה מקדימה.
+        {t("createCard.previewEmptyHint")}
       </p>
     );
   }

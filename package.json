@@ -6,7 +6,9 @@
     "dev": "dotenv -e .env.local -- next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -26,11 +28,13 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.1",
+    "i18next": "^25.8.11",
     "lucide-react": "^0.460.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.53.2",
+    "react-i18next": "^16.5.4",
     "react-player": "^3.4.0",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
@@ -46,6 +50,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }
