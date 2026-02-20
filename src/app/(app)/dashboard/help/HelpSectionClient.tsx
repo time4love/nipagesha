@@ -16,12 +16,15 @@ interface HelpSectionClientProps {
   categories: string[];
   /** When false, new requests default to showing name (matches profile "not anonymous"). */
   defaultIsAnonymous: boolean;
+  /** Unread help offer count per request id (for "הצעת עזרה חדשה!" badge). */
+  unreadByRequest: Record<string, number>;
 }
 
 export function HelpSectionClient({
   requests,
   categories,
   defaultIsAnonymous,
+  unreadByRequest,
 }: HelpSectionClientProps) {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
@@ -71,6 +74,7 @@ export function HelpSectionClient({
         requests={requests}
         getOffers={getOffersForRequest}
         onEditRequest={setEditingRequest}
+        unreadByRequest={unreadByRequest}
       />
     </div>
   );

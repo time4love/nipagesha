@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getMyHelpRequests } from "./actions";
+import { getMyHelpRequests, getUnreadHelpOffersByRequest } from "./actions";
 import { getCategories } from "@/app/help/actions";
 import { HelpSectionClient } from "./HelpSectionClient";
 
@@ -11,10 +11,11 @@ export default async function DashboardHelpPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [requests, categories, profileRow] = await Promise.all([
+  const [requests, categories, profileRow, unreadByRequest] = await Promise.all([
     getMyHelpRequests(),
     getCategories(),
     supabase.from("profiles").select("is_anonymous").eq("id", user.id).single(),
+    getUnreadHelpOffersByRequest(),
   ]);
 
   const profile = profileRow.data;
@@ -30,6 +31,7 @@ export default async function DashboardHelpPage() {
         requests={requests}
         categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
+        unreadByRequest={unreadByRequest}
       />
     </section>
   );

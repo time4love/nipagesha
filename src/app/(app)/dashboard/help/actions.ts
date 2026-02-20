@@ -49,7 +49,70 @@ export async function getOffersForRequest(requestId: string): Promise<HelpOfferR
     .order("created_at", { ascending: false });
 
   if (error) return [];
-  return (data ?? []) as HelpOfferRow[];
+  const offers = (data ?? []) as HelpOfferRow[];
+
+  // Mark as seen when owner views the list (like child reply "mark as read").
+  if (offers.length > 0) {
+    await supabase
+      .from("help_offers")
+      .update({ seen_by_owner: true })
+      .eq("request_id", requestId);
+  }
+
+  return offers;
+}
+
+/** Count of help offers not yet seen by the current user (request owner). For dashboard badge. */
+export async function getUnreadHelpOffersCount(): Promise<number> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const { data: requests } = await supabase
+    .from("help_requests")
+    .select("id")
+    .eq("user_id", user.id);
+  const ids = (requests ?? []).map((r) => r.id);
+  if (ids.length === 0) return 0;
+
+  const { count, error } = await supabase
+    .from("help_offers")
+    .select("id", { count: "exact", head: true })
+    .in("request_id", ids)
+    .eq("seen_by_owner", false);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
+/** Unread offer count per request (for "הבקשות שלי" list). */
+export async function getUnreadHelpOffersByRequest(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return {};
+
+  const { data: requests } = await supabase
+    .from("help_requests")
+    .select("id")
+    .eq("user_id", user.id);
+  const ids = (requests ?? []).map((r) => r.id);
+  if (ids.length === 0) return {};
+
+  const { data: offers } = await supabase
+    .from("help_offers")
+    .select("request_id")
+    .in("request_id", ids)
+    .eq("seen_by_owner", false);
+
+  const out: Record<string, number> = {};
+  for (const o of offers ?? []) {
+    out[o.request_id] = (out[o.request_id] ?? 0) + 1;
+  }
+  return out;
 }
 
 export interface UpdateStatusResult {

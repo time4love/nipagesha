@@ -107,4 +107,6 @@ export interface HelpOfferRow {
   helper_contact: string;
   message: string;
   created_at: string;
+  /** False until the request owner views the offers list. */
+  seen_by_owner?: boolean;
 }

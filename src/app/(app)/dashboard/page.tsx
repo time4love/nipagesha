@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid, HandHeart } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
+import { getUnreadHelpOffersCount } from "./help/actions";
 
 const FAILURE_DAYS = 7;
 
@@ -71,15 +72,25 @@ export default async function DashboardPage() {
     now.getTime() - FAILURE_DAYS * 24 * 60 * 60 * 1000
   );
 
+  const unreadHelpOffersCount = await getUnreadHelpOffersCount();
+
   return (
     <section className="space-y-8" dir="rtl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold text-foreground">לוח בקרה</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <Button asChild variant="outline" size="sm" className="shrink-0">
+          <Button asChild variant="outline" size="sm" className="shrink-0 relative">
             <Link href="/dashboard/help" className="inline-flex items-center gap-2">
               <HandHeart className="size-4" aria-hidden />
               הבקשות שלי
+              {unreadHelpOffersCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 rtl:right-auto rtl:-left-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-amber-500 text-amber-950 min-w-[1.25rem] text-center"
+                  aria-label={`${unreadHelpOffersCount} הצעות עזרה חדשות`}
+                >
+                  {unreadHelpOffersCount}
+                </span>
+              )}
             </Link>
           </Button>
           <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">

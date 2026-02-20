@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil } from "lucide-react";
+import { Pencil, MessageSquare } from "lucide-react";
 import { updateRequestStatus, deleteHelpRequest } from "./actions";
 import type { HelpRequestRow, HelpOfferRow } from "@/lib/supabase/types";
 
@@ -33,9 +34,17 @@ interface MyRequestsListProps {
   requests: HelpRequestRow[];
   getOffers: (requestId: string) => Promise<HelpOfferRow[]>;
   onEditRequest: (request: HelpRequestRow) => void;
+  /** Unread help offer count per request id (for prominent "הצעת עזרה חדשה!" badge). */
+  unreadByRequest: Record<string, number>;
 }
 
-export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequestsListProps) {
+export function MyRequestsList({
+  requests,
+  getOffers,
+  onEditRequest,
+  unreadByRequest,
+}: MyRequestsListProps) {
+  const router = useRouter();
   const [offersByRequest, setOffersByRequest] = useState<Record<string, HelpOfferRow[]>>({});
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -47,6 +56,7 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
     try {
       const list = await getOffers(requestId);
       setOffersByRequest((prev) => ({ ...prev, [requestId]: list }));
+      router.refresh();
     } finally {
       setLoadingId(null);
     }
@@ -97,8 +107,18 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
           {error}
         </p>
       )}
-      {requests.map((req) => (
-        <Card key={req.id} className="border-teal-100 dark:border-teal-900/50">
+      {requests.map((req) => {
+        const unreadCount = unreadByRequest[req.id] ?? 0;
+        return (
+        <Card key={req.id} className="border-teal-100 dark:border-teal-900/50 relative">
+          {unreadCount > 0 && (
+            <span
+              className="absolute top-2 left-2 rtl:left-auto rtl:right-2 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500 text-amber-950"
+              aria-label={`${unreadCount} הצעות עזרה חדשות`}
+            >
+              הצעת עזרה חדשה!
+            </span>
+          )}
           <CardHeader className="pb-2">
             <div className="flex flex-wrap items-center gap-2">
               <CardTitle className="text-lg">{req.title}</CardTitle>
@@ -136,17 +156,33 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
           <CardContent className="pb-2">
             <Button
               type="button"
-              variant="ghost"
+              variant={unreadCount > 0 ? "default" : "ghost"}
               size="sm"
+              className={
+                unreadCount > 0
+                  ? "w-fit gap-1 bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
+                  : "w-fit gap-1"
+              }
               onClick={() => loadOffers(req.id)}
               disabled={loadingId === req.id}
               aria-expanded={offersByRequest[req.id] !== undefined}
+              aria-label={
+                unreadCount > 0
+                  ? `הצעות חדשות – הצג ${unreadCount} הצעות שהתקבלו`
+                  : undefined
+              }
             >
+              <MessageSquare className="size-4" aria-hidden />
               {loadingId === req.id
                 ? "טוען…"
                 : offersByRequest[req.id]
                 ? `הצעות שהתקבלו (${offersByRequest[req.id].length})`
                 : "הצג הצעות שהתקבלו"}
+              {unreadCount > 0 && (
+                <span className="mr-1 rtl:ml-1 rounded-full bg-amber-500 text-amber-950 text-xs px-1.5">
+                  {unreadCount}
+                </span>
+              )}
             </Button>
             {offersByRequest[req.id] !== undefined && (
               <ul className="mt-3 space-y-2 border-t pt-3">
@@ -204,7 +240,8 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
             </Button>
           </CardFooter>
         </Card>
-      ))}
+      );
+      })}
 
       <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <DialogContent className="sm:max-w-md" dir="rtl">
