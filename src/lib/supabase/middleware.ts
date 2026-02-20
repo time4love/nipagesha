@@ -1,17 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-/** Production-safe cookie options so the browser accepts cookies on HTTPS (e.g. Vercel). */
-function cookieOptionsForEnv(options?: Record<string, unknown>) {
-  return {
-    ...options,
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    maxAge: 60 * 60 * 24 * 7, // 1 week
-  };
-}
-
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -28,14 +17,19 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          // עדכן בבקשה (כדי שהשרת יראה עכשיו)
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
 
+          // צור מחדש תגובה כדי לסנכרן
           response = NextResponse.next({
             request,
           });
 
+          // עדכן בתגובה (כדי שהדפדפן יראה אח"כ)
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, cookieOptionsForEnv(options ?? {}))
+            response.cookies.set(name, value, (options ?? {}) as Record<string, unknown>)
           );
         },
       },
