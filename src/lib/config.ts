@@ -11,6 +11,9 @@ export const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?
 export const ACCESS_LOG_SALT =
   process.env.LOG_SALT ?? process.env.ACCESS_LOG_SALT ?? SUPABASE_SERVICE_ROLE_KEY;
 
+/** Server-only: Resend API key for sending emails (e.g. help offer notifications). Set in .env.local. */
+export const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
+
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn("⚠️ Supabase keys are missing from environment variables!");
 }

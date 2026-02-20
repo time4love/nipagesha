@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { HelpRequestRow, HelpOfferRow } from "@/lib/supabase/types";
+import { HELP_CATEGORIES } from "@/lib/constants";
 
 export async function getMyHelpRequests(): Promise<HelpRequestRow[]> {
   const supabase = await createClient();
@@ -58,7 +59,7 @@ export interface UpdateStatusResult {
 
 export async function updateRequestStatus(
   requestId: string,
-  status: "open" | "fulfilled" | "closed"
+  status: "closed"
 ): Promise<UpdateStatusResult> {
   const supabase = await createClient();
   const {
@@ -102,8 +103,11 @@ export async function updateHelpRequest(
   if (!title || !category) {
     return { success: false, error: "נא למלא כותרת וקטגוריה." };
   }
+  if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
+    return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
+  }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("help_requests")
     .update({
       title,
@@ -113,9 +117,17 @@ export async function updateHelpRequest(
       is_anonymous: isAnonymous,
     })
     .eq("id", requestId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .eq("status", "pending")
+    .select("id")
+    .single();
 
-  if (error) return { success: false, error: error.message };
+  if (error) {
+    if (error.code === "PGRST116") {
+      return { success: false, error: "לא ניתן לערוך בקשה לאחר שאושרה." };
+    }
+    return { success: false, error: error.message };
+  }
   revalidatePath("/dashboard/help");
   revalidatePath("/help");
   return { success: true };

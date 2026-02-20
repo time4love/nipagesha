@@ -79,8 +79,8 @@ export interface ProfileUpdate {
   parent_role?: ParentRole | null;
 }
 
-/** Help request status. */
-export type HelpRequestStatus = "open" | "fulfilled" | "closed";
+/** Help request status (moderation: pending → approved/rejected; owner can close). */
+export type HelpRequestStatus = "pending" | "approved" | "rejected" | "closed";
 
 /** One row from help_requests. */
 export interface HelpRequestRow {
@@ -94,6 +94,8 @@ export interface HelpRequestRow {
   is_anonymous: boolean;
   created_at: string;
   updated_at: string;
+  /** Set by moderator when status is rejected; shown to the parent. */
+  rejection_reason?: string | null;
 }
 
 /** One row from help_offers. */

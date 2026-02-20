@@ -89,18 +89,20 @@ export function CreateHelpRequestDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="create_category">קטגוריה *</Label>
-            <Input
+            <select
               id="create_category"
               name="category"
               required
-              list="create_categories"
-              placeholder="למשל: ציוד, טיפול, לימודים"
-            />
-            <datalist id="create_categories">
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="בחירת קטגוריה"
+            >
+              <option value="">בחרו קטגוריה</option>
               {categories.map((c) => (
-                <option key={c} value={c} />
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
-            </datalist>
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="create_location">אזור (אופציונלי)</Label>

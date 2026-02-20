@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { signOut } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -151,11 +150,9 @@ export function NavbarNav({ hasUser, isAdmin }: NavbarNavProps) {
                 לוח בקרה
               </Link>
             </Button>
-            <form action={signOut} className="inline">
-              <Button type="submit" variant="ghost" size="sm" className="shrink-0">
-                התנתק
-              </Button>
-            </form>
+            <Button variant="ghost" size="sm" className="shrink-0" asChild>
+              <Link href="/api/auth/signout">התנתק</Link>
+            </Button>
           </>
         ) : (
           <Button
@@ -228,17 +225,15 @@ export function NavbarNav({ hasUser, isAdmin }: NavbarNavProps) {
               <div className="mt-6 flex flex-col gap-2 border-t pt-4">
                 {hasUser ? (
                   <>
-                    <form action={signOut} className="w-full">
-                      <Button
-                        type="submit"
-                        variant="ghost"
-                        size="lg"
-                        className="w-full justify-center text-lg"
-                        onClick={closeSheet}
-                      >
-                        התנתק
-                      </Button>
-                    </form>
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      className="w-full justify-center text-lg"
+                      asChild
+                      onClick={closeSheet}
+                    >
+                      <Link href="/api/auth/signout">התנתק</Link>
+                    </Button>
                   </>
                 ) : (
                   <Button asChild size="lg" className="w-full justify-center bg-teal-600 hover:bg-teal-700 text-white text-lg">

@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { HelpRequestRow } from "@/lib/supabase/types";
 import { getRequesterDisplay } from "@/lib/help";
+import { HELP_CATEGORIES } from "@/lib/constants";
+import { sendEmail } from "@/lib/email";
 
 export interface HelpRequestWithRequester extends HelpRequestRow {
   requester_display_name?: string | null;
@@ -43,9 +45,42 @@ export async function submitHelpOffer(formData: FormData): Promise<SubmitHelpOff
     return { success: false, error: error.message };
   }
 
+  // Notify request owner by email (best-effort; do not fail the action)
+  try {
+    const { adminClient } = await import("@/lib/supabase/admin");
+    const { data: request } = await adminClient
+      .from("help_requests")
+      .select("user_id, title")
+      .eq("id", requestId)
+      .single();
+    if (request?.user_id) {
+      const {
+        data: { user: owner },
+      } = await adminClient.auth.admin.getUserById(request.user_id);
+      const to = owner?.email;
+      if (to) {
+        await sendEmail({
+          to,
+          subject: "התקבלה הצעת עזרה בבקשה שלכם – לוח עזרה",
+          html: `<p>שלום,</p><p>מישהו/י הגיב/ה לבקשת העזרה &quot;${escapeHtml(request.title ?? "")}&quot; ורוצה לעזור.</p><p>כניסה ל<strong>הבקשות שלי</strong> באתר תאפשר לראות את פרטי ההתקשרות.</p><p>בברכה,<br/>לוח עזרה ניפגשה</p>`,
+        });
+      }
+    }
+  } catch {
+    // Ignore: missing service role key, Resend not configured, or auth/admin errors
+  }
+
   revalidatePath("/help");
   revalidatePath("/dashboard/help");
   return { success: true };
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 export async function getHelpRequests(filters: {
@@ -60,7 +95,7 @@ export async function getHelpRequests(filters: {
   let query = supabase
     .from("help_requests")
     .select("*")
-    .eq("status", "open")
+    .eq("status", "approved")
     .order("created_at", { ascending: false });
 
   if (filters.category) {
@@ -106,15 +141,9 @@ export async function getHelpRequests(filters: {
   });
 }
 
+/** Categories for filter/form (from constant). */
 export async function getCategories(): Promise<string[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("help_requests")
-    .select("category")
-    .eq("status", "open");
-  if (error) return [];
-  const set = new Set((data ?? []).map((r) => r.category).filter(Boolean));
-  return Array.from(set).sort();
+  return [...HELP_CATEGORIES];
 }
 
 export interface CreateHelpRequestResult {
@@ -141,6 +170,9 @@ export async function createHelpRequest(formData: FormData): Promise<CreateHelpR
   if (!title || !category) {
     return { success: false, error: "נא למלא כותרת וקטגוריה." };
   }
+  if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
+    return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
+  }
 
   const { data, error } = await supabase
     .from("help_requests")
@@ -151,7 +183,7 @@ export async function createHelpRequest(formData: FormData): Promise<CreateHelpR
       category,
       location,
       is_anonymous: isAnonymous,
-      status: "open",
+      status: "pending",
     })
     .select("id")
     .single();

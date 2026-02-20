@@ -23,8 +23,9 @@ import { updateRequestStatus, deleteHelpRequest } from "./actions";
 import type { HelpRequestRow, HelpOfferRow } from "@/lib/supabase/types";
 
 const STATUS_LABELS: Record<HelpRequestRow["status"], string> = {
-  open: "פתוח",
-  fulfilled: "מוגש",
+  pending: "ממתין לאישור",
+  approved: "מאושר (לוח)",
+  rejected: "נדחה",
   closed: "סגור",
 };
 
@@ -103,10 +104,12 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
               <CardTitle className="text-lg">{req.title}</CardTitle>
               <Badge
                 variant={
-                  req.status === "open"
+                  req.status === "approved"
                     ? "success"
-                    : req.status === "fulfilled"
+                    : req.status === "pending"
                     ? "secondary"
+                    : req.status === "rejected"
+                    ? "outline"
                     : "outline"
                 }
               >
@@ -116,7 +119,17 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
                 <span className="text-sm text-muted-foreground">📍 {req.location}</span>
               ) : null}
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
+            {req.status === "rejected" && req.rejection_reason ? (
+              <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30 p-3 mt-2">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                  סיבת הדחייה:
+                </p>
+                <p className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
+                  {req.rejection_reason}
+                </p>
+              </div>
+            ) : null}
+            <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap mt-2">
               {req.description}
             </p>
           </CardHeader>
@@ -159,27 +172,27 @@ export function MyRequestsList({ requests, getOffers, onEditRequest }: MyRequest
             )}
           </CardContent>
           <CardFooter className="flex flex-wrap gap-2 pt-0">
-            {req.status === "open" && (
-              <>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onEditRequest(req)}
-                  aria-label={`ערוך בקשה: ${req.title}`}
-                >
-                  <Pencil className="size-4 ml-1" aria-hidden />
-                  ערוך
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="bg-teal-600 hover:bg-teal-700 text-white"
-                  onClick={() => handleStatus(req.id, "fulfilled")}
-                >
-                  סומן כ־מוגש
-                </Button>
-              </>
+            {req.status === "pending" && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => onEditRequest(req)}
+                aria-label={`ערוך בקשה: ${req.title}`}
+              >
+                <Pencil className="size-4 ml-1" aria-hidden />
+                ערוך
+              </Button>
+            )}
+            {(req.status === "pending" || req.status === "approved") && (
+              <Button
+                type="button"
+                size="sm"
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+                onClick={() => handleStatus(req.id, "closed")}
+              >
+                סומן כסגור
+              </Button>
             )}
             <Button
               type="button"

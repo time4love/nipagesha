@@ -93,19 +93,21 @@ export function EditHelpRequestDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="edit_category">קטגוריה *</Label>
-            <Input
+            <select
               id="edit_category"
               name="category"
               required
-              list="edit_categories"
               defaultValue={request.category}
-              placeholder="למשל: ציוד, טיפול, לימודים"
-            />
-            <datalist id="edit_categories">
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="בחירת קטגוריה"
+            >
+              <option value="">בחרו קטגוריה</option>
               {categories.map((c) => (
-                <option key={c} value={c} />
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
-            </datalist>
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="edit_location">אזור (אופציונלי)</Label>

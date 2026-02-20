@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "./actions";
 import { Navbar } from "@/components/layout/navbar";
-import { LayoutDashboard, Music, FileText } from "lucide-react";
+import { LayoutDashboard, Music, FileText, HandHeart } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -36,6 +36,13 @@ export default async function AdminLayout({
             >
               <FileText className="size-4" aria-hidden />
               ניהול מאמרים
+            </Link>
+            <Link
+              href="/admin/help-requests"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <HandHeart className="size-4" aria-hidden />
+              בקשות לוח עזרה
             </Link>
           </nav>
         </aside>
