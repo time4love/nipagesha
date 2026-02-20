@@ -16,19 +16,29 @@ export interface PublicArticle {
   created_at: string;
 }
 
-export async function getPublishedArticles(): Promise<PublicArticle[]> {
+export interface GetPublishedArticlesResult {
+  data: PublicArticle[];
+  hasMore: boolean;
+}
+
+export async function getPublishedArticles(
+  offset: number = 0,
+  limit: number = 10
+): Promise<GetPublishedArticlesResult> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("articles")
     .select("id, title, content, media_type, media_url, created_at")
     .eq("is_published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error("getPublishedArticles error:", error.message);
-    return [];
+    return { data: [], hasMore: false };
   }
-  return (data ?? []) as PublicArticle[];
+  const list = (data ?? []) as PublicArticle[];
+  return { data: list, hasMore: list.length === limit };
 }
 
 export async function getPublishedArticleById(

@@ -84,10 +84,16 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export async function getHelpRequests(filters: {
-  category?: string;
-  location?: string;
-}): Promise<HelpRequestWithRequester[]> {
+export interface GetHelpRequestsResult {
+  data: HelpRequestWithRequester[];
+  hasMore: boolean;
+}
+
+export async function getHelpRequests(
+  filters: { category?: string; location?: string },
+  offset: number = 0,
+  limit: number = 10
+): Promise<GetHelpRequestsResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -114,15 +120,18 @@ export async function getHelpRequests(filters: {
     }
   }
 
-  const { data: requests, error } = await query;
+  const { data: requests, error } = await query.range(
+    offset,
+    offset + limit - 1
+  );
   if (error) {
     console.error("getHelpRequests error:", error.message);
-    return [];
+    return { data: [], hasMore: false };
   }
 
   const list = (requests ?? []) as HelpRequestRow[];
   if (list.length === 0) {
-    return [];
+    return { data: [], hasMore: false };
   }
 
   const { data: profiles } = await supabase
@@ -134,7 +143,7 @@ export async function getHelpRequests(filters: {
     (profiles ?? []).map((p) => [p.id, p])
   );
 
-  return list.map((req) => {
+  const data = list.map((req) => {
     const profile = profileMap.get(req.user_id) ?? null;
     const { displayName, avatarUrl } = getRequesterDisplay(
       req,
@@ -148,6 +157,8 @@ export async function getHelpRequests(filters: {
       requester_is_anonymous: req.is_anonymous || !profile?.display_name,
     };
   });
+
+  return { data, hasMore: list.length === limit };
 }
 
 /** Categories for filter/form (from constant). */

@@ -12,17 +12,27 @@ export interface Song {
   is_published: boolean;
 }
 
-export async function getSongs(): Promise<Song[]> {
+export interface GetSongsResult {
+  data: Song[];
+  hasMore: boolean;
+}
+
+export async function getSongs(
+  offset: number = 0,
+  limit: number = 10
+): Promise<GetSongsResult> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("songs")
     .select("id, title, lyrics, youtube_url, artist_name, created_at, is_published")
     .eq("is_published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error("getSongs error:", error.message);
-    return [];
+    return { data: [], hasMore: false };
   }
-  return (data ?? []) as Song[];
+  const list = (data ?? []) as Song[];
+  return { data: list, hasMore: list.length === limit };
 }

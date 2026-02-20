@@ -1,5 +1,5 @@
 import { getSongs } from "./actions";
-import { SongCard } from "@/components/songs/SongCard";
+import { SongList } from "@/components/songs/SongList";
 import {
   Card,
   CardContent,
@@ -17,8 +17,13 @@ export const metadata = {
     "שירים ומוזיקה שנכתבו עבור הורים שמחפשים לחדש את הקשר עם ילדיהם. המוזיקה מרפאה ומחברת.",
 };
 
+const INITIAL_LIMIT = 10;
+
 export default async function SongsPage() {
-  const songs = await getSongs();
+  const { data: initialData, hasMore: initialHasMore } = await getSongs(
+    0,
+    INITIAL_LIMIT
+  );
 
   return (
     <div className="min-h-screen" dir="rtl">
@@ -49,24 +54,18 @@ export default async function SongsPage() {
       </section>
 
       {/* Song grid */}
-      <section
-        className="container mx-auto px-4 py-8 sm:py-12"
-        aria-label="רשימת שירים"
-      >
-        {songs.length === 0 ? (
+      <section className="container mx-auto px-4 py-8 sm:py-12">
+        {initialData.length === 0 ? (
           <div className="max-w-md mx-auto text-center py-12">
             <p className="text-muted-foreground">
               עדיין לא הועלו שירים. בקרוב יופיעו כאן שירים וקליפים.
             </p>
           </div>
         ) : (
-          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 list-none p-0 m-0">
-            {songs.map((song) => (
-              <li key={song.id}>
-                <SongCard song={song} />
-              </li>
-            ))}
-          </ul>
+          <SongList
+            initialData={initialData}
+            initialHasMore={initialHasMore}
+          />
         )}
       </section>
 

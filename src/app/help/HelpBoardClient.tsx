@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HelpRequestCard } from "./HelpRequestCard";
 import { OfferHelpDialog } from "./OfferHelpDialog";
 import { CitySelect } from "@/components/ui/city-select";
-import type { HelpRequestWithRequester } from "./actions";
+import { InfiniteScrollTrigger } from "@/components/ui/infinite-scroll-trigger";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { getHelpRequests, type HelpRequestWithRequester } from "./actions";
 
 interface HelpBoardClientProps {
-  requests: HelpRequestWithRequester[];
+  initialRequests: HelpRequestWithRequester[];
+  initialHasMore: boolean;
+  filterCategory: string | undefined;
+  filterLocation: string | undefined;
   categories: string[];
   defaultName: string;
   defaultContact: string;
@@ -16,8 +21,13 @@ interface HelpBoardClientProps {
   currentUserId: string | null;
 }
 
+const LIMIT = 10;
+
 export function HelpBoardClient({
-  requests,
+  initialRequests,
+  initialHasMore,
+  filterCategory,
+  filterLocation,
   categories,
   defaultName,
   defaultContact,
@@ -35,6 +45,23 @@ export function HelpBoardClient({
   useEffect(() => {
     setLocation(locationParam);
   }, [locationParam]);
+
+  const fetchAction = useCallback(
+    (offset: number, limit: number) =>
+      getHelpRequests(
+        { category: filterCategory, location: filterLocation },
+        offset,
+        limit
+      ),
+    [filterCategory, filterLocation]
+  );
+
+  const { items: requests, loadMore, hasMore, isLoading } = useInfiniteScroll({
+    initialData: initialRequests,
+    initialHasMore: initialHasMore,
+    fetchAction,
+    limit: LIMIT,
+  });
 
   function handleOfferHelp(request: HelpRequestWithRequester) {
     setSelectedRequest(request);
@@ -98,16 +125,29 @@ export function HelpBoardClient({
           <p className="text-sm mt-1">נסו לשנות את הסינון או לחזור מאוחר יותר.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {requests.map((req) => (
-            <HelpRequestCard
-              key={req.id}
-              request={req}
-              onOfferHelp={handleOfferHelp}
-              isOwnRequest={currentUserId !== null && req.user_id === currentUserId}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {requests.map((req) => (
+              <div
+                key={req.id}
+                className="animate-in fade-in duration-300 ease-out"
+              >
+                <HelpRequestCard
+                  request={req}
+                  onOfferHelp={handleOfferHelp}
+                  isOwnRequest={currentUserId !== null && req.user_id === currentUserId}
+                />
+              </div>
+            ))}
+          </div>
+          <InfiniteScrollTrigger
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            isLoading={isLoading}
+            showEndMessage={requests.length > 0}
+            endMessage="סוף הרשימה"
+          />
+        </>
       )}
 
       <OfferHelpDialog

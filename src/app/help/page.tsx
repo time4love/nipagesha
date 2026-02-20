@@ -11,8 +11,8 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
   const category = params.category ?? undefined;
   const location = params.location ?? undefined;
 
-  const [requests, categories] = await Promise.all([
-    getHelpRequests({ category, location }),
+  const [helpResult, categories] = await Promise.all([
+    getHelpRequests({ category, location }, 0, 10),
     getCategories(),
   ]);
 
@@ -42,7 +42,11 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
         </p>
       </div>
       <HelpBoardClient
-        requests={requests}
+        key={`${category ?? ""}-${location ?? ""}`}
+        initialRequests={helpResult.data}
+        initialHasMore={helpResult.hasMore}
+        filterCategory={category}
+        filterLocation={location}
         categories={categories}
         defaultName={defaultName}
         defaultContact={defaultContact}
