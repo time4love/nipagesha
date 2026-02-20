@@ -11,6 +11,17 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY } from "@/li
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
+/** Production-safe cookie options so the browser accepts cookies on HTTPS (e.g. Vercel). */
+function cookieOptionsForEnv(options?: CookieOptions): CookieOptions {
+  return {
+    ...options,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+  };
+}
+
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -22,7 +33,7 @@ export async function createClient() {
       setAll(cookiesToSet: CookieToSet[]) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, cookieOptionsForEnv(options))
           );
         } catch {
           // Server Components cannot write cookies; middleware does the actual writing.
@@ -43,7 +54,9 @@ export async function createClientForRouteHandler(request: Request) {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet: CookieToSet[]) {
-        pendingCookies.push(...cookiesToSet);
+        cookiesToSet.forEach(({ name, value, options }) =>
+          pendingCookies.push({ name, value, options: cookieOptionsForEnv(options) })
+        );
       },
     },
   });
