@@ -21,3 +21,9 @@ export function isAdmin(userEmail: string | undefined): boolean {
   const normalized = userEmail.trim().toLowerCase();
   return getAdminEmails().includes(normalized);
 }
+
+/** First admin email for notifications (e.g. new contact submission). */
+export function getAdminNotificationEmail(): string | undefined {
+  const emails = getAdminEmails();
+  return emails[0];
+}

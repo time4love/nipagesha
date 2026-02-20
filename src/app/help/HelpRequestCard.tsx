@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,7 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { HandHeart } from "lucide-react";
+import { ReportDialog } from "@/components/common/ReportDialog";
+import { HandHeart, Flag } from "lucide-react";
 import { getHelpCategoryBadgeVariant } from "@/lib/constants";
 import type { HelpRequestWithRequester } from "./actions";
 
@@ -19,9 +21,19 @@ interface HelpRequestCardProps {
   onOfferHelp: (request: HelpRequestWithRequester) => void;
   /** When true, the "אני רוצה לעזור" button is hidden (own request). */
   isOwnRequest?: boolean;
+  /** When set (logged-in user), report dialog uses this instead of showing email field. */
+  reportInitialEmail?: string;
+  reportInitialName?: string;
 }
 
-export function HelpRequestCard({ request, onOfferHelp, isOwnRequest }: HelpRequestCardProps) {
+export function HelpRequestCard({
+  request,
+  onOfferHelp,
+  isOwnRequest,
+  reportInitialEmail,
+  reportInitialName,
+}: HelpRequestCardProps) {
+  const [reportOpen, setReportOpen] = useState(false);
   const displayName = request.requester_display_name ?? "הורה אנונימי";
   const avatarUrl = request.requester_avatar_url ?? null;
   const initial = displayName.charAt(0);
@@ -36,6 +48,18 @@ export function HelpRequestCard({ request, onOfferHelp, isOwnRequest }: HelpRequ
           {request.location ? (
             <span className="text-sm text-muted-foreground">📍 {request.location}</span>
           ) : null}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setReportOpen(true);
+            }}
+            className="ms-auto text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+            aria-label={`דיווח על בקשה: ${request.title}`}
+            title="דיווח על תוכן"
+          >
+            <Flag className="size-4" aria-hidden />
+          </button>
         </div>
         <CardTitle className="text-lg leading-tight">{request.title}</CardTitle>
       </CardHeader>
@@ -70,6 +94,15 @@ export function HelpRequestCard({ request, onOfferHelp, isOwnRequest }: HelpRequ
           </p>
         )}
       </CardFooter>
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        referenceId={request.id}
+        referenceType="help_request"
+        contentTitle={request.title}
+        initialEmail={reportInitialEmail}
+        initialName={reportInitialName}
+      />
     </Card>
   );
 }

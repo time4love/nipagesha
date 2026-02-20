@@ -14,6 +14,14 @@ export function Footer() {
         <ul className="flex gap-6">
           <li>
             <Link
+              href="/contact"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              צור קשר
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/about"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >

@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, FileText, HandHeart } from "lucide-react";
+import { Music, FileText, HandHeart, Inbox } from "lucide-react";
 
 export const metadata = {
   title: "ניהול | ניפגשה",
@@ -77,6 +77,26 @@ export default function AdminDashboardPage() {
             <CardContent>
               <span className="text-sm font-medium text-primary">
                 מעבר לבקשות לוח עזרה →
+              </span>
+            </CardContent>
+          </Link>
+        </Card>
+        <Card className="transition-shadow hover:shadow-md">
+          <Link href="/admin/inbox" className="block">
+            <CardHeader className="flex flex-row items-center gap-2">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Inbox className="size-5" aria-hidden />
+              </div>
+              <div>
+                <CardTitle className="text-lg">תיבת פניות</CardTitle>
+                <CardDescription>
+                  פניות משתמשים, דיווחי באגים ודיווחים על תוכן
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <span className="text-sm font-medium text-primary">
+                מעבר לתיבת פניות →
               </span>
             </CardContent>
           </Link>

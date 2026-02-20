@@ -110,3 +110,29 @@ export interface HelpOfferRow {
   /** False until the request owner views the offers list. */
   seen_by_owner?: boolean;
 }
+
+/** Contact form / report submission category. */
+export type ContactCategory =
+  | "general"
+  | "support"
+  | "bug"
+  | "report_abuse"
+  | "report_content";
+
+/** Contact submission status (admin workflow). */
+export type ContactStatus = "open" | "in_progress" | "resolved";
+
+/** One row from contact_submissions. */
+export interface ContactSubmissionRow {
+  id: string;
+  user_id: string | null;
+  name: string;
+  email: string;
+  category: ContactCategory;
+  subject: string;
+  message: string;
+  reference_id: string | null;
+  reference_type: string | null;
+  status: ContactStatus;
+  created_at: string;
+}

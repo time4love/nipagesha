@@ -136,6 +136,8 @@ export function HelpBoardClient({
                   request={req}
                   onOfferHelp={handleOfferHelp}
                   isOwnRequest={currentUserId !== null && req.user_id === currentUserId}
+                  reportInitialEmail={defaultContact || undefined}
+                  reportInitialName={defaultName || undefined}
                 />
               </div>
             ))}

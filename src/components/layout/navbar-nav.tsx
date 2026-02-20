@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 /** Nav links without Home (logo links to /). Dashboard and Admin shown conditionally. */
 const navLinks = [
   { href: "/about", label: "אודות", match: (path: string) => path.startsWith("/about") },
+  { href: "/contact", label: "צור קשר", match: (path: string) => path.startsWith("/contact") },
   { href: "/articles", label: "מאמרים", match: (path: string) => path.startsWith("/articles") },
   { href: "/songs", label: "שירים", match: (path: string) => path.startsWith("/songs") },
   { href: "/help", label: "לוח עזרה", match: (path: string) => path.startsWith("/help") },
