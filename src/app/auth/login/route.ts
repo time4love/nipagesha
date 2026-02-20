@@ -29,7 +29,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const response = NextResponse.redirect(`${requestUrl.origin}/dashboard`, { status: 302 });
+  // Return 200 + Set-Cookie, then redirect via HTML. Many browsers do not persist
+  // cookies set on a 302 response; returning 200 first fixes this (e.g. Safari, mobile).
+  const dashboardUrl = `${requestUrl.origin}/dashboard`;
+  const response = new NextResponse(
+    `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=${dashboardUrl}"></head><body>מתחבר... <a href="${dashboardUrl}">לחץ כאן אם לא הופנית</a></body></html>`,
+    {
+      status: 200,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    }
+  );
   pendingCookies.forEach(({ name, value, options }) =>
     response.cookies.set(name, value, (options ?? {}) as Record<string, unknown>)
   );
