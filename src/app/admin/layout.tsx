@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { requireAdmin } from "./actions";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { isAdmin } from "@/lib/admin";
 import { LayoutDashboard, Music, FileText, HandHeart, Inbox } from "lucide-react";
 
 export default async function AdminLayout({
@@ -7,7 +9,33 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireAdmin();
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  // --- Debug: visible in Vercel Dashboard → Logs ---
+  console.log("--- ADMIN LAYOUT DEBUG ---");
+  console.log("User found:", user ? "YES" : "NO");
+  if (user) {
+    console.log("User Email:", user.email);
+    console.log("Is Admin Check:", isAdmin(user.email));
+  }
+  if (error) {
+    console.error("Auth Error:", error.message);
+  }
+  // -------------------------------------------------
+
+  if (error || !user) {
+    console.log("Redirecting to login because no user found.");
+    redirect("/login");
+  }
+
+  if (!isAdmin(user.email)) {
+    console.log("Redirecting to home because user is NOT admin.");
+    redirect("/");
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
