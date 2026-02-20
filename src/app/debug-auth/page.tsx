@@ -50,9 +50,17 @@ export default async function DebugAuthPage() {
         {error && <p className="text-red-600">Error: {error.message}</p>}
       </section>
 
-      <p className="mt-6 text-xs text-gray-500">
-        Open this page after login. If cookies have size &gt; 0 and User is YES,
-        auth is working. Remove this page in production when done.
+      <section className="mt-6 rounded border border-amber-200 bg-amber-50 p-4 text-xs">
+        <h2 className="font-bold text-amber-800">אם עדיין NO COOKIES</h2>
+        <ul className="mt-2 list-inside list-disc space-y-1 text-amber-900">
+          <li>התחבר שוב, פתח DevTools (F12) → Network. חפש את הבקשה <code>login</code> (POST).</li>
+          <li>בתשובה (Response headers) בדוק אם יש <code>Set-Cookie</code> ו־<code>X-Auth-Cookies-Count</code> (מספר העוגיות).</li>
+          <li>אם אין Set-Cookie – הבעיה בשרת. אם יש אבל הדפדפן לא שומר – נסה באותו דומיין בדיוק (בלי להחליף www / לא-www).</li>
+        </ul>
+      </section>
+
+      <p className="mt-4 text-xs text-gray-500">
+        Open this page after login. If cookies have size &gt; 0 and User is YES, auth is working.
       </p>
     </div>
   );
