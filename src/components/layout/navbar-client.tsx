@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
@@ -23,11 +22,9 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
-  const supabase = createClient()
-
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    // Full redirect so the server sees cleared session (avoids stale RSC/cache)
+    // Server route clears auth cookies (Server Components can't write cookies)
+    await fetch('/auth/signout', { method: 'POST', redirect: 'follow' })
     window.location.href = '/'
   }
 
