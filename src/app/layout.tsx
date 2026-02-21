@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
         <I18nProvider>
           <Navbar />
           <div className="flex flex-1 flex-col min-h-0">{children}</div>
+          <Footer />
           <Toaster />
         </I18nProvider>
         <Analytics />
