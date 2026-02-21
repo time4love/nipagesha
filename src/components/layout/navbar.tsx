@@ -7,5 +7,15 @@ export async function Navbar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  return <NavbarClient user={user} />;
+  let avatarUrl: string | null = null;
+  if (user?.id) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", user.id)
+      .single();
+    avatarUrl = profile?.avatar_url ?? null;
+  }
+
+  return <NavbarClient user={user} avatarUrl={avatarUrl} />;
 }

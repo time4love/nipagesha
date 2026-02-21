@@ -14,11 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
-export function NavbarClient({ user }: { user: User | null }) {
+export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl?: string | null }) {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
@@ -77,8 +78,13 @@ export function NavbarClient({ user }: { user: User | null }) {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full bg-muted">
-                  <span className="font-bold text-lg">{user.email?.[0].toUpperCase()}</span>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={avatarUrl ?? undefined} alt="" />
+                    <AvatarFallback className="bg-muted text-lg font-bold text-muted-foreground">
+                      {user.email?.[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
