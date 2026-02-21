@@ -4,7 +4,6 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 export type SearchMatch = {
   id: string;
-  sender_name: string;
   security_question: string;
 };
 
@@ -31,7 +30,7 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("child_cards")
-    .select("id, sender_name, security_question")
+    .select("id, security_question")
     .ilike("child_first_name", firstName)
     .ilike("child_last_name", lastName)
     .eq("birth_year", birthYear)
@@ -43,7 +42,6 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
 
   const matches: SearchMatch[] = (data ?? []).map((row) => ({
     id: row.id,
-    sender_name: row.sender_name ?? "הורה",
     security_question: row.security_question,
   }));
 

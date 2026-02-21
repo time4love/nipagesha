@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorMessage } from "@/components/ui/error-message";
-import { Search, Heart, MessageCircle } from "lucide-react";
+import { Search, Heart, Lock, MessageCircle } from "lucide-react";
 import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
 
 const currentYear = new Date().getFullYear();
@@ -19,9 +19,8 @@ const birthYearOptions = Array.from(
 );
 
 const MULTIPLE_HEADLINE = "נמצאו מספר מסרים התואמים לשם זה";
-const MESSAGE_FROM_LABEL = "מסר מאת:";
-const IDENTITY_QUESTION_LABEL = "שאלת זיהוי:";
-const THIS_IS_MY_MESSAGE_LABEL = "זה המסר שלי";
+const IDENTIFICATION_QUESTION_TITLE = "שאלה מזהה:";
+const TRY_UNLOCK_LABEL = "זו השאלה שלי / נסה לפתוח";
 const SEARCH_AGAIN_LABEL = "חיפוש מחדש";
 
 export default function SearchPage() {
@@ -76,19 +75,26 @@ export default function SearchPage() {
                   {MULTIPLE_HEADLINE}
                 </h1>
                 <p className="text-muted-foreground mb-8">
-                  בחר את המסר שלך לפי איך שאת/ה מכיר/ה את השולח.
+                  בחר את השאלה שמתאימה למסר שלך ולחץ לפתיחה.
                 </p>
               </section>
               <ul className="space-y-4 mb-8" role="list">
                 {matches!.map((match) => (
                   <li key={match.id}>
-                    <Card className="border-amber-200/80 dark:border-amber-800/50 bg-card/80 shadow-md overflow-hidden">
+                    <Card className="border-amber-200/80 dark:border-amber-800/50 bg-card/80 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
                       <CardHeader className="pb-2">
-                        <p className="font-semibold text-foreground text-lg">
-                          {MESSAGE_FROM_LABEL} {match.sender_name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          <span className="font-medium">{IDENTITY_QUESTION_LABEL}</span>{" "}
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400">
+                            <Lock className="size-5" aria-hidden />
+                          </div>
+                          <CardTitle className="text-lg font-semibold text-foreground">
+                            {IDENTIFICATION_QUESTION_TITLE}
+                          </CardTitle>
+                        </div>
+                        <p
+                          className="text-lg sm:text-xl font-medium text-foreground leading-relaxed"
+                          dir="rtl"
+                        >
                           {match.security_question}
                         </p>
                       </CardHeader>
@@ -96,11 +102,11 @@ export default function SearchPage() {
                         <Button
                           asChild
                           className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                          aria-label={`${THIS_IS_MY_MESSAGE_LABEL} - ${match.sender_name}`}
+                          aria-label={`${TRY_UNLOCK_LABEL} - ${match.security_question}`}
                         >
                           <Link href={`/message/${match.id}`}>
                             <MessageCircle className="size-4 ml-2 rtl:ml-0 rtl:mr-2" aria-hidden />
-                            {THIS_IS_MY_MESSAGE_LABEL}
+                            {TRY_UNLOCK_LABEL}
                           </Link>
                         </Button>
                       </CardContent>
