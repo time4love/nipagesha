@@ -120,7 +120,34 @@ export async function deleteAccount(): Promise<DeleteAccountResult> {
       }
     }
 
-    // 2. Auth: delete user (CASCADE in DB will remove profiles, child_cards, help_requests, etc.)
+    // 2. Explicitly delete all public rows that reference this user (belt-and-suspenders:
+    //    avoids "database error deleting user" if any FK is not CASCADE or migration not run).
+    const { data: cardIds } = await admin
+      .from("child_cards")
+      .select("id")
+      .eq("user_id", userId);
+    const ids = (cardIds ?? []).map((r) => r.id);
+    if (ids.length > 0) {
+      const { error: logErr } = await admin
+        .from("card_access_logs")
+        .delete()
+        .in("card_id", ids);
+      if (logErr) return { success: false, error: logErr.message };
+    }
+    const tablesToDelete: { table: string; column: string }[] = [
+      { table: "child_replies", column: "parent_id" },
+      { table: "child_cards", column: "user_id" },
+      { table: "help_offers", column: "helper_id" },
+      { table: "help_requests", column: "user_id" },
+      { table: "contact_submissions", column: "user_id" },
+      { table: "profiles", column: "id" },
+    ];
+    for (const { table, column } of tablesToDelete) {
+      const { error: delError } = await admin.from(table).delete().eq(column, userId);
+      if (delError) return { success: false, error: delError.message };
+    }
+
+    // 3. Auth: delete user (public rows already removed; avoids FK blocking).
     const { error: deleteUserError } = await admin.auth.admin.deleteUser(userId);
     if (deleteUserError) {
       return { success: false, error: deleteUserError.message };

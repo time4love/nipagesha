@@ -15,11 +15,14 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: () => mockCreateClient(),
 }));
 
+const mockFrom = vi.fn();
+
 vi.mock("@/lib/supabase/admin", () => ({
   adminClient: {
     storage: {
       from: (bucket: string) => mockAdminStorageFrom(bucket),
     },
+    from: (table: string) => mockFrom(table),
     auth: {
       admin: {
         deleteUser: (userId: string) => mockAdminAuthDeleteUser(userId),
@@ -54,6 +57,18 @@ function setupUnauthenticated() {
           error: null,
         }),
     },
+  });
+}
+
+function setupAdminFromSuccess() {
+  mockFrom.mockReturnValue({
+    select: () => ({
+      eq: () => Promise.resolve({ data: [], error: null }),
+    }),
+    delete: () => ({
+      eq: () => Promise.resolve({ error: null }),
+      in: () => Promise.resolve({ error: null }),
+    }),
   });
 }
 
@@ -99,6 +114,7 @@ function setupDeleteUserFailure(message: string) {
 describe("deleteAccount", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setupAdminFromSuccess();
     setupStorageListEmpty();
     setupDeleteUserSuccess();
   });
@@ -139,6 +155,7 @@ describe("deleteAccount", () => {
 describe("deleteAccount — storage errors", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setupAdminFromSuccess();
     setupDeleteUserSuccess();
   });
 
