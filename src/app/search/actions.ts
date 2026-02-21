@@ -2,8 +2,14 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 
+export type SearchMatch = {
+  id: string;
+  sender_name: string;
+  security_question: string;
+};
+
 export type SearchResult =
-  | { success: true; redirectUrl: string }
+  | { success: true; matches: SearchMatch[] }
   | { success: false; error: string };
 
 const NOT_FOUND_MESSAGE = "לא נמצא כרטיס תואם לפרטים אלו";
@@ -25,20 +31,25 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("child_cards")
-    .select("id")
+    .select("id, sender_name, security_question")
     .ilike("child_first_name", firstName)
     .ilike("child_last_name", lastName)
     .eq("birth_year", birthYear)
-    .limit(1)
-    .maybeSingle();
+    .order("created_at", { ascending: true });
 
   if (error) {
     return { success: false, error: NOT_FOUND_MESSAGE };
   }
 
-  if (!data?.id) {
+  const matches: SearchMatch[] = (data ?? []).map((row) => ({
+    id: row.id,
+    sender_name: row.sender_name ?? "הורה",
+    security_question: row.security_question,
+  }));
+
+  if (matches.length === 0) {
     return { success: false, error: NOT_FOUND_MESSAGE };
   }
 
-  return { success: true, redirectUrl: `/message/${data.id}` };
+  return { success: true, matches };
 }

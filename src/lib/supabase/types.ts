@@ -9,6 +9,7 @@ export interface ChildCardRow {
   child_first_name: string;
   child_last_name: string;
   birth_year: number;
+  sender_name: string;
   security_question: string;
   encrypted_message: string;
   is_read: boolean;
@@ -30,6 +31,7 @@ export interface ChildCardInsert {
   child_first_name: string;
   child_last_name: string;
   birth_year: number;
+  sender_name: string;
   security_question: string;
   encrypted_message: string;
 }
@@ -39,6 +41,7 @@ export interface MessagePageCard {
   id: string;
   child_first_name: string;
   child_last_name: string;
+  sender_name: string;
   security_question: string;
   encrypted_message: string;
 }

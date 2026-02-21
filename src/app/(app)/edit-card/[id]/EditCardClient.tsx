@@ -68,6 +68,7 @@ const editCardSchema = z.object({
     .number()
     .min(1950, "validation.birthYear.range")
     .max(currentYear, "validation.birthYear.range"),
+  sender_name: z.string().min(1, "validation.senderName.required"),
   security_question: z.string().min(1, "validation.securityQuestion.required"),
   security_answer: z.string().min(1, "validation.securityAnswer.required"),
   message: z
@@ -101,6 +102,7 @@ function EditForm({
       child_first_name: card.child_first_name,
       child_last_name: card.child_last_name,
       birth_year: card.birth_year,
+      sender_name: card.sender_name ?? "הורה",
       security_question: card.security_question,
       security_answer: unlockAnswer,
       message: decryptedHtml,
@@ -132,6 +134,7 @@ function EditForm({
         child_first_name: values.child_first_name,
         child_last_name: values.child_last_name,
         birth_year: values.birth_year,
+        sender_name: values.sender_name,
         security_question: values.security_question,
         encrypted_message: encryptedMessage,
       });
@@ -217,6 +220,22 @@ function EditForm({
                     <FormMessage>
                       {form.formState.errors.birth_year?.message &&
                         translateError(form.formState.errors.birth_year.message)}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sender_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("createCard.senderNameLabel")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("createCard.senderNamePlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage>
+                      {form.formState.errors.sender_name?.message &&
+                        translateError(form.formState.errors.sender_name.message)}
                     </FormMessage>
                   </FormItem>
                 )}

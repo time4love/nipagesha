@@ -16,6 +16,7 @@ export type UpdateChildCardPayload = {
   child_first_name: string;
   child_last_name: string;
   birth_year: number;
+  sender_name: string;
   security_question: string;
   encrypted_message: string;
 };
@@ -26,6 +27,7 @@ export type EditCardData = {
   child_first_name: string;
   child_last_name: string;
   birth_year: number;
+  sender_name: string;
   security_question: string;
   encrypted_message: string;
 };
@@ -47,6 +49,7 @@ export async function createChildCard(
     child_first_name: payload.child_first_name.trim(),
     child_last_name: payload.child_last_name.trim(),
     birth_year: payload.birth_year,
+    sender_name: (payload.sender_name ?? "הורה").trim() || "הורה",
     security_question: payload.security_question.trim(),
     encrypted_message: payload.encrypted_message,
   };
@@ -70,7 +73,7 @@ export async function getCardForEdit(cardId: string): Promise<EditCardData | nul
 
   const { data, error } = await supabase
     .from("child_cards")
-    .select("id, child_first_name, child_last_name, birth_year, security_question, encrypted_message")
+    .select("id, child_first_name, child_last_name, birth_year, sender_name, security_question, encrypted_message")
     .eq("id", cardId)
     .eq("user_id", user.id)
     .single();
@@ -81,6 +84,7 @@ export async function getCardForEdit(cardId: string): Promise<EditCardData | nul
     child_first_name: data.child_first_name,
     child_last_name: data.child_last_name,
     birth_year: data.birth_year,
+    sender_name: data.sender_name ?? "הורה",
     security_question: data.security_question,
     encrypted_message: data.encrypted_message,
   };
@@ -117,6 +121,7 @@ export async function updateChildCard(
       child_first_name: payload.child_first_name.trim(),
       child_last_name: payload.child_last_name.trim(),
       birth_year: payload.birth_year,
+      sender_name: (payload.sender_name ?? "הורה").trim() || "הורה",
       security_question: payload.security_question.trim(),
       encrypted_message: payload.encrypted_message,
       updated_at: new Date().toISOString(),
