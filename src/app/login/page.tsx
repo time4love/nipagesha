@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ErrorMessage } from "@/components/ui/error-message";
 
 const AUTH_ERRORS: Record<string, string> = {
@@ -33,8 +34,11 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = !isSignUp || agreedToTerms;
 
   const supabase = createClient();
 
@@ -45,6 +49,10 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSignUp && !agreedToTerms) {
+      setError("יש לאשר את תנאי השימוש ומדיניות הפרטיות כדי להמשיך");
+      return;
+    }
     setIsLoading(true);
     setError(null);
 
@@ -132,14 +140,52 @@ function LoginForm() {
                 <p className="text-xs text-muted-foreground">לפחות 6 תווים</p>
               )}
             </div>
+            {isSignUp && (
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="auth-terms"
+                  checked={agreedToTerms}
+                  onCheckedChange={(checked) =>
+                    setAgreedToTerms(checked === true)
+                  }
+                  aria-describedby="auth-terms-label"
+                  aria-required
+                />
+                <Label
+                  id="auth-terms-label"
+                  htmlFor="auth-terms"
+                  className="text-sm font-normal cursor-pointer leading-snug text-muted-foreground peer-disabled:cursor-not-allowed"
+                >
+                  קראתי ואני מסכים ל
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                  >
+                    תנאי השימוש
+                  </Link>
+                  {" "}ול
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                  >
+                    מדיניות הפרטיות
+                  </Link>
+                  .
+                </Label>
+              </div>
+            )}
             <Button
               type="submit"
               className="w-full bg-teal-600 hover:bg-teal-700 text-white sm:w-auto"
-              disabled={isLoading}
+              disabled={isLoading || !canSubmit}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden />
+                  <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden />
                   {isSignUp ? "נרשם..." : "מתחבר..."}
                 </>
               ) : (
@@ -153,6 +199,7 @@ function LoginForm() {
             type="button"
             onClick={() => {
               setIsSignUp((v) => !v);
+              if (!isSignUp) setAgreedToTerms(false);
               setError(null);
             }}
             className="text-sm text-teal-600 underline dark:text-teal-400 hover:no-underline"
