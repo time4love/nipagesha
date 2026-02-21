@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProfileForm } from "./ProfileForm";
+import { DeleteAccountSection } from "./DeleteAccountSection";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -34,6 +35,9 @@ export default async function ProfilePage() {
             </CardDescription>
           </CardHeader>
         </Card>
+        <div className="max-w-2xl mt-8">
+          <DeleteAccountSection />
+        </div>
       </section>
     );
   }
@@ -63,6 +67,10 @@ export default async function ProfilePage() {
           <ProfileForm profile={profile} />
         </CardContent>
       </Card>
+
+      <div className="max-w-2xl mt-8">
+        <DeleteAccountSection />
+      </div>
     </section>
   );
 }
