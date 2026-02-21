@@ -27,8 +27,8 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    router.refresh()
-    router.push('/')
+    // Full redirect so the server sees cleared session (avoids stale RSC/cache)
+    window.location.href = '/'
   }
 
   const closeSheet = () => setIsOpen(false)
