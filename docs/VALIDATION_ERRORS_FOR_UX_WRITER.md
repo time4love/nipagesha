@@ -15,20 +15,19 @@ Use these descriptions to write user-facing error messages and create the corres
 
 ---
 
-### Child last name (`child_last_name`)
-| Key | When it happens | Explanation for UX writer |
-|-----|-----------------|---------------------------|
-| `validation.childLastName.required` | User leaves the field empty or submits only whitespace. | The child’s last name is required. Ask the user to enter the child’s last name. |
+### Child last name (removed)
+*Last name was removed for privacy. Identification is now: first name + exact date of birth.*
 
 *Optional future: same as first name (max length, format).*
 
 ---
 
-### Birth year (`birth_year`)
+### Date of birth (`birth_date`)
 | Key | When it happens | Explanation for UX writer |
 |-----|-----------------|---------------------------|
-| `validation.birthYear.required` | No year is selected (e.g. placeholder “Select year” still selected). | User must choose a birth year. |
-| `validation.birthYear.range` | The selected year is outside the allowed range (e.g. before 1950 or after the current year). | Birth year must be within the allowed range (e.g. 1950–current year). Use `{{min}}` and `{{max}}` in the string for the actual bounds. |
+| `validation.birthDate.required` | User has not selected a full date (day, month, and year). | User must select a complete date of birth (day, month, year). |
+
+*Birth year was replaced by full date of birth for identification.*
 
 ---
 
@@ -58,11 +57,11 @@ Use these descriptions to write user-facing error messages and create the corres
 
 ## Search message form (child-facing)
 
-### First name / Last name / Birth year
+### First name / Date of birth
 | Key | When it happens | Explanation for UX writer |
 |-----|-----------------|---------------------------|
-| `search.errorFillAll` | One or more of first name, last name, or birth year is missing or empty. | Ask the user to fill in all fields (first name, last name, and birth year). |
-| `search.errorNotFound` | All fields are filled but no matching card exists in the system. | No card matches the entered details. Ask them to check spelling and birth year, or say that no message was found for those details. |
+| `search.errorFillAll` | First name or date of birth is missing or incomplete. | Ask the user to fill in first name and full date of birth (day, month, year). |
+| `search.errorNotFound` | All fields are filled but no matching card exists in the system. | No card matches the entered details. Ask them to check spelling and date of birth, or say that no message was found for those details. |
 
 ---
 

@@ -53,7 +53,7 @@ export function DashboardCard({
   const [repliesState, setRepliesState] = useState(replies);
   const unreadCount = repliesState.filter((r) => !r.is_read).length;
 
-  const childName = `${card.child_first_name} ${card.child_last_name}`;
+  const childName = card.child_first_name;
 
   async function handleDeleteCard() {
     setDeleteLoading(true);
@@ -99,10 +99,10 @@ export function DashboardCard({
       )}
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">
-          {card.child_first_name} {card.child_last_name}
+          {card.child_first_name}
         </CardTitle>
         <CardDescription>
-          שנת לידה: {card.birth_year} • שאלת אבטחה מוגדרת
+          תאריך לידה: {card.birth_date} • שאלת אבטחה מוגדרת
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0 flex flex-col gap-2">

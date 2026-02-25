@@ -14,8 +14,7 @@ export type CreateChildCardPayload = Omit<ChildCardInsert, "user_id">;
 /** Payload for updating an existing card (encrypted_message is re-encrypted on client). */
 export type UpdateChildCardPayload = {
   child_first_name: string;
-  child_last_name: string;
-  birth_year: number;
+  birth_date: string; // ISO date YYYY-MM-DD
   security_question: string;
   encrypted_message: string;
 };
@@ -24,8 +23,7 @@ export type UpdateChildCardPayload = {
 export type EditCardData = {
   id: string;
   child_first_name: string;
-  child_last_name: string;
-  birth_year: number;
+  birth_date: string; // ISO date YYYY-MM-DD
   security_question: string;
   encrypted_message: string;
 };
@@ -45,8 +43,7 @@ export async function createChildCard(
   const row: ChildCardInsert = {
     user_id: user.id,
     child_first_name: payload.child_first_name.trim(),
-    child_last_name: payload.child_last_name.trim(),
-    birth_year: payload.birth_year,
+    birth_date: payload.birth_date,
     security_question: payload.security_question.trim(),
     encrypted_message: payload.encrypted_message,
   };
@@ -70,7 +67,7 @@ export async function getCardForEdit(cardId: string): Promise<EditCardData | nul
 
   const { data, error } = await supabase
     .from("child_cards")
-    .select("id, child_first_name, child_last_name, birth_year, security_question, encrypted_message")
+    .select("id, child_first_name, birth_date, security_question, encrypted_message")
     .eq("id", cardId)
     .eq("user_id", user.id)
     .single();
@@ -79,8 +76,7 @@ export async function getCardForEdit(cardId: string): Promise<EditCardData | nul
   return {
     id: data.id,
     child_first_name: data.child_first_name,
-    child_last_name: data.child_last_name,
-    birth_year: data.birth_year,
+    birth_date: data.birth_date,
     security_question: data.security_question,
     encrypted_message: data.encrypted_message,
   };
@@ -115,8 +111,7 @@ export async function updateChildCard(
     .from("child_cards")
     .update({
       child_first_name: payload.child_first_name.trim(),
-      child_last_name: payload.child_last_name.trim(),
-      birth_year: payload.birth_year,
+      birth_date: payload.birth_date,
       security_question: payload.security_question.trim(),
       encrypted_message: payload.encrypted_message,
       updated_at: new Date().toISOString(),

@@ -8,15 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DateOfBirthPicker, toIsoDateString } from "@/components/ui/dob-picker";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { Search, Heart, Lock, MessageCircle } from "lucide-react";
 import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
-
-const currentYear = new Date().getFullYear();
-const birthYearOptions = Array.from(
-  { length: currentYear - 1990 + 1 },
-  (_, i) => currentYear - i
-);
 
 const MULTIPLE_HEADLINE = "נמצאו מספר מסרים התואמים לשם זה";
 const IDENTIFICATION_QUESTION_TITLE = "שאלה מזהה:";
@@ -29,10 +24,19 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [matches, setMatches] = useState<SearchMatch[] | null>(null);
 
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const formData = new FormData(form);
+    const firstName = (form.querySelector('input[name="firstName"]') as HTMLInputElement)?.value?.trim() ?? "";
+    if (!firstName || !birthDate) {
+      setError("נא למלא את כל השדות.");
+      return;
+    }
+    const formData = new FormData();
+    formData.set("firstName", firstName);
+    formData.set("birthDate", toIsoDateString(birthDate));
     setError(null);
     setMatches(null);
     setPending(true);
@@ -145,7 +149,7 @@ export default function SearchPage() {
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">חיפוש מסר</CardTitle>
                   <CardDescription>
-                    שם פרטי, שם משפחה ושנת לידה — כמו שמופיעים בכרטיס.
+                    שם פרטי ותאריך לידה מדויק — כמו שמופיעים בכרטיס.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -163,34 +167,14 @@ export default function SearchPage() {
                         className="text-right"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">שם משפחה</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        placeholder="למשל כהן"
-                        required
-                        autoComplete="family-name"
-                        className="text-right"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="birthYear">שנת לידה</Label>
-                      <select
-                        id="birthYear"
-                        name="birthYear"
-                        required
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-right"
-                      >
-                        <option value="">בחר שנה</option>
-                        {birthYearOptions.map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <DateOfBirthPicker
+                      label="תאריך לידה"
+                      value={birthDate}
+                      onChange={setBirthDate}
+                      dayPlaceholder="יום"
+                      monthPlaceholder="חודש"
+                      yearPlaceholder="שנה"
+                    />
                     <Button
                       type="submit"
                       disabled={pending}

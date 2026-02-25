@@ -20,7 +20,7 @@ export default async function MessagePage({
   const supabase = createAdminClient();
   const { data: cardRow, error } = await supabase
     .from("child_cards")
-    .select("id, user_id, child_first_name, child_last_name, security_question, encrypted_message")
+    .select("id, user_id, child_first_name, security_question, encrypted_message")
     .eq("id", id)
     .single();
 
@@ -31,7 +31,6 @@ export default async function MessagePage({
   const card: MessagePageCard = {
     id: cardRow.id,
     child_first_name: cardRow.child_first_name,
-    child_last_name: cardRow.child_last_name,
     security_question: cardRow.security_question,
     encrypted_message: cardRow.encrypted_message,
   };

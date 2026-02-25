@@ -32,25 +32,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { DateOfBirthPicker, toIsoDateString } from "@/components/ui/dob-picker";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { MessageCard } from "@/components/message/MessageCard";
-import { formatChildName, hasHtmlContent } from "@/lib/child-card";
+import { hasHtmlContent } from "@/lib/child-card";
 import { encryptMessage } from "@/lib/crypto";
 import { createChildCard } from "./actions";
 import { toast } from "sonner";
 import { Eye } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
-const currentYear = new Date().getFullYear();
-
 const createCardSchema = z.object({
   child_first_name: z.string().min(1, "validation.childFirstName.required"),
-  child_last_name: z.string().min(1, "validation.childLastName.required"),
-  birth_year: z
-    .coerce
-    .number()
-    .min(1950, "validation.birthYear.range")
-    .max(currentYear, "validation.birthYear.range"),
+  birth_date: z.string().min(1, "validation.birthDate.required"),
   security_question: z.string().min(1, "validation.securityQuestion.required"),
   security_answer: z.string().min(1, "validation.securityAnswer.required"),
   message: z
@@ -67,8 +61,6 @@ function htmlWithPrivateImagePaths(html: string): string {
   );
 }
 
-const birthYearOptions = Array.from({ length: 30 }, (_, i) => currentYear - 5 - i);
-
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
 
 export default function CreateCardPage() {
@@ -80,8 +72,7 @@ export default function CreateCardPage() {
     resolver: zodResolver(createCardSchema),
     defaultValues: {
       child_first_name: "",
-      child_last_name: "",
-      birth_year: currentYear - 10,
+      birth_date: "",
       security_question: "",
       security_answer: "",
       message: "",
@@ -90,9 +81,6 @@ export default function CreateCardPage() {
 
   function translateError(message: string | undefined): string {
     if (!message) return "";
-    if (message === "validation.birthYear.range") {
-      return t(message, { min: 1950, max: currentYear });
-    }
     return t(message);
   }
 
@@ -106,8 +94,7 @@ export default function CreateCardPage() {
       );
       const result = await createChildCard({
         child_first_name: values.child_first_name,
-        child_last_name: values.child_last_name,
-        birth_year: values.birth_year,
+        birth_date: values.birth_date,
         security_question: values.security_question,
         encrypted_message: encryptedMessage,
       });
@@ -138,63 +125,40 @@ export default function CreateCardPage() {
           >
             <CardContent className="space-y-6">
               {submitError && <ErrorMessage message={submitError} />}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="child_first_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("createCard.childFirstNameLabel")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("createCard.childFirstNamePlaceholder")} {...field} />
-                      </FormControl>
-                      <FormMessage>
-                        {form.formState.errors.child_first_name?.message &&
-                          translateError(form.formState.errors.child_first_name.message)}
-                      </FormMessage>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="child_last_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("createCard.childLastNameLabel")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("createCard.childLastNamePlaceholder")} {...field} />
-                      </FormControl>
-                      <FormMessage>
-                        {form.formState.errors.child_last_name?.message &&
-                          translateError(form.formState.errors.child_last_name.message)}
-                      </FormMessage>
-                    </FormItem>
-                  )}
-                />
-              </div>
               <FormField
                 control={form.control}
-                name="birth_year"
+                name="child_first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("createCard.birthYearLabel")}</FormLabel>
+                    <FormLabel>{t("createCard.childFirstNameLabel")}</FormLabel>
                     <FormControl>
-                      <select
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        {...field}
-                        value={String(field.value)}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      >
-                        {birthYearOptions.map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
+                      <Input placeholder={t("createCard.childFirstNamePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage>
-                      {form.formState.errors.birth_year?.message &&
-                        translateError(form.formState.errors.birth_year.message)}
+                      {form.formState.errors.child_first_name?.message &&
+                        translateError(form.formState.errors.child_first_name.message)}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="birth_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("createCard.birthDateLabel")}</FormLabel>
+                    <FormControl>
+                      <DateOfBirthPicker
+                        value={field.value || null}
+                        onChange={(date) => field.onChange(date ? toIsoDateString(date) : "")}
+                        dayPlaceholder={t("createCard.dobDayPlaceholder")}
+                        monthPlaceholder={t("createCard.dobMonthPlaceholder")}
+                        yearPlaceholder={t("createCard.dobYearPlaceholder")}
+                      />
+                    </FormControl>
+                    <FormMessage>
+                      {form.formState.errors.birth_date?.message &&
+                        translateError(form.formState.errors.birth_date.message)}
                     </FormMessage>
                   </FormItem>
                 )}
@@ -314,9 +278,8 @@ export default function CreateCardPage() {
 function PreviewContent({ form }: { form: UseFormReturn<CreateCardFormValues> }) {
   const { t } = useTranslation();
   const firstName = form.watch("child_first_name") ?? "";
-  const lastName = form.watch("child_last_name") ?? "";
   const htmlContent = form.watch("message") ?? "";
-  const childName = formatChildName(firstName, lastName);
+  const childName = firstName.trim() || "הילד";
 
   if (!hasHtmlContent(htmlContent)) {
     return (

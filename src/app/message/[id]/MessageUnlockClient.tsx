@@ -136,7 +136,7 @@ export function MessageUnlockClient({
   const [decryptedHtml, setDecryptedHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const childName = formatChildName(card.child_first_name, card.child_last_name);
+  const childName = formatChildName(card.child_first_name);
 
   async function handleUnlock(e: React.FormEvent) {
     e.preventDefault();

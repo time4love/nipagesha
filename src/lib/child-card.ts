@@ -4,10 +4,10 @@
  */
 
 /**
- * Builds display name from first and last name (trimmed, no extra spaces).
+ * Returns display name for the child (first name only; last name removed for privacy).
  */
-export function formatChildName(firstName: string, lastName: string): string {
-  return [firstName, lastName].filter(Boolean).join(" ").trim();
+export function formatChildName(firstName: string, _lastName?: string): string {
+  return firstName.trim();
 }
 
 /**

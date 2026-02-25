@@ -60,7 +60,7 @@ Review date: 2025. Aligned with `.cursorrules` (SOLID, DRY, KISS, TypeScript str
 
 1. **Dashboard error state:** On `child_cards` fetch error, show a small inline message or retry instead of only `console.error`.
 2. **Auth:** Consider rate limiting or CAPTCHA on login/signup (handled later in Supabase or edge).
-3. **Create-card schema:** Optional `birth_year` range constants (e.g. `BIRTH_YEAR_MIN = 1950`) next to `currentYear` for one source of truth.
+3. **Create-card schema:** Child identification uses `birth_date` (full date); year range for the DOB picker is 1990–current year.
 4. **Tests:** Add unit tests for `parseAuthFormData`, `encryptMessage`/`decryptMessage` round-trip, and `getSupabaseEnv` (e.g. mock `process.env` and fs).
 
 ---

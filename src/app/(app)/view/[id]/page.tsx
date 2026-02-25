@@ -12,7 +12,7 @@ export default async function ViewCardPage({
   const card = await getCardForReveal(id);
   if (!card) notFound();
 
-  const childName = formatChildName(card.child_first_name, card.child_last_name);
+  const childName = formatChildName(card.child_first_name);
 
   return (
     <RevealMessageClient

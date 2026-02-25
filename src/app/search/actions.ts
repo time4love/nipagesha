@@ -16,14 +16,14 @@ const FILL_ALL_FIELDS_MESSAGE = "נא למלא את כל השדות.";
 
 export async function searchChild(formData: FormData): Promise<SearchResult> {
   const firstName = (formData.get("firstName") as string | null)?.trim() ?? "";
-  const lastName = (formData.get("lastName") as string | null)?.trim() ?? "";
-  const birthYearRaw = formData.get("birthYear");
-  const birthYear =
-    birthYearRaw !== null && birthYearRaw !== ""
-      ? Number(birthYearRaw)
-      : null;
+  const birthDate = (formData.get("birthDate") as string | null)?.trim() ?? "";
 
-  if (!firstName || !lastName || birthYear == null || Number.isNaN(birthYear)) {
+  if (!firstName || !birthDate) {
+    return { success: false, error: FILL_ALL_FIELDS_MESSAGE };
+  }
+
+  // Expect YYYY-MM-DD; validate format
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
     return { success: false, error: FILL_ALL_FIELDS_MESSAGE };
   }
 
@@ -32,8 +32,7 @@ export async function searchChild(formData: FormData): Promise<SearchResult> {
     .from("child_cards")
     .select("id, security_question")
     .ilike("child_first_name", firstName)
-    .ilike("child_last_name", lastName)
-    .eq("birth_year", birthYear)
+    .eq("birth_date", birthDate)
     .order("created_at", { ascending: true });
 
   if (error) {
