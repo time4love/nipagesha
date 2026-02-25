@@ -48,7 +48,7 @@ export default async function HomePage() {
               >
                 <Link href="/dashboard">
                   <LayoutDashboard className="size-4" aria-hidden />
-                  ניהול כרטיסי הילדים שלי
+                  לאזור האישי
                 </Link>
               </Button>
             ) : (
@@ -58,7 +58,7 @@ export default async function HomePage() {
                   size="lg"
                   className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
                 >
-                  <Link href="/dashboard">אני הורה</Link>
+                  <Link href="/dashboard">אני הורה או מתנדב</Link>
                 </Button>
                 <Button
                   asChild
@@ -169,7 +169,7 @@ export default async function HomePage() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
-              <Link href="/dashboard">אני הורה</Link>
+              <Link href="/dashboard">אני הורה או מתנדב</Link>
             </Button>
             <Button asChild variant="outline" className={OUTLINE_BUTTON_TEAL_CLASS}>
               <Link href="/search">אני מחפש מסר</Link>
