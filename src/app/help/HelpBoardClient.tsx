@@ -255,13 +255,13 @@ export function HelpBoardClient({
             {currentUserId ? (
               <Button
                 size="default"
-                className="h-10 shrink-0 w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white"
+                className="h-10 shrink-0 w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={() => setCreateOfferDialogOpen(true)}
               >
                 אני רוצה להציע עזרה
               </Button>
             ) : (
-              <Button asChild size="default" className="h-10 shrink-0 w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white">
+              <Button asChild size="default" className="h-10 shrink-0 w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white">
                 <Link href={loginUrl}>אני רוצה להציע עזרה</Link>
               </Button>
             )}
