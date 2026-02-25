@@ -4,12 +4,8 @@ import type { MessagePageCard } from "@/lib/supabase/types";
 import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
 import { MessageUnlockClient } from "./MessageUnlockClient";
 
-/** Label shown to child for reply CTA: אבא, אמא, or אבא/אמא when not set (ניכור הורי). */
-function getParentReplyLabel(parentRole: string | null): string {
-  if (parentRole === "dad") return "אבא";
-  if (parentRole === "mom") return "אמא";
-  return "אבא/אמא";
-}
+/** Label shown to child for reply CTA. Sender identity is per-card; no global parent_role. */
+const PARENT_REPLY_LABEL = "אבא/אמא";
 
 export default async function MessagePage({
   params,
@@ -35,18 +31,10 @@ export default async function MessagePage({
     encrypted_message: cardRow.encrypted_message,
   };
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("parent_role")
-    .eq("id", cardRow.user_id)
-    .single();
-
-  const parentReplyLabel = getParentReplyLabel(profile?.parent_role ?? null);
-
   return (
     <div className="min-h-screen" dir="rtl">
       <div className={CHILD_PAGE_GRADIENT} aria-hidden />
-      <MessageUnlockClient card={card} parentReplyLabel={parentReplyLabel} />
+      <MessageUnlockClient card={card} parentReplyLabel={PARENT_REPLY_LABEL} />
     </div>
   );
 }

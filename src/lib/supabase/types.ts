@@ -54,16 +54,16 @@ export interface ChildReplyRow {
 /** Profile row (1:1 with auth.users). */
 export type PrivacyLevel = "public" | "registered_only";
 
-/** Parent role shown to child on message/reply (ניכור הורי). */
-export type ParentRole = "dad" | "mom";
+export type ProfileRole = "parent" | "volunteer";
 
 export interface ProfileRow {
   id: string;
   display_name: string;
   avatar_url: string | null;
+  bio: string | null;
   is_anonymous: boolean;
   privacy_level: PrivacyLevel;
-  parent_role: ParentRole | null;
+  role: ProfileRole;
   created_at: string;
   updated_at: string;
 }
@@ -71,18 +71,23 @@ export interface ProfileRow {
 export interface ProfileUpdate {
   display_name?: string;
   avatar_url?: string | null;
+  bio?: string | null;
   is_anonymous?: boolean;
   privacy_level?: PrivacyLevel;
-  parent_role?: ParentRole | null;
+  role?: ProfileRole;
 }
 
 /** Help request status (moderation: pending → approved/rejected; owner can close). */
 export type HelpRequestStatus = "pending" | "approved" | "rejected" | "closed";
 
+/** Post type: request (parent asking) or offer (volunteer offering). */
+export type HelpRequestPostType = "request" | "offer";
+
 /** One row from help_requests. */
 export interface HelpRequestRow {
   id: string;
   user_id: string;
+  post_type: HelpRequestPostType;
   title: string;
   description: string;
   category: string;

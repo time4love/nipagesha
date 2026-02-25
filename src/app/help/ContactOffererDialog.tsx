@@ -12,105 +12,102 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { submitOfferResponse, type SubmitOfferResponseResult } from "./actions";
-import type { HelpRequestWithRequester } from "./actions";
+import { contactOfferer, type ContactOffererResult } from "./actions";
+import type { HelpOfferWithOfferer } from "./actions";
 
-interface OfferHelpDialogProps {
-  request: HelpRequestWithRequester | null;
+interface ContactOffererDialogProps {
+  offer: HelpOfferWithOfferer;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Pre-fill when user is logged in (from profile). */
   defaultName?: string;
-  defaultContact?: string;
+  defaultEmail?: string;
 }
 
-export function OfferHelpDialog({
-  request,
+export function ContactOffererDialog({
+  offer,
   open,
   onOpenChange,
   defaultName = "",
-  defaultContact = "",
-}: OfferHelpDialogProps) {
-  const [helperName, setHelperName] = useState(defaultName);
-  const [helperContact, setHelperContact] = useState(defaultContact);
+  defaultEmail = "",
+}: ContactOffererDialogProps) {
+  const [name, setName] = useState(defaultName);
+  const [email, setEmail] = useState(defaultEmail);
   const [message, setMessage] = useState("");
-  const [result, setResult] = useState<SubmitOfferResponseResult | null>(null);
+  const [result, setResult] = useState<ContactOffererResult | null>(null);
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setHelperName(defaultName);
-      setHelperContact(defaultContact);
+      setName(defaultName);
+      setEmail(defaultEmail);
       setMessage("");
       setResult(null);
     }
-  }, [open, defaultName, defaultContact]);
+  }, [open, defaultName, defaultEmail]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!request) return;
-    setPending(true);
     setResult(null);
-    const formData = new FormData(e.currentTarget);
-    formData.set("request_id", request.id);
-    const res = await submitOfferResponse(formData);
+    setPending(true);
+    const res = await contactOfferer(offer.id, message, { name, email });
     setResult(res);
     setPending(false);
     if (res.success) {
+      setMessage("");
       onOpenChange(false);
     }
   }
-
-  if (!request) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>אני רוצה לעזור</DialogTitle>
+          <DialogTitle>צור קשר עם המציע/ה</DialogTitle>
           <DialogDescription>
-            השאירו את פרטיכם כדי שהמבקש יוכל ליצור איתכם קשר. פרטיכם לא יוצגו publicly.
+            ההודעה תשלח לכתובת המייל של המציע/ה. הם יוכלו ליצור איתכם קשר בחזרה.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="hidden" name="request_id" value={request.id} />
           <div className="space-y-2">
-            <Label htmlFor="offer_helper_name">שם</Label>
+            <Label htmlFor="contact_offerer_name">שמכם</Label>
             <Input
-              id="offer_helper_name"
-              name="helper_name"
-              value={helperName}
-              onChange={(e) => setHelperName(e.target.value)}
+              id="contact_offerer_name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="השם שלכם"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="offer_helper_contact">טלפון או אימייל</Label>
+            <Label htmlFor="contact_offerer_email">אימייל ליצירת קשר</Label>
             <Input
-              id="offer_helper_contact"
-              name="helper_contact"
-              type="text"
-              value={helperContact}
-              onChange={(e) => setHelperContact(e.target.value)}
-              placeholder="טלפון או אימייל ליצירת קשר"
+              id="contact_offerer_email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="כתובת המייל שלכם"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="offer_message">הודעה (אופציונלי)</Label>
+            <Label htmlFor="contact_offerer_message">הודעה</Label>
             <textarea
-              id="offer_message"
-              name="message"
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              id="contact_offerer_message"
+              className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="כמה מילים על איך תוכלו לעזור"
+              placeholder="ספרו במה אתם צריכים עזרה..."
+              required
             />
           </div>
           {result?.error && (
             <p className="text-sm text-destructive" role="alert">
               {result.error}
+            </p>
+          )}
+          {result?.success && (
+            <p className="text-sm text-teal-600 dark:text-teal-400" role="status">
+              ההודעה נשלחה. המציע/ה ייצור/תיצור איתכם קשר בהקדם.
             </p>
           )}
           <DialogFooter className="gap-2 sm:gap-0">

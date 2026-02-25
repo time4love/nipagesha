@@ -38,6 +38,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
 
   const canSubmit = !isSignUp || agreedToTerms;
+  const redirectTo = searchParams.get("redirect") || "";
 
   const supabase = createClient();
 
@@ -84,8 +85,8 @@ function LoginForm() {
         }
       }
 
-      // Full navigation so root layout (Navbar) re-renders with the new session
-      window.location.href = "/dashboard";
+      const destination = redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard";
+      window.location.href = destination;
     } catch {
       setError("אירעה שגיאה בלתי צפויה");
     } finally {
@@ -102,7 +103,7 @@ function LoginForm() {
           </CardTitle>
           <CardDescription>
             {isSignUp
-              ? "צרו חשבון כדי ליצור כרטיסי ילד ולשלוח מסרים מאובטחים"
+              ? "צרו חשבון כדי ליצור כרטיסי ילד, לבקש או להציע עזרה."
               : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
           </CardDescription>
         </CardHeader>

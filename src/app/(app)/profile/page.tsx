@@ -46,9 +46,10 @@ export default async function ProfilePage() {
     id: profileRow.id,
     display_name: profileRow.display_name ?? "",
     avatar_url: profileRow.avatar_url,
+    bio: profileRow.bio ?? null,
     is_anonymous: Boolean(profileRow.is_anonymous),
     privacy_level: profileRow.privacy_level ?? "registered_only",
-    parent_role: profileRow.parent_role ?? null,
+    role: profileRow.role === "volunteer" ? "volunteer" as const : "parent" as const,
     created_at: profileRow.created_at,
     updated_at: profileRow.updated_at,
   };
@@ -60,7 +61,7 @@ export default async function ProfilePage() {
         <CardHeader>
           <CardTitle>פרופיל משתמש</CardTitle>
           <CardDescription>
-            השם והתמונה שלך יכולים להופיע בלוח העזרה. תוכלו תמיד לבחור להופיע כאנונימיים.
+            השם, התמונה והביוגרפיה שלך יכולים להופיע בלוח העזרה ובהצעות העזרה. תוכלו תמיד לבחור להופיע כאנונימיים.
           </CardDescription>
         </CardHeader>
         <CardContent>

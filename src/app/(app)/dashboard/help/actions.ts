@@ -17,10 +17,33 @@ export async function getMyHelpRequests(): Promise<HelpRequestRow[]> {
     .from("help_requests")
     .select("*")
     .eq("user_id", user.id)
+    .eq("post_type", "request")
     .order("created_at", { ascending: false });
 
   if (error) {
     console.error("getMyHelpRequests error:", error.message);
+    return [];
+  }
+  return (data ?? []) as HelpRequestRow[];
+}
+
+/** Current user's help offers (post_type = 'offer') for volunteer dashboard. */
+export async function getMyHelpOffers(): Promise<HelpRequestRow[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase
+    .from("help_requests")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("post_type", "offer")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("getMyHelpOffers error:", error.message);
     return [];
   }
   return (data ?? []) as HelpRequestRow[];

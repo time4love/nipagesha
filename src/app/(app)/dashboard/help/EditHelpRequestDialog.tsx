@@ -22,6 +22,8 @@ interface EditHelpRequestDialogProps {
   onOpenChange: (open: boolean) => void;
   categories: string[];
   onSuccess: () => void;
+  /** When true (editing an offer), hide anonymous option and use fixed title/description. */
+  isOffer?: boolean;
 }
 
 export function EditHelpRequestDialog({
@@ -30,6 +32,7 @@ export function EditHelpRequestDialog({
   onOpenChange,
   categories,
   onSuccess,
+  isOffer = false,
 }: EditHelpRequestDialogProps) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,10 +41,10 @@ export function EditHelpRequestDialog({
 
   useEffect(() => {
     if (open && request) {
-      setIsAnonymous(request.is_anonymous);
+      setIsAnonymous(isOffer ? false : request.is_anonymous);
       setLocation(request.location ?? "");
     }
-  }, [open, request]);
+  }, [open, request, isOffer]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,7 +52,7 @@ export function EditHelpRequestDialog({
     setError(null);
     setPending(true);
     const formData = new FormData(e.currentTarget);
-    formData.set("is_anonymous", isAnonymous ? "true" : "false");
+    formData.set("is_anonymous", isOffer ? "false" : (isAnonymous ? "true" : "false"));
     const res = await updateHelpRequest(request.id, formData);
     setPending(false);
     if (res.error) {
@@ -68,9 +71,11 @@ export function EditHelpRequestDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg" dir="rtl">
         <DialogHeader>
-          <DialogTitle>עריכת בקשה</DialogTitle>
+          <DialogTitle>{isOffer ? "עריכת הצעת עזרה" : "עריכת בקשה"}</DialogTitle>
           <DialogDescription>
-            עדכנו את פרטי הבקשה. שינוי &quot;הצג כאנונימי&quot; ישפיע על איך ששמכם מופיע בלוח העזרה.
+            {isOffer
+              ? "עדכנו את פרטי ההצעה. פרטיכם יוצגו לפי הפרופיל שלכם."
+              : "עדכנו את פרטי הבקשה. שינוי \"הצג כאנונימי\" ישפיע על איך ששמכם מופיע בלוח העזרה."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,24 +127,28 @@ export function EditHelpRequestDialog({
               clearable
             />
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="hidden"
-              name="is_anonymous"
-              value={isAnonymous ? "true" : "false"}
-            />
-            <input
-              type="checkbox"
-              id="edit_is_anonymous"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="rounded border-input"
-            />
-            <Label htmlFor="edit_is_anonymous">הצג את הבקשה כאנונימית (הורה אנונימי)</Label>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            אם תבטלו את הסימון והפרופיל שלכם גלוי, שמכם יופיע על הבקשה בלוח העזרה.
-          </p>
+          {!isOffer && (
+            <>
+              <div className="flex items-center gap-2">
+                <input
+                  type="hidden"
+                  name="is_anonymous"
+                  value={isAnonymous ? "true" : "false"}
+                />
+                <input
+                  type="checkbox"
+                  id="edit_is_anonymous"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="rounded border-input"
+                />
+                <Label htmlFor="edit_is_anonymous">הצג את הבקשה כאנונימית (הורה אנונימי)</Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                אם תבטלו את הסימון והפרופיל שלכם גלוי, שמכם יופיע על הבקשה בלוח העזרה.
+              </p>
+            </>
+          )}
           {error && (
             <p className="text-sm text-destructive" role="alert">
               {error}

@@ -14,11 +14,6 @@ const PRIVACY_OPTIONS: { value: ProfileRow["privacy_level"]; label: string }[] =
   { value: "public", label: "כל הגולשים" },
 ];
 
-const PARENT_ROLE_OPTIONS: { value: "dad" | "mom"; label: string }[] = [
-  { value: "dad", label: "אבא" },
-  { value: "mom", label: "אמא" },
-];
-
 interface ProfileFormProps {
   profile: ProfileRow;
 }
@@ -51,7 +46,23 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           aria-describedby="display_name_desc"
         />
         <p id="display_name_desc" className="text-sm text-muted-foreground">
-          יוצג בלוח העזרה אם תבחרו לא להופיע כאנונימיים.
+          יוצג בלוח העזרה ובהצעות העזרה אם תבחרו לא להופיע כאנונימיים.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="bio">אודות / ביוגרפיה</Label>
+        <textarea
+          id="bio"
+          name="bio"
+          rows={4}
+          defaultValue={profile.bio ?? ""}
+          placeholder="ספר/י קצת על עצמך... (למשל: הרקע המקצועי שלך, או הניסיון האישי)"
+          className="flex min-h-[80px] w-full max-w-md rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-describedby="bio_desc"
+        />
+        <p id="bio_desc" className="text-sm text-muted-foreground">
+          מוצג בהצעות העזרה שלך כדי להורים לבחור במי לפנות.
         </p>
       </div>
 
@@ -109,38 +120,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               <span className="text-sm">{opt.label}</span>
             </label>
           ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>אני</Label>
-        <p id="parent_role_desc" className="text-sm text-muted-foreground mb-1">
-          כשהילד יפתח את המסר וירצה לשלוח תגובה, הוא יראה &quot;שלח תגובה לאמא&quot; או &quot;שלח תגובה לאבא&quot; — לפי הבחירה כאן.
-        </p>
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
-          {PARENT_ROLE_OPTIONS.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="parent_role"
-                value={opt.value}
-                defaultChecked={profile.parent_role === opt.value}
-                className="rounded-full border-input"
-                aria-describedby="parent_role_desc"
-              />
-              <span className="text-sm">{opt.label}</span>
-            </label>
-          ))}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="parent_role"
-              value=""
-              defaultChecked={profile.parent_role === null || profile.parent_role === undefined}
-              className="rounded-full border-input"
-            />
-            <span className="text-sm">לא לציין</span>
-          </label>
         </div>
       </div>
 

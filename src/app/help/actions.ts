@@ -14,12 +14,13 @@ export interface HelpRequestWithRequester extends HelpRequestRow {
   requester_is_anonymous?: boolean;
 }
 
-export interface SubmitHelpOfferResult {
+export interface SubmitOfferResponseResult {
   success: boolean;
   error?: string;
 }
 
-export async function submitHelpOffer(formData: FormData): Promise<SubmitHelpOfferResult> {
+/** Submit a response to a help request (insert into help_offers; notify request owner by email). */
+export async function submitOfferResponse(formData: FormData): Promise<SubmitOfferResponseResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -76,6 +77,116 @@ export async function submitHelpOffer(formData: FormData): Promise<SubmitHelpOff
   return { success: true };
 }
 
+export interface SubmitHelpOfferResult {
+  success: boolean;
+  error?: string;
+}
+
+/** Create a new help offer (volunteer offering help; insert into help_requests with post_type='offer'). */
+export async function submitHelpOffer(formData: FormData): Promise<SubmitHelpOfferResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "יש להתחבר כדי לפרסם הצעת עזרה." };
+  }
+
+  const title = (formData.get("title") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() ?? "";
+  const category = (formData.get("category") as string)?.trim();
+  const city = (formData.get("city") as string)?.trim() ?? "";
+
+  if (!title || !category) {
+    return { success: false, error: "נא למלא כותרת וקטגוריה." };
+  }
+  if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
+    return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
+  }
+
+  const { error } = await supabase.from("help_requests").insert({
+    user_id: user.id,
+    post_type: "offer",
+    title,
+    description,
+    category,
+    location: city,
+    status: "pending",
+    is_anonymous: false,
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/help");
+  return { success: true };
+}
+
+export interface ContactOffererResult {
+  success: boolean;
+  error?: string;
+}
+
+/** Relay contact to offerer: send email to offer's user_id (volunteer) without exposing their email. */
+export async function contactOfferer(
+  offerId: string,
+  message: string,
+  seekerDetails: { name: string; email: string }
+): Promise<ContactOffererResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "יש להתחבר כדי ליצור קשר." };
+  }
+
+  const { adminClient } = await import("@/lib/supabase/admin");
+  const { data: offer, error: offerError } = await adminClient
+    .from("help_requests")
+    .select("id, user_id, title")
+    .eq("id", offerId)
+    .eq("post_type", "offer")
+    .single();
+
+  if (offerError || !offer) {
+    return { success: false, error: "ההצעה לא נמצאה." };
+  }
+
+  const {
+    data: { user: offererAuth },
+  } = await adminClient.auth.admin.getUserById(offer.user_id);
+  const to = offererAuth?.email;
+  if (!to) {
+    return { success: false, error: "לא ניתן לשלוח הודעה למציע." };
+  }
+
+  const name = seekerDetails.name?.trim() || "משתמש/ת";
+  const email = seekerDetails.email?.trim() || user.email || "";
+  const body = escapeHtml(message || "(ללא טקסט)");
+  const html = `
+    <p>שלום,</p>
+    <p>מישהו/י פנה/ה אליכם דרך לוח העזרה בנוגע להצעת העזרה &quot;${escapeHtml(offer.title ?? "")}&quot;.</p>
+    <p><strong>שם:</strong> ${escapeHtml(name)}</p>
+    <p><strong>אימייל ליצירת קשר:</strong> ${escapeHtml(email)}</p>
+    <p><strong>הודעה:</strong></p>
+    <p>${body.replace(/\n/g, "<br/>")}</p>
+    <p>בברכה,<br/>לוח עזרה ניפגשה</p>
+  `;
+
+  const sendResult = await sendEmail({
+    to,
+    subject: `פנייה בנוגע להצעת העזרה: ${offer.title ?? ""}`,
+    html,
+  });
+
+  if (!sendResult.success) {
+    return { success: false, error: sendResult.error ?? "שליחת המייל נכשלה." };
+  }
+  return { success: true };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -102,6 +213,7 @@ export async function getHelpRequests(
   let query = supabase
     .from("help_requests")
     .select("*")
+    .eq("post_type", "request")
     .eq("status", "approved")
     .order("created_at", { ascending: false });
 
@@ -161,6 +273,82 @@ export async function getHelpRequests(
   return { data, hasMore: list.length === limit };
 }
 
+export interface HelpOfferWithOfferer extends HelpRequestRow {
+  offerer_display_name?: string | null;
+  offerer_avatar_url?: string | null;
+  offerer_bio?: string | null;
+}
+
+export interface GetHelpOffersResult {
+  data: HelpOfferWithOfferer[];
+  hasMore: boolean;
+}
+
+export async function getHelpOffers(
+  filters: { category?: string; location?: string },
+  offset: number = 0,
+  limit: number = 10
+): Promise<GetHelpOffersResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let query = supabase
+    .from("help_requests")
+    .select("*")
+    .eq("post_type", "offer")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false });
+
+  if (filters.category) {
+    query = query.eq("category", filters.category);
+  }
+  if (filters.location && filters.location !== "כל הארץ") {
+    const isRegion = (REGIONS as readonly string[]).includes(filters.location);
+    if (isRegion) {
+      const citiesInRegion = Object.entries(CITY_TO_REGION_MAP)
+        .filter(([, region]) => region === filters.location)
+        .map(([city]) => city);
+      query = query.in("location", [filters.location, ...citiesInRegion]);
+    } else {
+      query = query.eq("location", filters.location);
+    }
+  }
+
+  const { data: rows, error } = await query.range(offset, offset + limit - 1);
+  if (error) {
+    console.error("getHelpOffers error:", error.message);
+    return { data: [], hasMore: false };
+  }
+
+  const list = (rows ?? []) as HelpRequestRow[];
+  if (list.length === 0) {
+    return { data: [], hasMore: false };
+  }
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, display_name, avatar_url, bio")
+    .in("id", list.map((r) => r.user_id));
+
+  const profileMap = new Map(
+    (profiles ?? []).map((p) => [p.id, p])
+  );
+
+  const data: HelpOfferWithOfferer[] = list.map((row) => {
+    const profile = profileMap.get(row.user_id) ?? null;
+    return {
+      ...row,
+      offerer_display_name: profile?.display_name?.trim() ?? null,
+      offerer_avatar_url: profile?.avatar_url ?? null,
+      offerer_bio: profile?.bio?.trim() ?? null,
+    };
+  });
+
+  return { data, hasMore: list.length === limit };
+}
+
 /** Categories for filter/form (from constant). */
 export async function getCategories(): Promise<string[]> {
   return [...HELP_CATEGORIES];
@@ -198,6 +386,7 @@ export async function createHelpRequest(formData: FormData): Promise<CreateHelpR
     .from("help_requests")
     .insert({
       user_id: user.id,
+      post_type: "request",
       title,
       description,
       category,

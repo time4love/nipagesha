@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { uploadPublicFile } from "@/lib/supabase/public-storage";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { adminClient } from "@/lib/supabase/admin";
-import type { ParentRole, PrivacyLevel, ProfileRow } from "@/lib/supabase/types";
+import type { PrivacyLevel, ProfileRow } from "@/lib/supabase/types";
 
 const BUCKET_SECURE_MEDIA = "secure-media";
 const BUCKET_PUBLIC_MEDIA = "public-media";
@@ -27,11 +27,9 @@ export async function updateProfile(formData: FormData): Promise<UpdateProfileRe
   }
 
   const displayName = (formData.get("display_name") as string)?.trim() ?? "";
+  const bio = (formData.get("bio") as string)?.trim() ?? null;
   const isAnonymous = formData.get("is_anonymous") === "true";
   const privacyLevel = (formData.get("privacy_level") as PrivacyLevel) ?? "registered_only";
-  const parentRoleRaw = formData.get("parent_role") as string | null;
-  const parentRole: ParentRole | null =
-    parentRoleRaw === "dad" || parentRoleRaw === "mom" ? parentRoleRaw : null;
   const avatarFile = formData.get("avatar") as File | null;
 
   let avatarUrl: string | null = null;
@@ -46,9 +44,9 @@ export async function updateProfile(formData: FormData): Promise<UpdateProfileRe
 
   const update: Partial<ProfileRow> = {
     display_name: displayName || "",
+    bio: bio || null,
     is_anonymous: isAnonymous,
     privacy_level: privacyLevel,
-    parent_role: parentRole,
   };
   if (avatarUrl !== null) {
     update.avatar_url = avatarUrl;

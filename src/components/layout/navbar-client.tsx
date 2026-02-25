@@ -85,7 +85,7 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
-                <DropdownMenuLabel>הורה מחובר</DropdownMenuLabel>
+                <DropdownMenuLabel>מחובר</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push('/dashboard')}>לוח בקרה</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/profile')}>פרופיל</DropdownMenuItem>
