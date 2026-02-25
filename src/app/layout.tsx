@@ -16,8 +16,17 @@ const heebo = Heebo({
 });
 
 export const metadata: Metadata = {
-  title: "ניפגשה | Nipagesha",
-  description: "פלטפורמה לחיבור מחדש בין הורים לילדים",
+  title: "ניפגשה | מחברים מחדש הורים וילדים",
+  description: "פלטפורמה להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח ופרטי. רק הילד יכול לפתוח אותו.",
+  metadataBase: new URL("https://www.nipagesha.co.il"), // חשוב מאוד לשיתוף!
+  openGraph: {
+    title: "ניפגשה | מחברים מחדש את הקשר",
+    description: "השאירו מסר מאובטח לילדכם. המקום הבטוח לחידוש הקשר.",
+    url: "https://www.nipagesha.co.il",
+    siteName: "ניפגשה",
+    locale: "he_IL",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
