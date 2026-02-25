@@ -38,14 +38,10 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
 
   return (
     <section className="space-y-8" dir="rtl">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">לוח עזרה</h1>
-        <p className="mt-1 text-muted-foreground">
-          הורים עוזרים להורים. בחרו בקשה או הצעת עזרה וצרו קשר.
-        </p>
-      </div>
       <HelpBoardClient
         key={`${category ?? ""}-${location ?? ""}`}
+        title="לוח עזרה"
+        subtitle="הורים עוזרים להורים. בחרו בקשה או הצעת עזרה וצרו קשר."
         initialRequests={helpResult.data}
         initialHasMore={helpResult.hasMore}
         initialOffers={offersResult.data}
