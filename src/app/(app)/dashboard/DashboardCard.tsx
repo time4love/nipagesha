@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ChildCardRow, ChildReplyRow, CardAccessLogRow } from "@/lib/supabase/types";
 import {
   Card,
@@ -14,13 +15,16 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, MessageSquare } from "lucide-react";
+import { Pencil, MessageSquare, Trash2 } from "lucide-react";
 import { CardActivityLog } from "./CardActivityLog";
 import { markAllRepliesAsReadForCard } from "@/app/message/actions";
+import { deleteChildCard } from "./actions";
 
 function formatReplyDate(iso: string): string {
   return new Intl.DateTimeFormat("he-IL", {
@@ -42,9 +46,28 @@ export function DashboardCard({
   logs,
   failureDaysAgo,
 }: DashboardCardProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [repliesState, setRepliesState] = useState(replies);
   const unreadCount = repliesState.filter((r) => !r.is_read).length;
+
+  const childName = `${card.child_first_name} ${card.child_last_name}`;
+
+  async function handleDeleteCard() {
+    setDeleteLoading(true);
+    const { success, error } = await deleteChildCard(card.id);
+    setDeleteLoading(false);
+    if (error) {
+      alert(error);
+      return;
+    }
+    if (success) {
+      setDeleteOpen(false);
+      router.refresh();
+    }
+  }
 
   const lastSuccess = logs.find((l) => l.attempt_type === "success");
   const lastReadAt = lastSuccess ? new Date(lastSuccess.created_at) : null;
@@ -168,6 +191,44 @@ export function DashboardCard({
               ערוך
             </Link>
           </Button>
+          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-fit text-destructive hover:text-destructive hover:bg-destructive/10"
+                aria-label="מחק כרטיס"
+              >
+                <Trash2 className="size-4 ml-1 rtl:ml-0 rtl:mr-1" aria-hidden />
+                מחק
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md" dir="rtl">
+              <DialogHeader>
+                <DialogTitle>מחיקת כרטיס ילד</DialogTitle>
+                <DialogDescription>
+                  האם למחוק את כרטיס הילד &quot;{childName}&quot;? פעולה זו לא ניתנת
+                  לביטול — המסר, התגובות ורישום הגישה יימחקו.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteOpen(false)}
+                  disabled={deleteLoading}
+                >
+                  ביטול
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteCard}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? "מוחק..." : "מחק"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>
