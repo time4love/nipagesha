@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
 import {
@@ -29,7 +29,6 @@ function getErrorMessage(message: string): string {
 }
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,8 +84,8 @@ function LoginForm() {
         }
       }
 
-      router.refresh();
-      router.push("/dashboard");
+      // Full navigation so root layout (Navbar) re-renders with the new session
+      window.location.href = "/dashboard";
     } catch {
       setError("אירעה שגיאה בלתי צפויה");
     } finally {
