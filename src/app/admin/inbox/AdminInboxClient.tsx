@@ -18,9 +18,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { setSubmissionStatusResolved } from "./actions";
+import { setSubmissionStatusResolved, deleteContactSubmission } from "./actions";
 import type { ContactStatus, ContactSubmissionRow } from "@/lib/supabase/types";
-import { Check } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 
 const categoryLabels: Record<string, string> = {
   general: "כללי",
@@ -77,6 +77,19 @@ export function AdminInboxClient({ submissions: initialSubmissions }: AdminInbox
     setSubmissions((prev) =>
       prev.map((s) => (s.id === id ? { ...s, status: "resolved" as const } : s))
     );
+    if (selected?.id === id) setSelected(null);
+  }
+
+  async function handleDelete(id: string) {
+    setError(null);
+    setLoadingId(id);
+    const res = await deleteContactSubmission(id);
+    setLoadingId(null);
+    if (res.error) {
+      setError(res.error);
+      return;
+    }
+    setSubmissions((prev) => prev.filter((s) => s.id !== id));
     if (selected?.id === id) setSelected(null);
   }
 
@@ -167,6 +180,7 @@ export function AdminInboxClient({ submissions: initialSubmissions }: AdminInbox
                 </Badge>
               </TableCell>
               <TableCell onClick={(e) => e.stopPropagation()}>
+                <div className="flex flex-wrap gap-2">
                 {s.status !== "resolved" && (
                   <Button
                     size="sm"
@@ -185,6 +199,17 @@ export function AdminInboxClient({ submissions: initialSubmissions }: AdminInbox
                     )}
                   </Button>
                 )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => handleDelete(s.id)}
+                  disabled={loadingId === s.id}
+                  aria-label={`מחק פנייה: ${s.subject}`}
+                >
+                  {loadingId === s.id ? "…" : <Trash2 className="size-4" aria-hidden />}
+                </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -225,15 +250,24 @@ export function AdminInboxClient({ submissions: initialSubmissions }: AdminInbox
                   <p className="text-sm font-medium text-muted-foreground mb-1">הודעה</p>
                   <p className="text-sm whitespace-pre-wrap">{selected.message}</p>
                 </div>
-                {selected.status !== "resolved" && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selected.status !== "resolved" && (
+                    <Button
+                      onClick={() => handleResolve(selected.id)}
+                      disabled={loadingId === selected.id}
+                    >
+                      {loadingId === selected.id ? "שולח…" : "סמן כטופל"}
+                    </Button>
+                  )}
                   <Button
-                    className="mt-2"
-                    onClick={() => handleResolve(selected.id)}
+                    variant="outline"
+                    className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                    onClick={() => handleDelete(selected.id)}
                     disabled={loadingId === selected.id}
                   >
-                    {loadingId === selected.id ? "שולח…" : "סמן כטופל"}
+                    {loadingId === selected.id ? "…" : "מחק פנייה"}
                   </Button>
-                )}
+                </div>
               </div>
             </>
           )}

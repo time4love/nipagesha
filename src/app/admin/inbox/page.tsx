@@ -13,7 +13,7 @@ export default async function AdminInboxPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">תיבת פניות</h1>
       <p className="text-muted-foreground">
-        פניות מטופס צור קשר ודיווחים על תוכן. ניתן לסנן לפי סטטוס ולסמן כטופל.
+        פניות מטופס צור קשר ודיווחים על תוכן. ניתן לסנן לפי סטטוס, לסמן כטופל ולמחוק פנייה לאחר שטופלה.
       </p>
       <AdminInboxClient submissions={submissions} />
     </div>

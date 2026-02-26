@@ -50,3 +50,29 @@ export async function setSubmissionStatusResolved(
   revalidatePath("/admin/inbox");
   return { success: true };
 }
+
+export interface DeleteSubmissionResult {
+  success: boolean;
+  error?: string;
+}
+
+export async function deleteContactSubmission(
+  submissionId: string
+): Promise<DeleteSubmissionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !isAdmin(user.email)) {
+    return { success: false, error: "לא מאושר" };
+  }
+
+  const { error } = await adminClient
+    .from("contact_submissions")
+    .delete()
+    .eq("id", submissionId);
+
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/inbox");
+  return { success: true };
+}
