@@ -59,6 +59,8 @@ function getErrorMessage(message: string): string {
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [formRevealed, setFormRevealed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -99,6 +101,18 @@ function LoginForm() {
     const err = searchParams.get("error");
     if (err) setError(decodeURIComponent(err));
   }, [searchParams]);
+
+  // Trigger slide-down animation when email form is first shown
+  useEffect(() => {
+    if (!showEmailForm) {
+      setFormRevealed(false);
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      setFormRevealed(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [showEmailForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,136 +169,175 @@ function LoginForm() {
             {isSignUp ? "הרשמה" : "התחברות"}
           </CardTitle>
           <CardDescription>
-            {isSignUp
-              ? "צרו חשבון כדי ליצור כרטיסי ילד, לבקש או להציע עזרה."
-              : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
+            {!showEmailForm
+              ? "התחברו או הירשמו כדי להמשיך"
+              : isSignUp
+                ? "צרו חשבון כדי ליצור כרטיסי ילד, לבקש או להציע עזרה."
+                : "הכנס אימייל וסיסמה כדי להתחבר לחשבון שלך"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
           {error && <ErrorMessage message={error} />}
+
+          {/* Top: Google sign-in (always visible, prominent) */}
           <Button
             type="button"
+            size="lg"
             variant="outline"
-            className="w-full border-neutral-300 bg-white hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="w-full border-neutral-300 bg-white hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-base"
             onClick={handleGoogleLogin}
             disabled={isGoogleLoading || isLoading}
             aria-label="המשך עם Google"
           >
             {isGoogleLoading ? (
-              <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden />
+              <Loader2 className="me-2 h-5 w-5 animate-spin" aria-hidden />
             ) : (
-              <GoogleIcon className="me-2 h-4 w-4 shrink-0" />
+              <GoogleIcon className="me-2 h-5 w-5 shrink-0" />
             )}
             המשך עם Google
           </Button>
-          <div className="relative flex items-center gap-3">
-            <span className="absolute inset-0 flex items-center" aria-hidden>
-              <span className="w-full border-t border-border" />
-            </span>
-            <span className="relative px-2 text-xs text-muted-foreground bg-card">
-              או
-            </span>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="auth-email">אימייל</Label>
-              <Input
-                id="auth-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                autoComplete="email"
-                required
-                aria-required
-              />
+
+          {/* Middle: Progressive disclosure — link or email form */}
+          {!showEmailForm ? (
+            <div className="flex justify-center pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground text-sm font-normal underline-offset-4 hover:underline"
+                onClick={() => setShowEmailForm(true)}
+                aria-expanded="false"
+                aria-controls="email-auth-form"
+              >
+                אני מעדיף להמשיך עם אימייל וסיסמה
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="auth-password">סיסמה</Label>
-              <Input
-                id="auth-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                required
-                aria-required
-                minLength={isSignUp ? 6 : undefined}
-              />
-              {isSignUp && (
-                <p className="text-xs text-muted-foreground">לפחות 6 תווים</p>
-              )}
-            </div>
-            {isSignUp && (
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="auth-terms"
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) =>
-                    setAgreedToTerms(checked === true)
-                  }
-                  aria-describedby="auth-terms-label"
-                  aria-required
-                />
-                <Label
-                  id="auth-terms-label"
-                  htmlFor="auth-terms"
-                  className="text-sm font-normal cursor-pointer leading-snug text-muted-foreground peer-disabled:cursor-not-allowed"
-                >
-                  קראתי ואני מסכים ל
-                  <Link
-                    href="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
-                  >
-                    תנאי השימוש
-                  </Link>
-                  {" "}ול
-                  <Link
-                    href="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
-                  >
-                    מדיניות הפרטיות
-                  </Link>
-                  .
-                </Label>
-              </div>
-            )}
-            <Button
-              type="submit"
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white sm:w-auto"
-              disabled={isLoading || !canSubmit}
+          ) : (
+            <div
+              id="email-auth-form"
+              className="overflow-hidden transition-[max-height] duration-300 ease-out"
+              style={{ maxHeight: formRevealed ? 600 : 0 }}
+              aria-expanded="true"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden />
-                  {isSignUp ? "נרשם..." : "מתחבר..."}
-                </>
-              ) : (
-                isSignUp ? "הירשם" : "התחבר"
-              )}
-            </Button>
-          </form>
+              <div className="space-y-4 pt-2">
+                  <div className="relative flex items-center gap-3">
+                    <span className="absolute inset-0 flex items-center" aria-hidden>
+                      <span className="w-full border-t border-border" />
+                    </span>
+                    <span className="relative px-2 text-xs text-muted-foreground bg-card">
+                      או
+                    </span>
+                  </div>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="auth-email">אימייל</Label>
+                      <Input
+                        id="auth-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        autoComplete="email"
+                        required
+                        aria-required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="auth-password">סיסמה</Label>
+                      <Input
+                        id="auth-password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        autoComplete={isSignUp ? "new-password" : "current-password"}
+                        required
+                        aria-required
+                        minLength={isSignUp ? 6 : undefined}
+                      />
+                      {isSignUp && (
+                        <p className="text-xs text-muted-foreground">לפחות 6 תווים</p>
+                      )}
+                    </div>
+                    {isSignUp && (
+                      <div className="flex items-start gap-3">
+                        <Checkbox
+                          id="auth-terms"
+                          checked={agreedToTerms}
+                          onCheckedChange={(checked) =>
+                            setAgreedToTerms(checked === true)
+                          }
+                          aria-describedby="auth-terms-label"
+                          aria-required
+                        />
+                        <Label
+                          id="auth-terms-label"
+                          htmlFor="auth-terms"
+                          className="text-sm font-normal cursor-pointer leading-snug text-muted-foreground peer-disabled:cursor-not-allowed"
+                        >
+                          קראתי ואני מסכים ל
+                          <Link
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                          >
+                            תנאי השימוש
+                          </Link>
+                          {" "}ול
+                          <Link
+                            href="/privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                          >
+                            מדיניות הפרטיות
+                          </Link>
+                          .
+                        </Label>
+                      </div>
+                    )}
+                    <Button
+                      type="submit"
+                      className="w-full bg-teal-600 hover:bg-teal-700 text-white sm:w-auto"
+                      disabled={isLoading || !canSubmit}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden />
+                          {isSignUp ? "נרשם..." : "מתחבר..."}
+                        </>
+                      ) : (
+                        isSignUp ? "הירשם" : "התחבר"
+                      )}
+                    </Button>
+                  </form>
+              </div>
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-3 sm:flex-row-reverse sm:justify-between">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp((v) => !v);
-              if (!isSignUp) setAgreedToTerms(false);
-              setError(null);
-            }}
-            className="text-sm text-teal-600 underline dark:text-teal-400 hover:no-underline"
-          >
-            {isSignUp ? "כבר יש לכם חשבון? התחברו" : "אין לכם חשבון? הירשמו"}
-          </button>
-          <Button type="button" variant="outline" asChild className="w-full sm:w-auto order-last sm:order-none">
-            <Link href="/">ביטול</Link>
-          </Button>
+          {showEmailForm ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp((v) => !v);
+                  if (!isSignUp) setAgreedToTerms(false);
+                  setError(null);
+                }}
+                className="text-sm text-teal-600 underline dark:text-teal-400 hover:no-underline"
+              >
+                {isSignUp ? "כבר יש לכם חשבון? התחברו" : "אין לכם חשבון? הירשמו"}
+              </button>
+              <Button type="button" variant="outline" asChild className="w-full sm:w-auto order-last sm:order-none">
+                <Link href="/">ביטול</Link>
+              </Button>
+            </>
+          ) : (
+            <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
+              <Link href="/">ביטול</Link>
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>
