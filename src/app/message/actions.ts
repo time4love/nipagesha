@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { ACCESS_LOG_SALT } from "@/lib/config";
+import { sendEmail } from "@/lib/email";
 import { createHmac } from "crypto";
 
 const ATTEMPT_SUCCESS = "success";
@@ -99,6 +100,23 @@ export async function sendReply(
 
   if (insertError) {
     return { error: insertError.message };
+  }
+
+  // Notify parent by email (best-effort; do not fail the action)
+  try {
+    const {
+      data: { user: parentUser },
+    } = await admin.auth.admin.getUserById(card.user_id);
+    const to = parentUser?.email;
+    if (to) {
+      await sendEmail({
+        to,
+        subject: "התקבלה תשובה לכרטיס שלך – ניפגשה",
+        html: `<p>שלום,</p><p>התקבלה תשובה חדשה לכרטיס שיצרת.</p><p>כניסה ל<strong>הכרטיסים שלי</strong> באתר תאפשר לראות את ההודעה.</p><p>בברכה,<br/>ניפגשה</p>`,
+      });
+    }
+  } catch {
+    // Ignore: missing service role, Resend not configured, or auth errors
   }
 
   return {};
