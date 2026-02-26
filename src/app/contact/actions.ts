@@ -42,6 +42,7 @@ export async function submitContactForm(
     const label = categoryLabels[parsed.data.category] ?? parsed.data.category;
     await sendEmail({
       to: adminTo,
+      replyTo: parsed.data.email,
       subject: `[Nipagesha] New Submission: ${parsed.data.category}`,
       html: [
         `<p><strong>קטגוריה:</strong> ${escapeHtml(label)}</p>`,

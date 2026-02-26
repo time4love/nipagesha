@@ -177,6 +177,7 @@ export async function contactOfferer(
 
   const sendResult = await sendEmail({
     to,
+    replyTo: email,
     subject: `פנייה בנוגע להצעת העזרה: ${offer.title ?? ""}`,
     html,
   });
