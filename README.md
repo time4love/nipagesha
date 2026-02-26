@@ -1,34 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div dir="rtl" align="center">
 
-## Getting Started
+# ניפגשה
 
-Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+<img src="https://www.nipagesha.co.il/logo.avif" alt="לוגו ניפגשה" width="200" />
 
-Run the development server:
+### מחברים מחדש הורים וילדים
+
+[![ניפגשה](https://img.shields.io/badge/ניפגשה-קוד_פתוח-blue?style=flat)](https://github.com/time4love/nipagesha)
+
+</div>
+
+---
+
+<div dir="rtl">
+
+## מה זה ניפגשה?
+
+**ניפגשה** היא פלטפורמה שמאפשרת להורים שהקשר עם ילדיהם נותק — להשאיר מסר מאובטח ופרטי. רק הילד יכול לפתוח את המסר.
+
+- **פרטיות** — המסר מוצפן בצד הלקוח; השרת לא רואה את התוכן.
+- **אמון** — הקוד פתוח (Open Source) כך שניתן לוודא שהמערכת עושה בדיוק מה שהיא מצהירה.
+- **בטיחות** — שאלת אבטחה מגנה על המסר; רק מי שיודע את התשובה יכול לגשת אליו.
+
+האתר מיועד למשפחות במצבים מורכבים, ומאפשר תקשורת ראשונית מכובדת ובטוחה.
+
+</div>
+
+---
+
+<div dir="rtl">
+
+## טכנולוגיות
+
+- **Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind CSS, Shadcn/UI
+- **Backend:** Supabase (Auth, PostgreSQL, RLS, Storage)
+- **אבטחה:** הצפנה בצד הלקוח (Web Crypto), עוגיות מינימליות, YouTube במצב פרטיות (nocookie)
+
+</div>
+
+---
+
+<div dir="rtl">
+
+## הרצה מקומית (למפתחים)
+
+1. **שכפול הפרויקט והתקנת תלויות:**
+
+```bash
+git clone https://github.com/time4love/nipagesha.git
+cd nipagesha
+npm install
+```
+
+2. **הגדרת סביבה:** העתק את `.env.example` ל־`.env.local` והגדר:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+(לפונקציונליות מלאה — גם מפתחות שרת ו־Resend לפי הצורך.)
+
+3. **הפעלת שרת פיתוח:**
 
 ```bash
 npm run dev
 ```
 
-`npm run dev` uses webpack so `.env.local` is available everywhere. For Turbopack use `npm run dev:turbo` (Supabase env will not work in server code with Turbopack).
+פתח [http://localhost:3000](http://localhost:3000) בדפדפן.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+</div>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+<div dir="rtl" align="center">
 
-## Learn More
+## רישיון ותרומה
 
-To learn more about Next.js, take a look at the following resources:
+הפרויקט פתוח לצפייה ולתרומה. אם מצאת באג או רוצה להציע שיפור — נשמח ל־Issue או Pull Request.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**[→ לפרויקט ב-GitHub](https://github.com/time4love/nipagesha)**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</div>

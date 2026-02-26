@@ -4,21 +4,10 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-
-function getYouTubeVideoId(url: string): string | null {
-  if (!url || typeof url !== "string") return null;
-  const trimmed = url.trim();
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-  ];
-  for (const re of patterns) {
-    const m = trimmed.match(re);
-    if (m?.[1]) return m[1];
-  }
-  return null;
-}
+import {
+  getPrivacyEnhancedYouTubeEmbedUrl,
+  getYouTubeThumbnailUrl,
+} from "@/lib/youtube";
 
 const ReactPlayer = dynamic(
   () => import("react-player").then((m) => m.default),
@@ -54,8 +43,16 @@ export function ArticleCard({
   imageClassName,
   imageAlt = "תמונה למאמר",
 }: ArticleCardProps) {
-  const videoId = useMemo(
-    () => (mediaType === "video" ? getYouTubeVideoId(mediaUrl) : null),
+  const embedUrl = useMemo(
+    () =>
+      mediaType === "video"
+        ? getPrivacyEnhancedYouTubeEmbedUrl(mediaUrl)
+        : null,
+    [mediaType, mediaUrl]
+  );
+  const thumbnailUrl = useMemo(
+    () =>
+      mediaType === "video" ? getYouTubeThumbnailUrl(mediaUrl, "hq") : null,
     [mediaType, mediaUrl]
   );
 
@@ -67,12 +64,12 @@ export function ArticleCard({
           className
         )}
       >
-        {videoId ? (
+        {embedUrl ? (
           <ReactPlayer
-            src={`https://www.youtube.com/watch?v=${videoId}`}
+            src={embedUrl}
             width="100%"
             height="100%"
-            light
+            light={thumbnailUrl ?? true}
             playing={false}
             title={title}
           />

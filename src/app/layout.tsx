@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { CookieBanner } from "@/components/layout/cookie-banner";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
           <Navbar />
           <div className="flex flex-1 flex-col min-h-0">{children}</div>
           <Footer />
+          <CookieBanner />
           <Toaster />
         </I18nProvider>
         <Analytics />
