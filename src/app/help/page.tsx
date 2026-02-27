@@ -3,13 +3,14 @@ import { getHelpRequests, getHelpOffers, getCategories } from "./actions";
 import { HelpBoardClient } from "./HelpBoardClient";
 
 interface HelpPageProps {
-  searchParams: Promise<{ category?: string; location?: string }>;
+  searchParams: Promise<{ category?: string; location?: string; action?: string }>;
 }
 
 export default async function HelpPage({ searchParams }: HelpPageProps) {
   const params = await searchParams;
   const category = params.category ?? undefined;
   const location = params.location ?? undefined;
+  const openOfferForm = params.action === "offer";
 
   const [helpResult, offersResult, categories] = await Promise.all([
     getHelpRequests({ category, location }, 0, 10),
@@ -39,7 +40,7 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
   return (
     <section className="space-y-8" dir="rtl">
       <HelpBoardClient
-        key={`${category ?? ""}-${location ?? ""}`}
+        key={`${category ?? ""}-${location ?? ""}-${openOfferForm}`}
         title="לוח עזרה"
         subtitle="הורים עוזרים להורים. בחרו בקשה או הצעת עזרה וצרו קשר."
         initialRequests={helpResult.data}
@@ -53,6 +54,7 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
         defaultContact={defaultContact}
         defaultIsAnonymous={defaultIsAnonymous}
         currentUserId={user?.id ?? null}
+        initialOpenCreateOffer={openOfferForm}
       />
     </section>
   );

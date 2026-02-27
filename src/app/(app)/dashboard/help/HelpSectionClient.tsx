@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, HandHeart } from "lucide-react";
 import { MyRequestsList } from "./MyRequestsList";
 import { CreateHelpRequestDialog } from "./CreateHelpRequestDialog";
+import { CreateOfferDialog } from "@/app/help/CreateOfferDialog";
 import { EditHelpRequestDialog } from "./EditHelpRequestDialog";
 import { getOffersForRequest } from "./actions";
 import type { HelpRequestRow } from "@/lib/supabase/types";
@@ -29,6 +30,7 @@ export function HelpSectionClient({
 }: HelpSectionClientProps) {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
+  const [createOfferOpen, setCreateOfferOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<HelpRequestRow | null>(null);
 
   const hasItems = requests.length > 0;
@@ -44,6 +46,12 @@ export function HelpSectionClient({
         onOpenChange={setCreateOpen}
         categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
+        onSuccess={handleSuccess}
+      />
+
+      <CreateOfferDialog
+        open={createOfferOpen}
+        onOpenChange={setCreateOfferOpen}
         onSuccess={handleSuccess}
       />
 
@@ -78,11 +86,13 @@ export function HelpSectionClient({
                 <Plus className="size-4" aria-hidden />
                 בקש עזרה
               </Button>
-              <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white">
-                <Link href="/help?action=offer" className="inline-flex items-center gap-2">
-                  <Plus className="size-4" aria-hidden />
-                  הצע עזרה
-                </Link>
+              <Button
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white inline-flex items-center gap-2"
+                onClick={() => setCreateOfferOpen(true)}
+              >
+                <Plus className="size-4" aria-hidden />
+                הצע עזרה
               </Button>
             </div>
           </CardContent>

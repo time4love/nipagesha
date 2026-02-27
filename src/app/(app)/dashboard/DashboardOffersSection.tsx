@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, HandHeart, ChevronLeft, Pencil } from "lucide-react";
 import { EditHelpRequestDialog } from "./help/EditHelpRequestDialog";
+import { CreateOfferDialog } from "@/app/help/CreateOfferDialog";
 import { deleteHelpRequest } from "./help/actions";
 import type { HelpRequestRow } from "@/lib/supabase/types";
 
@@ -44,6 +45,7 @@ export function DashboardOffersSection({
 }: DashboardOffersSectionProps) {
   const router = useRouter();
   const [editingOffer, setEditingOffer] = useState<HelpRequestRow | null>(null);
+  const [createOfferOpen, setCreateOfferOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,11 +70,13 @@ export function DashboardOffersSection({
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-xl font-semibold text-foreground">הצעות העזרה שלי</h2>
           {offers.length > 0 && (
-            <Button asChild size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
-              <Link href="/help?action=offer" className="inline-flex items-center gap-2">
-                <Plus className="size-4" aria-hidden />
-                הצע עזרה
-              </Link>
+            <Button
+              size="sm"
+              className="bg-teal-600 hover:bg-teal-700 text-white inline-flex items-center gap-2"
+              onClick={() => setCreateOfferOpen(true)}
+            >
+              <Plus className="size-4" aria-hidden />
+              הצע עזרה
             </Button>
           )}
         </div>
@@ -96,11 +100,13 @@ export function DashboardOffersSection({
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-8">
-            <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white">
-              <Link href="/help?action=offer" className="inline-flex items-center gap-2">
-                <Plus className="size-4" aria-hidden />
-                הצע עזרה
-              </Link>
+            <Button
+              size="lg"
+              className="bg-teal-600 hover:bg-teal-700 text-white inline-flex items-center gap-2"
+              onClick={() => setCreateOfferOpen(true)}
+            >
+              <Plus className="size-4" aria-hidden />
+              הצע עזרה
             </Button>
           </CardContent>
         </Card>
@@ -173,6 +179,12 @@ export function DashboardOffersSection({
           </div>
         </div>
       )}
+
+      <CreateOfferDialog
+        open={createOfferOpen}
+        onOpenChange={setCreateOfferOpen}
+        onSuccess={handleSuccess}
+      />
 
       <EditHelpRequestDialog
         request={editingOffer}

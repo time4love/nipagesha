@@ -36,6 +36,8 @@ interface HelpBoardClientProps {
   defaultIsAnonymous: boolean;
   /** When set, "אני רוצה לעזור" is hidden on this user's own requests. */
   currentUserId: string | null;
+  /** When true, open the "create offer" dialog and show the offers tab (e.g. from dashboard "הצע עזרה" link). */
+  initialOpenCreateOffer?: boolean;
 }
 
 const LIMIT = 10;
@@ -54,13 +56,15 @@ export function HelpBoardClient({
   defaultContact,
   defaultIsAnonymous,
   currentUserId,
+  initialOpenCreateOffer = false,
 }: HelpBoardClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedRequest, setSelectedRequest] = useState<HelpRequestWithRequester | null>(null);
   const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
-  const [createOfferDialogOpen, setCreateOfferDialogOpen] = useState(false);
+  const [createOfferDialogOpen, setCreateOfferDialogOpen] = useState(initialOpenCreateOffer);
+  const [activeTab, setActiveTab] = useState<"requests" | "offers">(initialOpenCreateOffer ? "offers" : "requests");
 
   const categoryParam = searchParams.get("category") ?? "";
   const locationParam = searchParams.get("location") ?? "";
@@ -186,7 +190,7 @@ export function HelpBoardClient({
       </div>
 
       {/* 2. Tabs as main wrapper: each tab has its own toolbar + content */}
-      <Tabs defaultValue="requests" className="w-full">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "requests" | "offers")} className="w-full">
         <TabsList className="grid w-full max-w-[280px] grid-cols-2">
           <TabsTrigger value="requests">בקשות</TabsTrigger>
           <TabsTrigger value="offers">הצעות</TabsTrigger>

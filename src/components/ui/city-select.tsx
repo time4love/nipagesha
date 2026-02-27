@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -58,15 +57,16 @@ export function CitySelect({
       ) : null}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
+          <div
             id={id}
-            type="button"
-            variant="outline"
             role="combobox"
+            tabIndex={0}
             aria-expanded={open}
+            aria-haspopup="listbox"
             aria-label={placeholder}
             className={cn(
-              "w-full justify-between font-normal h-9 min-h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm",
+              "inline-flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 py-1 text-sm font-normal shadow-sm transition-colors",
+              "hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               !displayValue && "text-muted-foreground"
             )}
           >
@@ -75,22 +75,30 @@ export function CitySelect({
             </span>
             <span className="flex items-center gap-1 shrink-0">
               {clearable && value ? (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     onChange("");
                   }}
-                  className="rounded p-0.5 hover:bg-accent"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onChange("");
+                    }
+                  }}
+                  className="rounded p-0.5 hover:bg-accent cursor-pointer"
                   aria-label="נקה בחירה"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </span>
               ) : null}
               <ChevronsUpDown className="h-4 w-4 opacity-50" aria-hidden />
             </span>
-          </Button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0"
