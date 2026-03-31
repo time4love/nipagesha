@@ -129,7 +129,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </p>
       )}
       {state?.success && !state?.error && (
-        <p className="text-sm text-teal-600 dark:text-teal-400" role="status">
+        <p className="text-sm text-teal-600" role="status">
           הפרופיל נשמר בהצלחה.
         </p>
       )}

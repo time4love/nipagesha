@@ -69,7 +69,7 @@ export default function SearchPage() {
                 className="text-center"
                 aria-labelledby="multiple-messages-heading"
               >
-                <div className="inline-flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400 mb-4">
+                <div className="inline-flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-4">
                   <Heart className="size-7" aria-hidden />
                 </div>
                 <h1
@@ -85,10 +85,10 @@ export default function SearchPage() {
               <ul className="space-y-4 mb-8" role="list">
                 {matches!.map((match) => (
                   <li key={match.id}>
-                    <Card className="border-amber-200/80 dark:border-amber-800/50 bg-card/80 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+                    <Card className="border-amber-200/80 bg-card/80 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
                       <CardHeader className="pb-2">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
                             <Lock className="size-5" aria-hidden />
                           </div>
                           <CardTitle className="text-lg font-semibold text-foreground">
@@ -123,7 +123,7 @@ export default function SearchPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setMatches(null)}
-                  className="border-amber-300 dark:border-amber-700"
+                  className="border-amber-300"
                   aria-label={SEARCH_AGAIN_LABEL}
                 >
                   <Search className="size-4 ml-2 rtl:ml-0 rtl:mr-2" aria-hidden />
@@ -134,7 +134,7 @@ export default function SearchPage() {
           ) : (
             <>
               <div className="text-center mb-10">
-                <div className="inline-flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400 mb-4">
+                <div className="inline-flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-4">
                   <Heart className="size-7" aria-hidden />
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -145,7 +145,7 @@ export default function SearchPage() {
                 </p>
               </div>
 
-              <Card className="border-amber-200/80 dark:border-amber-800/50 shadow-lg">
+              <Card className="border-amber-200/80 shadow-lg">
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">חיפוש מסר</CardTitle>
                   <CardDescription>

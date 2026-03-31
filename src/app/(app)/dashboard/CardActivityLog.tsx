@@ -25,12 +25,12 @@ export function CardActivityLog({
     <div className="flex flex-col gap-1 text-sm" aria-label="יומן גישה לכרטיס">
       {lastReadAt !== null && (
         <p className="text-muted-foreground flex items-center gap-1.5" dir="rtl">
-          <Eye className="size-3.5 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden />
+          <Eye className="size-3.5 shrink-0 text-teal-600" aria-hidden />
           <span>נצפה לאחרונה: {formatDate(lastReadAt)}</span>
         </p>
       )}
       {failureCountAll > 0 && (
-        <p className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400" dir="rtl">
+        <p className="flex items-center gap-1.5 text-amber-700" dir="rtl">
           <AlertCircle className="size-3.5 shrink-0" aria-hidden />
           <span>
             נסיונות כושלים: {failureCountAll}

@@ -266,7 +266,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[200px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none prose prose-sm max-w-none dark:prose-invert",
+          "min-h-[200px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none prose prose-sm max-w-none ",
         dir: "rtl",
       },
       handleDrop(_view, event) {

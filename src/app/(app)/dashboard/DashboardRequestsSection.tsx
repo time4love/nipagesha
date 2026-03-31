@@ -64,7 +64,7 @@ export function DashboardRequestsSection({
       </div>
 
       {requests.length === 0 ? (
-        <Card className="border-teal-200 dark:border-teal-800 border-dashed">
+        <Card className="border-teal-200 border-dashed">
           <CardHeader className="text-center">
             <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground mb-2">
               <HandHeart className="size-7" aria-hidden />

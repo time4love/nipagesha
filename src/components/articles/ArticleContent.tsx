@@ -39,7 +39,7 @@ export function ArticleContent({ html, className }: ArticleContentProps) {
   return (
     <div
       className={cn(
-        "prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4",
+        "prose prose-lg max-w-none  prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4",
         className
       )}
       dir="rtl"

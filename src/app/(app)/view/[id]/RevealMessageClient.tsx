@@ -48,7 +48,7 @@ export function RevealMessageClient({
 
   return (
     <div className="container max-w-2xl mx-auto py-8" dir="rtl">
-      <Card className="border-teal-200 dark:border-teal-800">
+      <Card className="border-teal-200">
         <CardHeader>
           <CardTitle className="text-xl">צפייה במסר</CardTitle>
           <p className="text-muted-foreground text-sm">{securityQuestion}</p>

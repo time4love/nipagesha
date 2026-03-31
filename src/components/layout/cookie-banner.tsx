@@ -26,23 +26,23 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="הודעת עוגיות"
-      className="fixed bottom-0 left-0 right-0 z-[100] bg-slate-900 text-white px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.2)]"
+      className="fixed bottom-0 left-0 right-0 z-[100] border-t border-border bg-card px-4 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]"
     >
       <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center sm:justify-between sm:text-right">
-        <p className="text-sm text-white/95">
+        <p className="text-sm text-muted-foreground">
           האתר משתמש בקובצי עוגיות (Cookies) נחוצים לצורך תפעולו התקין וחווית השימוש.
         </p>
         <div className="flex items-center gap-3">
           <Link
             href="/privacy"
-            className="text-sm font-medium text-white/90 underline underline-offset-2 transition hover:text-white"
+            className="text-sm font-medium text-teal-700 underline underline-offset-2 transition hover:text-teal-800"
           >
             מדיניות פרטיות
           </Link>
           <button
             type="button"
             onClick={handleAccept}
-            className="rounded-md bg-white/15 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-white/25 focus:outline-none focus:ring-2 focus:ring-white/40"
+            className="rounded-md border border-border bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring"
           >
             הבנתי, תודה
           </button>

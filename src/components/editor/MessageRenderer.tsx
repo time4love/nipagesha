@@ -77,7 +77,7 @@ export function MessageRenderer({ html, className, cardId }: MessageRendererProp
 
   return (
     <div
-      className={`prose prose-sm max-w-none dark:prose-invert ${className ?? ""}`}
+      className={`prose prose-sm max-w-none  ${className ?? ""}`}
       dir="rtl"
       dangerouslySetInnerHTML={{ __html: sanitized }}
     />

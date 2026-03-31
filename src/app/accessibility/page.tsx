@@ -12,7 +12,7 @@ export default function AccessibilityPage() {
       dir="rtl"
       aria-label="הצהרת נגישות"
     >
-      <article className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed text-foreground">
+      <article className="prose prose-lg max-w-none prose-headings:font-bold prose-p:leading-relaxed text-foreground">
         <h1>הצהרת נגישות</h1>
         <p>
           אתר &quot;ניפגשה&quot; שואף להעניק חוויית גלישה נגישה לכולם. אנו פועלים להתאמת האתר לעקרונות תקן WCAG 2.1 ברמת AA ככל האפשר, לרבות ניווט מקלדת, תמיכה בקוראי מסך, ניגודיות מספקת וטקסט ברור.

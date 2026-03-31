@@ -88,7 +88,7 @@ export function AdminHelpRequestsClient({ requests: initialRequests }: AdminHelp
         {requests.map((req) => (
           <Card
             key={req.id}
-            className="cursor-pointer border-teal-100 dark:border-teal-900/50 transition-shadow hover:shadow-md focus-within:ring-2 focus-within:ring-teal-500"
+            className="cursor-pointer border-teal-100 transition-shadow hover:shadow-md focus-within:ring-2 focus-within:ring-teal-500"
             onClick={() => openDetail(req)}
           >
             <CardContent className="p-4">
@@ -107,7 +107,7 @@ export function AdminHelpRequestsClient({ requests: initialRequests }: AdminHelp
                     {req.description}
                   </p>
                 ) : null}
-                <span className="text-teal-600 dark:text-teal-400 text-sm font-medium inline-flex items-center gap-1 mt-1">
+                <span className="text-teal-600 text-sm font-medium inline-flex items-center gap-1 mt-1">
                   צפה ואישור/דחייה
                   <ChevronLeft className="size-4" aria-hidden />
                 </span>

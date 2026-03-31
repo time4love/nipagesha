@@ -65,7 +65,7 @@ export function HelpSectionClient({
 
       {!hasItems ? (
         /* Case A: NO ITEMS — only empty state card; no filter tabs in DOM */
-        <Card className="w-full border-teal-200 dark:border-teal-800 border-dashed">
+        <Card className="w-full border-teal-200 border-dashed">
           <CardHeader className="text-center">
             <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground mb-2">
               <HandHeart className="size-7" aria-hidden />

@@ -46,14 +46,14 @@ export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
   if (success) {
     return (
       <div
-        className="rounded-lg border border-teal-200 bg-teal-50 p-6 text-center dark:border-teal-800 dark:bg-teal-950/30"
+        className="rounded-lg border border-teal-200 bg-teal-50 p-6 text-center"
         role="status"
         aria-live="polite"
       >
-        <p className="font-medium text-teal-800 dark:text-teal-200">
+        <p className="font-medium text-teal-800">
           ההודעה נשלחה בהצלחה
         </p>
-        <p className="mt-1 text-sm text-teal-700 dark:text-teal-300">
+        <p className="mt-1 text-sm text-teal-700">
           ניצור איתכם קשר בהקדם האפשרי.
         </p>
       </div>

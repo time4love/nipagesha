@@ -89,7 +89,7 @@ export function DashboardOffersSection({
       </div>
 
       {offers.length === 0 ? (
-        <Card className="border-teal-200 dark:border-teal-800 border-dashed">
+        <Card className="border-teal-200 border-dashed">
           <CardHeader className="text-center">
             <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground mb-2">
               <HandHeart className="size-7" aria-hidden />
@@ -119,7 +119,7 @@ export function DashboardOffersSection({
           )}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {offers.map((offer) => (
-              <Card key={offer.id} className="border-teal-100 dark:border-teal-900/50">
+              <Card key={offer.id} className="border-teal-100">
                 <CardHeader className="pb-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <CardTitle className="text-lg">{offer.title}</CardTitle>
@@ -139,11 +139,11 @@ export function DashboardOffersSection({
                     ) : null}
                   </div>
                   {offer.status === "rejected" && offer.rejection_reason ? (
-                    <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30 p-3 mt-2">
-                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                    <div className="rounded-md border border-amber-200 bg-amber-50/50 p-3 mt-2">
+                      <p className="text-sm font-medium text-amber-800 mb-1">
                         סיבת הדחייה:
                       </p>
-                      <p className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
+                      <p className="text-sm text-amber-900 whitespace-pre-wrap">
                         {offer.rejection_reason}
                       </p>
                     </div>

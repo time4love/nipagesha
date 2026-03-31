@@ -28,7 +28,7 @@ export function MessageCard({
 
   return (
     <Card
-      className="border-teal-200 dark:border-teal-800 w-full"
+      className="border-teal-200 w-full"
       dir="rtl"
       aria-label={isPreview ? "תצוגה מקדימה של המסר" : undefined}
     >

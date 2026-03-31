@@ -8,7 +8,7 @@ export const OUTLINE_BUTTON_TEAL_CLASS =
 
 /** Background gradient for child-facing pages (search, message unlock). */
 export const CHILD_PAGE_GRADIENT =
-  "absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/80 via-orange-50/50 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background";
+  "absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/80 via-orange-50/50 to-background   ";
 
 /** Help Board categories (Hebrew). Used for form dropdown and filter. */
 export const HELP_CATEGORIES = [

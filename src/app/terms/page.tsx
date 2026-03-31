@@ -12,7 +12,7 @@ export default function TermsPage() {
       dir="rtl"
       aria-label="תנאי שימוש"
     >
-      <article className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1 text-foreground">
+      <article className="prose prose-lg max-w-none prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1 text-foreground">
         <h1>תנאי שימוש – אתר &quot;ניפגשה&quot;</h1>
         <p>
           <strong>עדכון אחרון: פברואר 2026</strong>

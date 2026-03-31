@@ -24,7 +24,7 @@ function ArticleListItem({ article }: { article: PublicArticle }) {
     article.content?.replace(/<[^>]*>/g, "").slice(0, 200) ?? "";
   return (
     <Link href={`/articles/${article.id}`}>
-      <Card className="group border-border bg-card hover:border-teal-200 hover:shadow-md dark:hover:border-teal-800 transition-all duration-200 overflow-hidden h-full">
+      <Card className="group border-border bg-card hover:border-teal-200 hover:shadow-md transition-all duration-200 overflow-hidden h-full">
         <ArticleCard
           title={article.title}
           mediaType={article.media_type}

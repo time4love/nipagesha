@@ -216,7 +216,7 @@ export function HelpBoardClient({
           </div>
 
           {requests.length === 0 ? (
-            <div className="w-full rounded-xl border border-dashed border-teal-200 dark:border-teal-800 p-8 text-center">
+            <div className="w-full rounded-xl border border-dashed border-teal-200 p-8 text-center">
               <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
                 <HandHeart className="size-6" aria-hidden />
               </div>
@@ -272,7 +272,7 @@ export function HelpBoardClient({
           </div>
 
           {offers.length === 0 ? (
-            <div className="w-full rounded-xl border border-dashed border-teal-200 dark:border-teal-800 p-8 text-center">
+            <div className="w-full rounded-xl border border-dashed border-teal-200 p-8 text-center">
               <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
                 <HandHeart className="size-6" aria-hidden />
               </div>

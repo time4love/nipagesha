@@ -63,16 +63,16 @@ export default async function AdminDashboardPage() {
           <Card className="border-orange-500/40 bg-orange-500/5 transition-shadow hover:shadow-md">
             <Link href="/admin/inbox" className="block">
               <CardHeader className="flex flex-row items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-orange-600">
                   <Inbox className="size-5" aria-hidden />
                 </div>
                 <CardTitle className="text-base">פניות צור קשר חדשות</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <span className="text-2xl font-bold tabular-nums text-orange-600 dark:text-orange-400">
+                <span className="text-2xl font-bold tabular-nums text-orange-600">
                   {stats.open_contact_messages}
                 </span>
-                <p className="mt-1 text-sm font-medium text-orange-600/90 dark:text-orange-400/90">
+                <p className="mt-1 text-sm font-medium text-orange-600/90">
                   מעבר לתיבת פניות →
                 </p>
               </CardContent>
@@ -82,16 +82,16 @@ export default async function AdminDashboardPage() {
           <Card className="border-amber-500/40 bg-amber-500/5 transition-shadow hover:shadow-md">
             <Link href="/admin/reports" className="block">
               <CardHeader className="flex flex-row items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600">
                   <Flag className="size-5" aria-hidden />
                 </div>
                 <CardTitle className="text-base">דיווחים על תוכן</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <span className="text-2xl font-bold tabular-nums text-amber-600 dark:text-amber-400">
+                <span className="text-2xl font-bold tabular-nums text-amber-600">
                   {stats.open_reports}
                 </span>
-                <p className="mt-1 text-sm font-medium text-amber-600/90 dark:text-amber-400/90">
+                <p className="mt-1 text-sm font-medium text-amber-600/90">
                   מעבר לדיווחים →
                 </p>
               </CardContent>
@@ -108,7 +108,7 @@ export default async function AdminDashboardPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <Card className="border-teal-500/30 bg-teal-500/5 transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-teal-500/15 text-teal-600 dark:text-teal-400">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-teal-500/15 text-teal-600">
                 <Heart className="size-5" aria-hidden />
               </div>
               <CardTitle className="text-base">כרטיסי ילד</CardTitle>
@@ -117,7 +117,7 @@ export default async function AdminDashboardPage() {
               <CardDescription className="mb-1">
                 {stats.read_child_cards} נצפו מתוך {stats.total_child_cards} נוצרו
               </CardDescription>
-              <span className="text-xl font-bold tabular-nums text-teal-600 dark:text-teal-400">
+              <span className="text-xl font-bold tabular-nums text-teal-600">
                 {stats.total_child_cards > 0
                   ? Math.round((stats.read_child_cards / stats.total_child_cards) * 100)
                   : 0}
@@ -129,14 +129,14 @@ export default async function AdminDashboardPage() {
 
           <Card className="border-blue-500/30 bg-blue-500/5 transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600">
                 <Users className="size-5" aria-hidden />
               </div>
               <CardTitle className="text-base">משתמשים רשומים</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <CardDescription className="mb-1">סך הפרופילים במערכת</CardDescription>
-              <span className="text-2xl font-bold tabular-nums text-blue-600 dark:text-blue-400">
+              <span className="text-2xl font-bold tabular-nums text-blue-600">
                 {stats.total_users}
               </span>
             </CardContent>
@@ -144,14 +144,14 @@ export default async function AdminDashboardPage() {
 
           <Card className="border-cyan-500/30 bg-cyan-500/5 transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 text-cyan-600">
                 <Library className="size-5" aria-hidden />
               </div>
               <CardTitle className="text-base">מאגר תוכן</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <CardDescription className="mb-1">שירים ומאמרים</CardDescription>
-              <span className="text-2xl font-bold tabular-nums text-cyan-600 dark:text-cyan-400">
+              <span className="text-2xl font-bold tabular-nums text-cyan-600">
                 {stats.total_songs + stats.total_articles}
               </span>
               <span className="mr-2 text-sm text-muted-foreground">

@@ -88,7 +88,7 @@ export function DashboardCard({
   );
 
   return (
-    <Card className="border-teal-100 dark:border-teal-900/50 relative">
+    <Card className="border-teal-100 relative">
       {unreadCount > 0 && (
         <span
           className="absolute top-2 left-2 rtl:left-auto rtl:right-2 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500 text-amber-950"
@@ -144,7 +144,7 @@ export function DashboardCard({
                       className={`rounded-lg border p-3 text-right ${
                         reply.is_read
                           ? "border-border bg-muted/30"
-                          : "border-teal-300 dark:border-teal-700 bg-teal-50/50 dark:bg-teal-950/30"
+                          : "border-teal-300  bg-teal-50/50 "
                       }`}
                     >
                       <p className="text-sm text-foreground whitespace-pre-wrap">
@@ -158,7 +158,7 @@ export function DashboardCard({
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatReplyDate(reply.created_at)}
                         {!reply.is_read && (
-                          <span className="mr-2 text-amber-600 dark:text-amber-400">
+                          <span className="mr-2 text-amber-600">
                             • חדש
                           </span>
                         )}

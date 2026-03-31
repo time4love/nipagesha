@@ -33,12 +33,12 @@ export default async function SongsPage() {
         aria-labelledby="songs-hero-heading"
       >
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/70 via-orange-50/40 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/70 via-orange-50/40 to-background"
           aria-hidden
         />
         <div className="container mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 p-3 mb-4">
-            <Music className="size-8 text-amber-600 dark:text-amber-400" aria-hidden />
+          <div className="inline-flex items-center justify-center rounded-full bg-amber-100 p-3 mb-4">
+            <Music className="size-8 text-amber-600" aria-hidden />
           </div>
           <h1
             id="songs-hero-heading"
@@ -75,9 +75,9 @@ export default async function SongsPage() {
         aria-labelledby="songs-cta-heading"
       >
         <div className="container mx-auto max-w-2xl">
-          <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-b from-amber-50/50 to-card dark:from-amber-950/20 dark:to-card text-center sm:text-right">
+          <Card className="border-amber-200 bg-gradient-to-b from-amber-50/50 to-card text-center sm:text-right">
             <CardHeader>
-              <div className="mx-auto sm:mr-0 flex size-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400 mb-2">
+              <div className="mx-auto sm:mr-0 flex size-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-2">
                 <MessageCircle className="size-6" aria-hidden />
               </div>
               <CardTitle id="songs-cta-heading" className="text-xl sm:text-2xl">

@@ -113,7 +113,7 @@ export default function CreateCardPage() {
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
-      <Card className="border-teal-200 dark:border-teal-800">
+      <Card className="border-teal-200">
         <CardHeader className="text-right">
           <CardTitle className="text-2xl">{t("createCard.title")}</CardTitle>
           <CardDescription>{t("createCard.description")}</CardDescription>

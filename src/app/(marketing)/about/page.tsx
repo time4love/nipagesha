@@ -46,7 +46,7 @@ export default function AboutPage() {
         aria-labelledby="about-heading"
       >
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-teal-50/80 via-sky-50/50 to-background dark:from-teal-950/30 dark:via-sky-950/20 dark:to-background"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-teal-50/80 via-sky-50/50 to-background"
           aria-hidden
         />
         <div className="container mx-auto max-w-3xl text-center">
@@ -89,12 +89,12 @@ export default function AboutPage() {
               return (
                 <Card
                   key={step.title}
-                  className="border-teal-100 dark:border-teal-900/50 bg-card/80 backdrop-blur"
+                  className="border-teal-100 bg-card/80 backdrop-blur"
                 >
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <span
-                        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400"
+                        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-600"
                         aria-hidden
                       >
                         <Icon className="size-5" />
@@ -123,9 +123,9 @@ export default function AboutPage() {
         aria-labelledby="security-heading"
       >
         <div className="container mx-auto max-w-3xl">
-          <Card className="border-teal-200 bg-gradient-to-b from-teal-50/50 to-card dark:border-teal-800 dark:from-teal-950/20 dark:to-card">
+          <Card className="border-teal-200 bg-gradient-to-b from-teal-50/50 to-card">
             <CardHeader className="text-center sm:text-right">
-              <div className="mx-auto sm:mx-0 flex size-12 items-center justify-center rounded-full bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400 mb-2">
+              <div className="mx-auto sm:mx-0 flex size-12 items-center justify-center rounded-full bg-teal-100 text-teal-600 mb-2">
                 <Shield className="size-6" aria-hidden />
               </div>
               <CardTitle id="security-heading" className="text-2xl">

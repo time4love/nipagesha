@@ -163,7 +163,7 @@ function LoginForm() {
 
   return (
     <div className="container mx-auto flex min-h-[80vh] items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-teal-200 dark:border-teal-800">
+      <Card className="w-full max-w-md border-teal-200">
         <CardHeader className="text-center sm:text-right">
           <CardTitle className="text-2xl">
             {isSignUp ? "הרשמה" : "התחברות"}
@@ -184,7 +184,7 @@ function LoginForm() {
             type="button"
             size="lg"
             variant="outline"
-            className="w-full border-neutral-300 bg-white hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-base"
+            className="w-full border-neutral-300 bg-white hover:bg-neutral-50 text-base"
             onClick={handleGoogleLogin}
             disabled={isGoogleLoading || isLoading}
             aria-label="המשך עם Google"
@@ -325,7 +325,7 @@ function LoginForm() {
                   if (!isSignUp) setAgreedToTerms(false);
                   setError(null);
                 }}
-                className="text-sm text-teal-600 underline dark:text-teal-400 hover:no-underline"
+                className="text-sm text-teal-600 underline hover:no-underline"
               >
                 {isSignUp ? "כבר יש לכם חשבון? התחברו" : "אין לכם חשבון? הירשמו"}
               </button>

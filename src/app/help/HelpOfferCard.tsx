@@ -36,7 +36,7 @@ export function HelpOfferCard({
 
   return (
     <>
-      <Card className="flex flex-col h-full border-teal-100 dark:border-teal-900/50 hover:shadow-md transition-shadow" dir="rtl">
+      <Card className="flex flex-col h-full border-teal-100 hover:shadow-md transition-shadow" dir="rtl">
         <CardHeader className="pb-2">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <Badge variant={getHelpCategoryBadgeVariant(offer.category)}>
@@ -71,7 +71,7 @@ export function HelpOfferCard({
           <Button
             type="button"
             variant="outline"
-            className="w-full border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-950/50"
+            className="w-full border-teal-200 text-teal-700 hover:bg-teal-50"
             onClick={() => setContactOpen(true)}
             aria-label={`צור קשר – ${offer.title}`}
           >

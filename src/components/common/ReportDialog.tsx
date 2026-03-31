@@ -96,7 +96,7 @@ export function ReportDialog({
           </DialogDescription>
         </DialogHeader>
         {success ? (
-          <p className="py-4 text-center text-sm text-teal-700 dark:text-teal-300" role="status">
+          <p className="py-4 text-center text-sm text-teal-700" role="status">
             הדיווח נשלח. תודה.
           </p>
         ) : (

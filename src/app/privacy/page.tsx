@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       dir="rtl"
       aria-label="מדיניות פרטיות"
     >
-      <article className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1 text-foreground">
+      <article className="prose prose-lg max-w-none prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1 text-foreground">
         <h1>מדיניות פרטיות – אתר &quot;ניפגשה&quot;</h1>
         <p>
           אנו מכבדים את פרטיותך ורואים בהגנה על המידע האישי ערך עליון.

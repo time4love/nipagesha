@@ -91,7 +91,7 @@ export function MyRequestsList({
 
   if (requests.length === 0) {
     return (
-      <Card className="border-teal-200 dark:border-teal-800 border-dashed">
+      <Card className="border-teal-200 border-dashed">
         <CardContent className="py-8 text-center text-muted-foreground">
           <p className="font-medium">אין לכם בקשות עדיין</p>
           <p className="text-sm mt-1">פרסמו בקשה בלוח העזרה כדי לקבל עזרה מהקהילה.</p>
@@ -110,7 +110,7 @@ export function MyRequestsList({
       {requests.map((req) => {
         const unreadCount = unreadByRequest[req.id] ?? 0;
         return (
-        <Card key={req.id} className="border-teal-100 dark:border-teal-900/50 relative">
+        <Card key={req.id} className="border-teal-100 relative">
           {unreadCount > 0 && (
             <span
               className="absolute top-2 left-2 rtl:left-auto rtl:right-2 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500 text-amber-950"
@@ -140,11 +140,11 @@ export function MyRequestsList({
               ) : null}
             </div>
             {req.status === "rejected" && req.rejection_reason ? (
-              <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30 p-3 mt-2">
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+              <div className="rounded-md border border-amber-200 bg-amber-50/50 p-3 mt-2">
+                <p className="text-sm font-medium text-amber-800 mb-1">
                   סיבת הדחייה:
                 </p>
-                <p className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
+                <p className="text-sm text-amber-900 whitespace-pre-wrap">
                   {req.rejection_reason}
                 </p>
               </div>

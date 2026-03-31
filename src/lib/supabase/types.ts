@@ -138,3 +138,33 @@ export interface ContactSubmissionRow {
   status: ContactStatus;
   created_at: string;
 }
+
+/** Official source for evidence (e.g. Knesset protocol, video). */
+export interface EvidenceSourceRow {
+  id: string;
+  title: string;
+  type: string;
+  publication_date: string | null;
+  official_url: string | null;
+}
+
+/** Single evidence excerpt linked to a source. */
+export interface EvidenceItemRow {
+  id: string;
+  source_id: string;
+  evidence_number: number;
+  evidence_title: string;
+  category: string;
+  speaker: string | null;
+  exact_location: string | null;
+  thesis: string | null;
+  smoking_gun: string | null;
+  verbatim_quote: string | null;
+  forensic_analysis: string | null;
+  media_asset_url: string | null;
+}
+
+/** Join shape from `evidence_items` with embedded `sources`. */
+export type EvidenceItemWithSource = EvidenceItemRow & {
+  sources: EvidenceSourceRow | null;
+};

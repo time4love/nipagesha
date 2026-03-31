@@ -136,10 +136,10 @@ function EditForm({
 
   return (
     <div className="container max-w-2xl mx-auto py-8" dir="rtl">
-      <Card className="border-teal-200 dark:border-teal-800 transition-shadow">
+      <Card className="border-teal-200 transition-shadow">
         <CardHeader className="text-right">
           <div className="flex items-center gap-2">
-            <Pencil className="size-5 text-teal-600 dark:text-teal-400" aria-hidden />
+            <Pencil className="size-5 text-teal-600" aria-hidden />
             <CardTitle className="text-2xl">{t("editCard.title")}</CardTitle>
           </div>
           <CardDescription>{t("editCard.description")}</CardDescription>
@@ -296,9 +296,9 @@ export function EditCardClient({ card }: EditCardClientProps) {
   if (decryptedHtml === null) {
     return (
       <div className="container max-w-2xl mx-auto py-8" dir="rtl">
-        <Card className="border-amber-200/80 dark:border-amber-800/50 shadow-lg transition-shadow">
+        <Card className="border-amber-200/80 shadow-lg transition-shadow">
           <CardHeader className="text-right">
-            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 mb-2">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-2">
               <Lock className="size-6" aria-hidden />
             </div>
             <CardTitle className="text-xl text-center">{t("editCard.unlockTitle")}</CardTitle>

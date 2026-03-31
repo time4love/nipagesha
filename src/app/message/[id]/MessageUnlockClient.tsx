@@ -51,9 +51,9 @@ function ChildReplySection({
 
   if (success) {
     return (
-      <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/30">
+      <Card className="border-teal-200 bg-teal-50/50">
         <CardContent className="pt-6">
-          <p className="text-center text-teal-800 dark:text-teal-200 font-medium">
+          <p className="text-center text-teal-800 font-medium">
             {REPLY_SUCCESS_MESSAGE}
           </p>
         </CardContent>
@@ -62,7 +62,7 @@ function ChildReplySection({
   }
 
   return (
-    <Card className="border-teal-200/80 dark:border-teal-800/80">
+    <Card className="border-teal-200/80">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">יצירת קשר</CardTitle>
       </CardHeader>
@@ -71,7 +71,7 @@ function ChildReplySection({
           <Button
             type="button"
             variant="outline"
-            className="w-full border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-950/50"
+            className="w-full border-teal-300 text-teal-700 hover:bg-teal-50"
             onClick={() => setShowForm(true)}
           >
             שלח תגובה ל{parentReplyLabel}
@@ -162,7 +162,7 @@ export function MessageUnlockClient({
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-12">
-      <Card className="border-amber-200/80 dark:border-amber-800/50 shadow-lg">
+      <Card className="border-amber-200/80 shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             נמצא מסר עבור {childName || FALLBACK_CHILD_LABEL}

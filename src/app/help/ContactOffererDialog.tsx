@@ -106,7 +106,7 @@ export function ContactOffererDialog({
             </p>
           )}
           {result?.success && (
-            <p className="text-sm text-teal-600 dark:text-teal-400" role="status">
+            <p className="text-sm text-teal-600" role="status">
               ההודעה נשלחה. המציע/ה ייצור/תיצור איתכם קשר בהקדם.
             </p>
           )}
