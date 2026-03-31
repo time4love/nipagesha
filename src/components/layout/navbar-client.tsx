@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu } from 'lucide-react'
+import { Menu, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import {
@@ -35,6 +35,7 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
       <Link href="/about" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>אודות</Link>
       <Link href="/articles" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>מאמרים</Link>
       <Link href="/songs" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>שירים</Link>
+      <Link href="/forum" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>פורום קהילה</Link>
       <Link href="/help" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>לוח עזרה</Link>
       <Link href="/contact" className="flex cursor-pointer select-none items-center rounded-sm px-3 py-3 text-base min-h-[44px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground md:min-h-0 md:py-0 md:inline-flex md:px-0 md:text-sm md:font-medium md:hover:bg-transparent md:hover:text-primary" onClick={onNavigate}>צור קשר</Link>
     </>
@@ -88,6 +89,13 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
                 <DropdownMenuLabel>מחובר</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push('/dashboard')}>לוח בקרה</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push('/dashboard#forum-posts')}
+                  className="flex items-center gap-2"
+                >
+                  <MessageSquare className="size-4 shrink-0" aria-hidden />
+                  הפוסטים שלי
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/profile')}>פרופיל</DropdownMenuItem>
                 {['jodagm@gmail.com'].includes(user.email || '') && (
                    <DropdownMenuItem onClick={() => router.push('/admin')}>ניהול</DropdownMenuItem>
