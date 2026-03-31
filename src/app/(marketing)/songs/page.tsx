@@ -48,7 +48,7 @@ export default async function SongsPage() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
             שירים ומוזיקה שנכתבו מתוך הלב, עבור הורים שהקשר עם ילדיהם נותק.
-            המוזיקה נושאת תפילה ותקווה — ומרפאת.
+            המוזיקה נושאת תפילה ותקווה לאיחוד ומרפאה את הלבבות.
           </p>
         </div>
       </section>
