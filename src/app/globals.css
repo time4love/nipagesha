@@ -96,6 +96,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --font-sans: var(--font-heebo), system-ui, sans-serif;
+  --font-tagline: var(--font-noto-hebrew), var(--font-heebo), system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

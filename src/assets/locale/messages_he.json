@@ -39,7 +39,7 @@
   "login.passwordHint": "לפחות 6 תווים",
 
   "createCard.title": "יצירת כרטיס ילד",
-  "createCard.description": "המסר והתשובה לסוד מוצפנים בדפדפן — השרת לא רואה אותם. רק הילד יוכל לפתוח את המסר עם התשובה הנכונה.",
+  "createCard.description": "המסר והתשובה לשאלת אבטחה מוצפנים בדפדפן — השרת לא רואה אותם. רק הילד יוכל לפתוח את המסר עם התשובה הנכונה.",
   "createCard.childFirstNameLabel": "שם פרטי של הילד",
   "createCard.childFirstNamePlaceholder": "למשל דני",
   "createCard.childLastNameLabel": "שם משפחה של הילד",
@@ -53,7 +53,7 @@
   "createCard.senderNamePlaceholder": "אבא, אמא, סבא יוסי...",
   "createCard.securityQuestionLabel": "שאלת אבטחה (רק הילד יודע את התשובה)",
   "createCard.securityQuestionPlaceholder": "למשל: מה היה שם הכלב הראשון שלנו?",
-  "createCard.securityAnswerLabel": "תשובה לסוד (משמשת כמפתח הצפנה — אל תשתפו)",
+  "createCard.securityAnswerLabel": "תשובה לשאלת אבטחה (משמשת כמפתח הצפנה — אל תשתפו)",
   "createCard.securityAnswerPlaceholder": "••••••••",
   "createCard.messageLabel": "המסר לילד",
   "createCard.messagePlaceholder": "כתבו כאן את המסר. הוא יוצפן לפני שליחה.",
@@ -149,7 +149,7 @@
   "validation.birthDate.required": "נא לבחור תאריך לידה",
   "validation.senderName.required": "נא להזין איך הילד מכיר אותך",
   "validation.securityQuestion.required": "נא להזין שאלת אבטחה",
-  "validation.securityAnswer.required": "נא להזין תשובה לסוד",
+  "validation.securityAnswer.required": "נא להזין תשובה לשאלת אבטחה",
   "validation.message.required": "נא להזין את המסר",
   "validation.message.hasContent": "נא להזין את המסר",
 

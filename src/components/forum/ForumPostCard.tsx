@@ -76,7 +76,7 @@ export function ForumPostCard({ post, currentUserId }: ForumPostCardProps) {
             )}
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-3 text-end">
+          <div className="flex min-w-0 flex-1 flex-col gap-3 text-right">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant={getForumCategoryBadgeVariant(post.category)}
