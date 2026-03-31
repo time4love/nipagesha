@@ -14,12 +14,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid } from "lucide-react";
+import { Plus, LayoutGrid, MessageSquare, ChevronLeft } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
 import { getMyHelpRequests, getMyHelpOffers, getUnreadHelpOffersByRequest } from "./help/actions";
 import { getCategories } from "@/app/help/actions";
+import { getUserForumPosts } from "@/app/forum/actions";
 import { DashboardRequestsSection } from "./DashboardRequestsSection";
 import { DashboardOffersSection } from "./DashboardOffersSection";
+import { ForumPostCard } from "@/components/forum/ForumPostCard";
 
 const FAILURE_DAYS = 7;
 
@@ -42,6 +44,7 @@ export default async function DashboardPage() {
     unreadByRequest,
     categories,
     profileRow,
+    userForumPosts,
   ] = await Promise.all([
     supabase
       .from("child_cards")
@@ -55,9 +58,11 @@ export default async function DashboardPage() {
     getUnreadHelpOffersByRequest(),
     getCategories(),
     supabase.from("profiles").select("is_anonymous").eq("id", user.id).single(),
+    getUserForumPosts(),
   ]);
 
   const defaultIsAnonymous = profileRow?.data?.is_anonymous !== false;
+  const hasForumPosts = userForumPosts.length > 0;
 
   if (cardsError) {
     console.error("Dashboard fetch error:", cardsError.message);
@@ -143,6 +148,62 @@ export default async function DashboardPage() {
 
       {/* Section 3: My Help Offers — same structure as Child Cards */}
       <DashboardOffersSection offers={myOffers} categories={categories} />
+
+      {/* Section 4: My Community Forum Posts */}
+      <div id="forum-posts" className="scroll-mt-24 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground">הפוסטים שלי בקהילה</h2>
+            {hasForumPosts ? (
+              <Button asChild size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Link href="/forum/new" className="inline-flex items-center gap-2">
+                  <Plus className="size-4" aria-hidden />
+                  כתוב פוסט חדש
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground shrink-0"
+          >
+            <Link href="/forum" className="inline-flex items-center gap-1">
+              למעבר לפורום הקהילה
+              <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
+            </Link>
+          </Button>
+        </div>
+
+        {hasForumPosts ? (
+          <div className="space-y-4">
+            {userForumPosts.map((post) => (
+              <ForumPostCard key={post.id} post={post} currentUserId={user.id} />
+            ))}
+          </div>
+        ) : (
+          <Card className="border-teal-200 dark:border-teal-800 border-dashed">
+            <CardHeader className="text-center">
+              <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground mb-2">
+                <MessageSquare className="size-7" aria-hidden />
+              </div>
+              <CardTitle className="text-xl">הקול שלך חסר בקהילה</CardTitle>
+              <CardDescription className="max-w-sm mx-auto">
+                עדיין לא פרסמת פוסטים בפורום. זה המקום לשתף, להתייעץ ולתמוך בהורים אחרים.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center pb-8">
+              <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Link href="/forum/new" className="inline-flex items-center gap-2">
+                  <Plus className="size-4" aria-hidden />
+                  כתוב פוסט חדש
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </section>
   );
 }

@@ -138,3 +138,25 @@ export interface ContactSubmissionRow {
   status: ContactStatus;
   created_at: string;
 }
+
+/** One row from forum_posts. */
+export interface ForumPostRow {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  category: string;
+  /** Set at insert; may be null for legacy rows until backfilled. */
+  thumbnail_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** One row from forum_comments. */
+export interface ForumCommentRow {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+}

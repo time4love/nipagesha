@@ -42,3 +42,32 @@ export function getHelpCategoryBadgeVariant(
 ): "default" | "secondary" | "success" | "outline" {
   return HELP_CATEGORY_VARIANTS[category as HelpCategory] ?? "outline";
 }
+
+/** Forum categories (Hebrew). */
+export const FORUM_CATEGORIES = [
+  "תמיכה רגשית",
+  "שאלות ותשובות",
+  "סיפורי הצלחה",
+  "כללי",
+] as const;
+
+export type ForumCategory = (typeof FORUM_CATEGORIES)[number];
+
+/** Default selection in the new-post form. */
+export const DEFAULT_FORUM_CATEGORY: ForumCategory = "כללי";
+
+const FORUM_CATEGORY_VARIANTS: Record<
+  ForumCategory,
+  "default" | "secondary" | "success" | "outline"
+> = {
+  "תמיכה רגשית": "secondary",
+  "שאלות ותשובות": "default",
+  "סיפורי הצלחה": "success",
+  כללי: "outline",
+};
+
+export function getForumCategoryBadgeVariant(
+  category: string
+): "default" | "secondary" | "success" | "outline" {
+  return FORUM_CATEGORY_VARIANTS[category as ForumCategory] ?? "outline";
+}
