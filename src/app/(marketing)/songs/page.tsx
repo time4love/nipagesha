@@ -93,7 +93,10 @@ export default async function SongsPage() {
                 size="lg"
                 className="bg-teal-600 hover:bg-teal-700 text-white gap-2"
               >
-                <Link href="/#cta-heading" className="inline-flex items-center gap-2">
+                <Link
+                  href="/contact?category=song_request"
+                  className="inline-flex items-center gap-2"
+                >
                   <MessageCircle className="size-4" aria-hidden />
                   צרו קשר
                 </Link>
