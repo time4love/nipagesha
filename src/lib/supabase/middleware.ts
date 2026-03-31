@@ -1,6 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Clears broken auth cookies when refresh is no longer valid on the server. */
+function shouldClearStaleSession(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  const { code, message } = error;
+  if (
+    code === "refresh_token_not_found" ||
+    code === "refresh_token_already_used" ||
+    code === "session_not_found"
+  ) {
+    return true;
+  }
+  return typeof message === "string" && message.includes("Invalid Refresh Token");
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -36,7 +50,15 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  try {
+    const { error } = await supabase.auth.getUser();
+    if (shouldClearStaleSession(error)) {
+      // Local only: no extra round-trip; sync cleared cookies via setAll above.
+      await supabase.auth.signOut({ scope: "local" });
+    }
+  } catch {
+    // Transient Edge fetch failure (offline, DNS, firewall). Do not fail the request.
+  }
 
   return response;
 }

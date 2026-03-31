@@ -28,6 +28,7 @@ export function initI18n(lng: string = "he") {
     lng: supportedLngs.includes(lng as SupportedLocale) ? lng : "he",
     fallbackLng: "he",
     defaultNS,
+    showSupportNotice: false,
     interpolation: {
       escapeValue: false,
     },

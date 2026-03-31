@@ -34,10 +34,8 @@ export default async function HomePage() {
             className="w-full max-w-3xl mx-auto object-contain"
             priority
           />
-          <p className="mt-6 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            {user
-              ? "ברוך שובך. כאן תוכל לנהל את כרטיסי הילדים ולשלוח מסרים מאובטחים."
-              : "ניפגשה מאפשרת להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח ופרטי. רק הילד יוכל לפתוח אותו — באמצעות תשובה לסוד שרק הוא מכיר."}
+          <p className="mt-6 max-w-2xl mx-auto text-2xl text-muted-foreground sm:text-3xl md:text-4xl font-medium font-tagline tracking-tight">
+            חיבור הורים וילדים
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-4">
             {user ? (

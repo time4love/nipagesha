@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Heebo } from "next/font/google";
+import { Heebo, Noto_Sans_Hebrew } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
@@ -13,6 +13,13 @@ import "./globals.css";
 const heebo = Heebo({
   variable: "--font-heebo",
   subsets: ["latin", "hebrew"],
+  weight: ["400", "500", "600", "700"],
+});
+
+/** Hebrew from the Noto family (Oriya font has no Hebrew glyphs). */
+const notoSansHebrew = Noto_Sans_Hebrew({
+  variable: "--font-noto-hebrew",
+  subsets: ["hebrew"],
   weight: ["400", "500", "600", "700"],
 });
 
@@ -40,6 +47,7 @@ export default function RootLayout({
       <body
         className={cn(
           heebo.variable,
+          notoSansHebrew.variable,
           "font-sans antialiased overflow-x-hidden min-h-screen flex flex-col"
         )}
       >
