@@ -28,6 +28,7 @@ const categoryLabels: Record<string, string> = {
   bug: "באג",
   report_abuse: "דיווח שימוש לרעה",
   report_content: "דיווח תוכן",
+  song_request: "בקשה לשיר",
 };
 
 const statusLabels: Record<ContactStatus, string> = {

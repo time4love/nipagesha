@@ -11,9 +11,23 @@ import { cn } from "@/lib/utils";
 interface ContactFormProps {
   initialName: string;
   initialEmail: string;
+  /** Pre-selected category (e.g. from `/contact?category=song_request`). */
+  defaultCategory?: ContactFormData["category"];
+  defaultSubject?: string;
+  defaultMessage?: string;
+  referenceId?: string;
+  referenceType?: string;
 }
 
-export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
+export function ContactForm({
+  initialName,
+  initialEmail,
+  defaultCategory = "general",
+  defaultSubject = "",
+  defaultMessage = "",
+  referenceId,
+  referenceType,
+}: ContactFormProps) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -30,6 +44,8 @@ export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
         .value as ContactFormData["category"],
       subject: (form.elements.namedItem("subject") as HTMLInputElement).value.trim(),
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim(),
+      reference_id: referenceId?.trim() || undefined,
+      reference_type: referenceType?.trim() || undefined,
     };
     const res = await submitContactForm(data);
     setPending(false);
@@ -109,7 +125,7 @@ export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
           )}
-          defaultValue="general"
+          defaultValue={defaultCategory}
         >
           {contactCategories.map((cat) => (
             <option key={cat} value={cat}>
@@ -125,6 +141,7 @@ export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
           name="subject"
           type="text"
           required
+          defaultValue={defaultSubject}
           placeholder="תקציר קצר"
           disabled={pending}
           className="w-full"
@@ -137,6 +154,7 @@ export function ContactForm({ initialName, initialEmail }: ContactFormProps) {
           name="message"
           required
           rows={5}
+          defaultValue={defaultMessage}
           placeholder="פרטו את בקשתכם או את הדיווח..."
           disabled={pending}
           className={cn(

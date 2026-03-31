@@ -42,7 +42,7 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
       <HelpBoardClient
         key={`${category ?? ""}-${location ?? ""}-${openOfferForm}`}
         title="לוח עזרה"
-        subtitle="הורים עוזרים להורים. בחרו בקשה או הצעת עזרה וצרו קשר."
+        subtitle="בקשות והצעות עזרה"
         initialRequests={helpResult.data}
         initialHasMore={helpResult.hasMore}
         initialOffers={offersResult.data}

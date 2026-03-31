@@ -20,10 +20,19 @@ import Link from "next/link";
 
 interface SongCardProps {
   song: Song;
-  onRequestSong?: () => void;
 }
 
-export function SongCard({ song, onRequestSong }: SongCardProps) {
+function songContactHref(song: Song): string {
+  const params = new URLSearchParams({
+    category: "song_request",
+    reference_id: song.id,
+    reference_type: "song",
+    song_title: song.title,
+  });
+  return `/contact?${params.toString()}`;
+}
+
+export function SongCard({ song }: SongCardProps) {
   return (
     <Card className="overflow-hidden flex flex-col">
       <CardHeader className="pb-2">
@@ -57,26 +66,15 @@ export function SongCard({ song, onRequestSong }: SongCardProps) {
         </Accordion>
       </CardContent>
       <CardFooter className="pt-0">
-        {onRequestSong ? (
-          <Button
-            onClick={onRequestSong}
-            variant="outline"
-            className="w-full gap-2"
-            asChild
+        <Button variant="outline" className="w-full gap-2" asChild>
+          <Link
+            href={songContactHref(song)}
+            className="inline-flex items-center justify-center gap-2"
           >
-            <Link href="/#cta-heading" className="inline-flex items-center gap-2">
-              <MessageCircle className="size-4" aria-hidden />
-              אני רוצה שיר כזה
-            </Link>
-          </Button>
-        ) : (
-          <Button variant="outline" className="w-full gap-2" asChild>
-            <Link href="/#cta-heading" className="inline-flex items-center gap-2">
-              <MessageCircle className="size-4" aria-hidden />
-              אני רוצה שיר כזה
-            </Link>
-          </Button>
-        )}
+            <MessageCircle className="size-4" aria-hidden />
+            אני רוצה שיר כזה
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );

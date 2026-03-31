@@ -8,6 +8,7 @@ export const contactCategories = [
   "bug",
   "report_abuse",
   "report_content",
+  "song_request",
 ] as const;
 
 export const categoryLabels: Record<(typeof contactCategories)[number], string> = {
@@ -16,6 +17,7 @@ export const categoryLabels: Record<(typeof contactCategories)[number], string> 
   bug: "דיווח על תקלה",
   report_abuse: "דיווח על שימוש לרעה",
   report_content: "דיווח על תוכן",
+  song_request: "בקשה לשיר",
 };
 
 export const contactSchema = z.object({

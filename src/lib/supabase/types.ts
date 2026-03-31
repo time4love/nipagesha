@@ -119,7 +119,8 @@ export type ContactCategory =
   | "support"
   | "bug"
   | "report_abuse"
-  | "report_content";
+  | "report_content"
+  | "song_request";
 
 /** Contact submission status (admin workflow). */
 export type ContactStatus = "open" | "in_progress" | "resolved";
