@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,14 +19,22 @@ interface ProfileFormProps {
   profile: ProfileRow;
 }
 
+const initialProfileActionState: UpdateProfileResult = { success: false };
+
 export function ProfileForm({ profile }: ProfileFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(profile.is_anonymous);
   const [state, formAction] = useActionState(
     async (_prev: UpdateProfileResult, formData: FormData) => {
       return updateProfile(formData);
     },
-    { success: true }
+    initialProfileActionState
   );
+
+  useEffect(() => {
+    if (state.success && !state.error) {
+      toast.success("הפרופיל נשמר בהצלחה.", { id: "profile-saved" });
+    }
+  }, [state]);
 
   const displayInitial = profile.display_name?.trim() || "";
   const initialLetter = displayInitial
@@ -126,11 +135,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       {state?.error && (
         <p className="text-sm text-destructive" role="alert">
           {state.error}
-        </p>
-      )}
-      {state?.success && !state?.error && (
-        <p className="text-sm text-teal-600 dark:text-teal-400" role="status">
-          הפרופיל נשמר בהצלחה.
         </p>
       )}
 

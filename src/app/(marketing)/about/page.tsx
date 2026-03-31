@@ -27,7 +27,7 @@ const steps = [
   {
     icon: KeyRound,
     title: "תשובה לשאלת אבטחה וחשיפת המסר",
-    description: "הילד עונה על שאלת האבטחה. רק תשובה נכונה תפענח את ההודעה — ואף אחד אחר לא יראה אותה.",
+    description: "הילד עונה על שאלת האבטחה. רק תשובה נכונה תפתח את ההודעה — ואף אחד אחר לא יראה אותה.",
   },
 ] as const;
 
@@ -150,7 +150,7 @@ export default function AboutPage() {
               <CardDescription className="text-base text-right max-w-none">
                 ההודעה מוצפנת אצלכם בדפדפן לפני שליחה. השרת לא רואה את תוכן
                 ההודעה או את תשובת האבטחה. רק מי שיודע את התשובה הנכונה יכול
-                לפענח את המסר — אנחנו לא יכולים ואף אחד אחר לא יכול.
+                לקרוא את המסר — אנחנו לא יכולים ואף אחד אחר לא יכול.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
