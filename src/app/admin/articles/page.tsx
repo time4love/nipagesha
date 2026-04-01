@@ -13,8 +13,8 @@ import { Plus, Pencil, ImageIcon, Video } from "lucide-react";
 import { DeleteArticleButton } from "./DeleteArticleButton";
 
 export const metadata = {
-  title: "ניהול מאמרים | ניפגשה",
-  description: "הוספה, עריכה ומחיקה של מאמרים",
+  title: "ניהול מידע | ניפגשה",
+  description: "הוספה, עריכה ומחיקה של תוכן במדור המידע",
 };
 
 export default async function AdminArticlesPage() {
@@ -23,17 +23,17 @@ export default async function AdminArticlesPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">ניהול מאמרים</h1>
+        <h1 className="text-2xl font-bold text-foreground">ניהול מידע</h1>
         <Button asChild>
           <Link href="/admin/articles/new" className="inline-flex items-center gap-2">
             <Plus className="size-4" aria-hidden />
-            מאמר חדש
+            תוכן חדש
           </Link>
         </Button>
       </div>
 
       {articles.length === 0 ? (
-        <p className="text-muted-foreground">אין מאמרים. הוסף מאמר חדש.</p>
+        <p className="text-muted-foreground">אין תוכן. הוסף פריט חדש.</p>
       ) : (
         <div className="rounded-md border">
           <Table>
@@ -74,7 +74,7 @@ export default async function AdminArticlesPage() {
                       <Button variant="ghost" size="icon" asChild>
                         <Link
                           href={`/admin/articles/${a.id}`}
-                          aria-label="ערוך מאמר"
+                          aria-label="ערוך תוכן"
                         >
                           <Pencil className="size-4" aria-hidden />
                         </Link>

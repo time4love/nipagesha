@@ -13,9 +13,9 @@ export async function generateMetadata({
 }) {
   const { id } = await params;
   const article = await getPublishedArticleById(id);
-  if (!article) return { title: "מאמר | ניפגשה" };
+  if (!article) return { title: "מידע | ניפגשה" };
   return {
-    title: `${article.title} | מאמרים | ניפגשה`,
+    title: `${article.title} | מידע | ניפגשה`,
     description:
       article.content?.replace(/<[^>]*>/g, "").slice(0, 160) ?? article.title,
   };
@@ -36,7 +36,7 @@ export default async function ArticlePage({
         <Button variant="ghost" size="sm" asChild className="mb-6 -mr-2">
           <Link href="/articles" className="inline-flex items-center gap-2">
             <ArrowRight className="size-4" aria-hidden />
-            חזרה למאמרים
+            חזרה למידע
           </Link>
         </Button>
 

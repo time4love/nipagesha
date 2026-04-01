@@ -134,7 +134,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
             <FormItem>
               <FormLabel>כותרת *</FormLabel>
               <FormControl>
-                <Input placeholder="כותרת המאמר" {...field} />
+                <Input placeholder="כותרת" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -152,7 +152,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                   value={field.value ?? ""}
                   onChange={field.onChange}
                   mode="public"
-                  placeholder="כתבו כאן את תוכן המאמר. כותרות, רשימות, תמונות ויישור."
+                  placeholder="כתבו כאן את התוכן. כותרות, רשימות, תמונות ויישור."
                   onUploadError={(msg) => toast.error(msg)}
                 />
               </FormControl>
@@ -248,7 +248,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
 
         {mediaType === "image" && (
           <div className="space-y-2">
-            <Label>תמונת המאמר</Label>
+            <Label>תמונת ראשית</Label>
             <div
               onDrop={onDrop}
               onDragOver={onDragOver}
@@ -305,7 +305,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                 />
               </FormControl>
               <FormLabel htmlFor="is_published" className="cursor-pointer">
-                פורסם (מופיע בדף המאמרים)
+                פורסם (מופיע בדף המידע)
               </FormLabel>
             </FormItem>
           )}
@@ -316,8 +316,8 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
             {pending
               ? "שומר..."
               : isNew
-                ? "הוסף מאמר"
-                : "עדכן מאמר"}
+                ? "הוסף תוכן"
+                : "עדכן תוכן"}
           </Button>
           <Button type="button" variant="outline" asChild>
             <Link href="/admin/articles" className="inline-flex items-center gap-2">

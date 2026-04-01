@@ -55,9 +55,9 @@ export function DeleteArticleButton({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>מחיקת מאמר</DialogTitle>
+          <DialogTitle>מחיקת תוכן</DialogTitle>
           <DialogDescription>
-            האם למחוק את המאמר &quot;{articleTitle}&quot;? פעולה זו לא ניתנת
+            האם למחוק את התוכן &quot;{articleTitle}&quot;? פעולה זו לא ניתנת
             לביטול.
           </DialogDescription>
         </DialogHeader>

@@ -145,7 +145,7 @@ export default async function HomePage() {
             <Button asChild variant="outline" size="lg" className={`gap-2 ${OUTLINE_BUTTON_TEAL_CLASS}`}>
               <Link href="/articles">
                 <BookOpen className="size-4" aria-hidden />
-                למתחם המאמרים
+                למתחם המידע
                 <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
               </Link>
             </Button>

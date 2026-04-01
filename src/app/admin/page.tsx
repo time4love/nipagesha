@@ -150,12 +150,12 @@ export default async function AdminDashboardPage() {
               <CardTitle className="text-base">מאגר תוכן</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <CardDescription className="mb-1">שירים ומאמרים</CardDescription>
+              <CardDescription className="mb-1">שירים ומידע</CardDescription>
               <span className="text-2xl font-bold tabular-nums text-cyan-600 dark:text-cyan-400">
                 {stats.total_songs + stats.total_articles}
               </span>
               <span className="mr-2 text-sm text-muted-foreground">
-                ({stats.total_songs} שירים, {stats.total_articles} מאמרים)
+                ({stats.total_songs} שירים, {stats.total_articles} פריטי מידע)
               </span>
             </CardContent>
           </Card>
@@ -177,7 +177,7 @@ export default async function AdminDashboardPage() {
           <Button asChild variant="secondary" size="default" className="gap-2">
             <Link href="/admin/articles/new">
               <FileText className="size-4" aria-hidden />
-              כתוב מאמר חדש
+              הוסף תוכן למידע
             </Link>
           </Button>
         </div>

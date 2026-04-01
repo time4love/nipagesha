@@ -41,7 +41,7 @@ export function ArticleCard({
   mediaUrl,
   className,
   imageClassName,
-  imageAlt = "תמונה למאמר",
+  imageAlt = "תמונה לתוכן",
 }: ArticleCardProps) {
   const embedUrl = useMemo(
     () =>

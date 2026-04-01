@@ -2,9 +2,9 @@ import { ArticleList } from "@/components/articles/ArticleList";
 import { getPublishedArticles } from "@/lib/articles";
 
 export const metadata = {
-  title: "מאמרים | מידע וכלים להתמודדות | ניפגשה",
+  title: "מידע נוסף על ניכור הורי וחטיפות ילדים | ניפגשה",
   description:
-    "מאמרים על ניכור הורי, היבטים משפטיים ותמיכה נפשית. כלים להבנה ולהתמודדות.",
+    "מידע על ניכור הורי, היבטים משפטיים ותמיכה נפשית. כלים להבנה ולהתמודדות.",
 };
 
 const INITIAL_LIMIT = 10;
@@ -19,15 +19,15 @@ export default async function ArticlesPage() {
         <section className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-              מידע וכלים להתמודדות
+              מידע נוסף על ניכור הורי וחטיפות ילדים
             </h1>
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-              מאמרים וכלים שיעזרו לכם להבין, להתמודד ולפעול.
+              מידע וכלים שיעזרו לכם להבין, להתמודד ולפעול.
             </p>
           </div>
           {initialData.length === 0 ? (
             <p className="text-center text-muted-foreground">
-              אין מאמרים לפרסום כרגע.
+              אין תוכן לפרסום כרגע.
             </p>
           ) : (
             <ArticleList

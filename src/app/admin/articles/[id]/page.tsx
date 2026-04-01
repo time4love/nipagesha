@@ -5,8 +5,8 @@ import { ArticleForm } from "./ArticleForm";
 import type { AdminArticle } from "../actions";
 
 export const metadata = {
-  title: "עריכת מאמר | ניפגשה",
-  description: "עריכת או הוספת מאמר",
+  title: "עריכת מידע | ניפגשה",
+  description: "עריכת או הוספת תוכן במדור המידע",
 };
 
 export default async function AdminArticleEditPage({
@@ -39,7 +39,7 @@ export default async function AdminArticleEditPage({
   return (
     <div className="space-y-6" dir="rtl">
       <h1 className="text-2xl font-bold text-foreground">
-        {isNew ? "מאמר חדש" : "עריכת מאמר"}
+        {isNew ? "תוכן חדש" : "עריכת תוכן"}
       </h1>
       <ArticleForm initialArticle={initialArticle} isNew={isNew} />
     </div>
