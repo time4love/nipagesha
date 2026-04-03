@@ -1,26 +1,58 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getPublishedArticleById } from "@/lib/articles";
+import {
+  getPublishedArticleById,
+  getArticleOpenGraphImageUrl,
+} from "@/lib/articles";
+import { stripHtmlToSnippet } from "@/lib/forum";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { ArticleContent } from "@/components/articles/ArticleContent";
+import { ShareButton } from "@/components/common/ShareButton";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
 /** ISR: article pages can be cached and revalidated hourly. */
 export const revalidate = 3600;
 
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nipagesha.co.il";
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) {
+}): Promise<Metadata> {
   const { id } = await params;
   const article = await getPublishedArticleById(id);
-  if (!article) return { title: "מידע | ניפגשה" };
+  if (!article) {
+    return { title: "מידע | ניפגשה" };
+  }
+
+  const description = article.content?.trim()
+    ? stripHtmlToSnippet(article.content, 150)
+    : article.title;
+
+  const ogImage = getArticleOpenGraphImageUrl(article, SITE_ORIGIN);
+  const pageUrl = `${SITE_ORIGIN}/articles/${id}`;
+
   return {
-    title: `${article.title} | מידע | ניפגשה`,
-    description:
-      article.content?.replace(/<[^>]*>/g, "").slice(0, 160) ?? article.title,
+    title: `${article.title} | ניפגשה`,
+    description,
+    openGraph: {
+      title: article.title,
+      description,
+      url: pageUrl,
+      type: "article",
+      locale: "he_IL",
+      siteName: "ניפגשה",
+      images: [{ url: ogImage, alt: article.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -33,6 +65,12 @@ export default async function ArticlePage({
   const article = await getPublishedArticleById(id);
   if (!article) notFound();
 
+  const shareUrl = `${SITE_ORIGIN}/articles/${id}`;
+  const shareText =
+    article.content && article.content.trim()
+      ? stripHtmlToSnippet(article.content, 160)
+      : article.title;
+
   return (
     <div className="min-h-screen" dir="rtl">
       <div className="container mx-auto px-4 py-12 max-w-3xl">
@@ -44,20 +82,30 @@ export default async function ArticlePage({
         </Button>
 
         <article className="space-y-8">
-          <header>
-            <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+          <header className="space-y-4">
+            <h1 className="text-3xl font-bold text-foreground sm:text-4xl leading-tight">
               {article.title}
             </h1>
-            <time
-              dateTime={article.created_at}
-              className="mt-2 block text-sm text-muted-foreground"
-            >
-              {new Date(article.created_at).toLocaleDateString("he-IL", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <time
+                dateTime={article.created_at}
+                className="text-sm text-muted-foreground tabular-nums"
+              >
+                {new Date(article.created_at).toLocaleDateString("he-IL", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+              <ShareButton
+                title={article.title}
+                text={shareText}
+                url={shareUrl}
+                variant="outline"
+                size="sm"
+                className="shrink-0 border-border/80 text-muted-foreground hover:text-foreground"
+              />
+            </div>
           </header>
 
           {article.media_type === "link" ? (
@@ -101,9 +149,20 @@ export default async function ArticlePage({
             />
           )}
 
-          {article.content && (
+          {article.content ? (
             <ArticleContent html={article.content} className="mt-8" />
-          )}
+          ) : null}
+
+          <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border/80 pt-6">
+            <ShareButton
+              title={article.title}
+              text={shareText}
+              url={shareUrl}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            />
+          </footer>
         </article>
       </div>
     </div>

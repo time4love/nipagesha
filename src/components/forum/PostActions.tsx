@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
-import { Heart, Share2, Link2 } from "lucide-react";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
+import { ShareButton } from "@/components/common/ShareButton";
 import { togglePostLike } from "@/app/forum/actions";
 import { cn } from "@/lib/utils";
 
@@ -28,11 +28,7 @@ export function PostActions({
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [likeBurst, setLikeBurst] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-
-  const canNativeShare =
-    typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   const triggerLikeAnimation = useCallback(() => {
     setLikeBurst(true);
@@ -57,43 +53,6 @@ export function PostActions({
       setLikeCount(result.likeCount);
       triggerLikeAnimation();
     });
-  };
-
-  const handleShareButtonClick = async () => {
-    if (canNativeShare) {
-      try {
-        await navigator.share({
-          title: postTitle,
-          text: postTitle,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        const e = err as { name?: string };
-        if (e?.name === "AbortError") return;
-        setShareOpen(true);
-        return;
-      }
-    }
-    setShareOpen((o) => !o);
-  };
-
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${postTitle} ${shareUrl}`)}`;
-
-  const openExternal = (url: string) => {
-    window.open(url, "_blank", "noopener,noreferrer");
-    setShareOpen(false);
-  };
-
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("הקישור הועתק.");
-      setShareOpen(false);
-    } catch {
-      toast.error("לא ניתן להעתיק את הקישור.");
-    }
   };
 
   return (
@@ -124,54 +83,14 @@ export function PostActions({
         <span className="tabular-nums font-medium">{likeCount}</span>
       </Button>
 
-      <Popover open={shareOpen} onOpenChange={setShareOpen}>
-        <PopoverAnchor asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="gap-2 rounded-full text-muted-foreground hover:text-foreground"
-            onClick={() => void handleShareButtonClick()}
-            aria-label="שיתוף הפוסט"
-            aria-expanded={shareOpen}
-            aria-haspopup="dialog"
-            suppressHydrationWarning
-          >
-            <Share2 className="size-5 shrink-0" aria-hidden />
-            שיתוף
-          </Button>
-        </PopoverAnchor>
-        <PopoverContent
-          dir="rtl"
-          align="end"
-          className="w-56 p-2 space-y-0.5"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">שיתוף</p>
-          <button
-            type="button"
-            className="flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-accent text-start"
-            onClick={() => openExternal(facebookUrl)}
-          >
-            שיתוף לפייסבוק
-          </button>
-          <button
-            type="button"
-            className="flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-accent text-start"
-            onClick={() => openExternal(whatsappUrl)}
-          >
-            שיתוף לוואטסאפ
-          </button>
-          <button
-            type="button"
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent text-start"
-            onClick={() => void copyLink()}
-          >
-            <Link2 className="size-4 shrink-0 opacity-70" aria-hidden />
-            העתקת קישור
-          </button>
-        </PopoverContent>
-      </Popover>
+      <ShareButton
+        title={postTitle}
+        text={postTitle}
+        url={shareUrl}
+        variant="ghost"
+        size="sm"
+        className="rounded-full text-muted-foreground hover:text-foreground [&_svg]:size-5"
+      />
     </div>
   );
 }

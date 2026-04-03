@@ -4,6 +4,61 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { resolveForumOgImageUrl } from "@/lib/forum";
+
+/** Extract YouTube video ID from common watch/embed/shorts URLs. */
+export function extractYoutubeVideoIdFromUrl(url: string): string | null {
+  const trimmed = url?.trim();
+  if (!trimmed) return null;
+  try {
+    const u = new URL(trimmed);
+    const host = u.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = u.pathname.replace(/^\//, "").split("/")[0];
+      return id || null;
+    }
+    if (host === "youtube.com" || host === "m.youtube.com" || host === "www.youtube.com") {
+      if (u.pathname.startsWith("/embed/")) {
+        const id = u.pathname.slice("/embed/".length).split("/")[0];
+        return id || null;
+      }
+      const shorts = u.pathname.match(/^\/shorts\/([^/?]+)/);
+      if (shorts?.[1]) return shorts[1];
+      const v = u.searchParams.get("v");
+      if (v) return v;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+/** Absolute Open Graph image URL for a published article. */
+export function getArticleOpenGraphImageUrl(
+  article: PublicArticle,
+  siteOrigin: string
+): string {
+  const origin = siteOrigin.replace(/\/$/, "");
+  const fallback = `${origin}/opengraph-image.png`;
+
+  if (article.media_type === "image" && article.media_url?.trim()) {
+    return resolveForumOgImageUrl(article.media_url, siteOrigin);
+  }
+
+  if (article.media_type === "video" && article.media_url?.trim()) {
+    const id = extractYoutubeVideoIdFromUrl(article.media_url);
+    if (id) {
+      return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+    }
+    return fallback;
+  }
+
+  if (article.media_type === "link" && article.link_thumbnail?.trim()) {
+    return resolveForumOgImageUrl(article.link_thumbnail, siteOrigin);
+  }
+
+  return fallback;
+}
 
 export type ArticleMediaType = "video" | "image" | "link";
 
