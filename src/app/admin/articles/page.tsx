@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, ImageIcon, Video } from "lucide-react";
+import { Plus, Pencil, ImageIcon, Link2, Video } from "lucide-react";
 import { DeleteArticleButton } from "./DeleteArticleButton";
 
 export const metadata = {
@@ -54,6 +54,11 @@ export default async function AdminArticlesPage() {
                       <span className="inline-flex items-center gap-1">
                         <Video className="size-4" aria-hidden />
                         וידאו
+                      </span>
+                    ) : a.media_type === "link" ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Link2 className="size-4" aria-hidden />
+                        קישור
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1">

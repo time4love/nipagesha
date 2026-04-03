@@ -3,7 +3,10 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { getPrivacyEnhancedYouTubeEmbedUrl } from "@/lib/youtube";
+import {
+  getPrivacyEnhancedYouTubeEmbedUrl,
+  REACT_PLAYER_YOUTUBE_CONFIG,
+} from "@/lib/youtube";
 
 const ReactPlayer = dynamic(() => import("react-player").then((m) => m.default), {
   ssr: false,
@@ -42,7 +45,7 @@ export function YouTubePlayer({ url, className, title }: YouTubePlayerProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl shadow-md aspect-video w-full bg-black",
+        "rounded-xl shadow-md aspect-video w-full bg-black",
         className
       )}
     >
@@ -50,8 +53,10 @@ export function YouTubePlayer({ url, className, title }: YouTubePlayerProps) {
         src={embedUrl}
         width="100%"
         height="100%"
+        controls
         playing={false}
         title={title ?? "סרטון יוטיוב"}
+        config={REACT_PLAYER_YOUTUBE_CONFIG}
       />
     </div>
   );

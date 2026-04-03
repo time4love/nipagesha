@@ -3,6 +3,17 @@
  * Using the nocookie domain avoids third-party tracking cookies until the user plays.
  */
 
+/**
+ * Options passed to `react-player` v3 `config.youtube` (youtube-video-element).
+ * `fs: 1` enables the YouTube player’s fullscreen control (maps to iframe `fs` param).
+ * @see https://developers.google.com/youtube/player_parameters
+ */
+export const REACT_PLAYER_YOUTUBE_CONFIG = {
+  youtube: {
+    fs: 1 as const,
+  },
+} as const;
+
 const YOUTUBE_VIDEO_ID_PATTERNS = [
   /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
   /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,

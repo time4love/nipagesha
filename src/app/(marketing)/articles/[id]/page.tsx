@@ -4,7 +4,7 @@ import { getPublishedArticleById } from "@/lib/articles";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { ArticleContent } from "@/components/articles/ArticleContent";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 
 /** ISR: article pages can be cached and revalidated hourly. */
 export const revalidate = 3600;
@@ -60,13 +60,46 @@ export default async function ArticlePage({
             </time>
           </header>
 
-          <ArticleCard
-            title={article.title}
-            mediaType={article.media_type}
-            mediaUrl={article.media_url}
-            imageAlt={article.title}
-            className="rounded-xl overflow-hidden"
-          />
+          {article.media_type === "link" ? (
+            <section
+              className="rounded-xl border border-teal-200/90 bg-gradient-to-br from-teal-50/95 via-card to-card p-6 text-center shadow-sm dark:border-teal-900/50 dark:from-teal-950/40 dark:via-card dark:to-card"
+              aria-labelledby="article-external-cta"
+              dir="rtl"
+            >
+              <h2
+                id="article-external-cta"
+                className="text-lg font-semibold text-foreground sm:text-xl"
+              >
+                לצפייה בכתבה המלאה / סרטון המקור
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                התוכן נפתח באתר המקור — לחצו להמשך צפייה או קריאה.
+              </p>
+              <Button
+                asChild
+                size="lg"
+                className="mt-5 bg-teal-600 hover:bg-teal-700 text-white gap-2"
+              >
+                <a
+                  href={article.media_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="size-4 shrink-0" aria-hidden />
+                  מעבר לאתר החיצוני
+                </a>
+              </Button>
+            </section>
+          ) : (
+            <ArticleCard
+              title={article.title}
+              mediaType={article.media_type}
+              mediaUrl={article.media_url}
+              linkThumbnail={article.link_thumbnail}
+              imageAlt={article.title}
+              className="rounded-xl overflow-hidden"
+            />
+          )}
 
           {article.content && (
             <ArticleContent html={article.content} className="mt-8" />

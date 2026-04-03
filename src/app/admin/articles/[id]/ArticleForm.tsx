@@ -23,7 +23,7 @@ import Image from "next/image";
 import { upsertArticleWithFormData } from "../actions";
 import type { AdminArticle } from "../actions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, ImageIcon, Video } from "lucide-react";
+import { ArrowRight, ImageIcon, Link2, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -38,13 +38,69 @@ const RichTextEditor = dynamic(
   }
 );
 
-const articleSchema = z.object({
-  title: z.string().min(1, "כותרת חובה"),
-  content: z.string().optional(),
-  media_type: z.enum(["video", "image"]),
-  media_url: z.string().optional(),
-  is_published: z.boolean(),
-});
+const articleSchema = z
+  .object({
+    title: z.string().min(1, "כותרת חובה"),
+    content: z.string().optional(),
+    media_type: z.enum(["video", "image", "link"]),
+    media_url: z.string().optional(),
+    link_thumbnail: z.string().optional(),
+    is_published: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    const url = data.media_url?.trim() ?? "";
+    if (data.media_type === "video" && !url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "קישור יוטיוב חובה",
+        path: ["media_url"],
+      });
+    }
+    if (data.media_type === "link" && !url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "נא להזין כתובת URL של הכתבה או הסרטון",
+        path: ["media_url"],
+      });
+    }
+    if (data.media_type === "link" && url) {
+      try {
+        const u = new URL(url);
+        if (u.protocol !== "http:" && u.protocol !== "https:") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "הקישור חייב להתחיל ב-https:// או http://",
+            path: ["media_url"],
+          });
+        }
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "כתובת URL לא תקינה",
+          path: ["media_url"],
+        });
+      }
+    }
+    const thumb = data.link_thumbnail?.trim() ?? "";
+    if (data.media_type === "link" && thumb) {
+      try {
+        const u = new URL(thumb);
+        if (u.protocol !== "http:" && u.protocol !== "https:") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "כתובת תמונה חייבת להתחיל ב-https:// או http://",
+            path: ["link_thumbnail"],
+          });
+        }
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "כתובת תמונה לא תקינה",
+          path: ["link_thumbnail"],
+        });
+      }
+    }
+  });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
@@ -60,6 +116,12 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
     initialArticle?.media_type === "image" ? initialArticle.media_url : null
   );
+  const [linkThumbFile, setLinkThumbFile] = useState<File | null>(null);
+  const [linkThumbPreviewUrl, setLinkThumbPreviewUrl] = useState<string | null>(
+    initialArticle?.media_type === "link" && initialArticle.link_thumbnail
+      ? initialArticle.link_thumbnail
+      : null
+  );
   const [dragActive, setDragActive] = useState(false);
 
   const form = useForm<ArticleFormValues>({
@@ -69,6 +131,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
       content: initialArticle?.content ?? "",
       media_type: initialArticle?.media_type ?? "video",
       media_url: initialArticle?.media_url ?? "",
+      link_thumbnail: initialArticle?.link_thumbnail ?? "",
       is_published: initialArticle?.is_published ?? true,
     },
   });
@@ -81,6 +144,14 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
       return file ? URL.createObjectURL(file) : null;
     });
     setImageFile(file ?? null);
+  }, []);
+
+  const handleLinkThumbChange = useCallback((file: File | null) => {
+    setLinkThumbPreviewUrl((prevUrl) => {
+      if (prevUrl?.startsWith("blob:")) URL.revokeObjectURL(prevUrl);
+      return file ? URL.createObjectURL(file) : null;
+    });
+    setLinkThumbFile(file ?? null);
   }, []);
 
   const onDrop = useCallback(
@@ -111,6 +182,12 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
     if (!isNew && initialArticle?.id) formData.set("id", initialArticle.id);
     if (values.media_type === "image" && imageFile) {
       formData.set("media_file", imageFile);
+    }
+    if (values.media_type === "link") {
+      formData.set("link_thumbnail", values.link_thumbnail?.trim() ?? "");
+      if (linkThumbFile) {
+        formData.set("link_thumbnail_file", linkThumbFile);
+      }
     }
 
     startTransition(async () => {
@@ -189,7 +266,10 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                       id="media_video"
                       value="video"
                       checked={field.value === "video"}
-                      onChange={() => field.onChange("video")}
+                      onChange={() => {
+                        field.onChange("video");
+                        handleLinkThumbChange(null);
+                      }}
                       className="h-4 w-4 border-input"
                       aria-describedby="media_video_desc"
                     />
@@ -219,6 +299,7 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                       onChange={() => {
                         field.onChange("image");
                         handleImageChange(null);
+                        handleLinkThumbChange(null);
                       }}
                       className="h-4 w-4 border-input"
                       aria-describedby="media_image_desc"
@@ -231,6 +312,37 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                   >
                     <ImageIcon className="size-4" aria-hidden />
                     תמונה (העלאה)
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="media_type"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormControl>
+                    <input
+                      type="radio"
+                      id="media_link"
+                      value="link"
+                      checked={field.value === "link"}
+                      onChange={() => {
+                        field.onChange("link");
+                        handleImageChange(null);
+                        handleLinkThumbChange(null);
+                      }}
+                      className="h-4 w-4 border-input"
+                      aria-describedby="media_link_desc"
+                    />
+                  </FormControl>
+                  <FormLabel
+                    htmlFor="media_link"
+                    className="flex items-center gap-2 cursor-pointer font-normal"
+                    id="media_link_desc"
+                  >
+                    <Link2 className="size-4" aria-hidden />
+                    קישור חיצוני (כתבה/VOD)
                   </FormLabel>
                 </FormItem>
               )}
@@ -305,6 +417,88 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {mediaType === "link" && (
+          <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
+            <p className="text-sm text-muted-foreground">
+              מתאים לכתבות או סרטונים באתרי ערוצים שלא מאפשרים הטמעה (iframe).
+            </p>
+            <FormField
+              control={form.control}
+              name="media_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>קישור לכתבה / VOD *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://..."
+                      dir="ltr"
+                      className="text-left"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="link_thumbnail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>תמונת תצוגה (כתובת URL, אופציונלי)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://.../image.jpg"
+                      dir="ltr"
+                      className="text-left"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="space-y-2">
+              <Label htmlFor="link_thumb_file">או העלאת תמונת תצוגה</Label>
+              <input
+                id="link_thumb_file"
+                type="file"
+                accept="image/*"
+                className="text-sm"
+                onChange={(e) =>
+                  handleLinkThumbChange(e.target.files?.[0] ?? null)
+                }
+                aria-label="העלאת תמונה לתצוגה מקדימה"
+              />
+              {(linkThumbPreviewUrl ||
+                (initialArticle?.media_type === "link" &&
+                  initialArticle.link_thumbnail &&
+                  !linkThumbFile)) && (
+                <div className="mt-2">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    תצוגה מקדימה
+                  </p>
+                  <Image
+                    src={
+                      linkThumbPreviewUrl ??
+                      initialArticle!.link_thumbnail!
+                    }
+                    alt=""
+                    width={640}
+                    height={360}
+                    unoptimized
+                    className="h-36 w-auto max-w-full rounded-md border object-cover"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 

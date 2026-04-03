@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { uploadPublicFile } from "@/lib/supabase/public-storage";
 
-export type ArticleMediaType = "video" | "image";
+export type ArticleMediaType = "video" | "image" | "link";
 
 export interface AdminArticle {
   id: string;
@@ -14,6 +14,7 @@ export interface AdminArticle {
   content: string | null;
   media_type: ArticleMediaType;
   media_url: string;
+  link_thumbnail: string | null;
   is_published: boolean;
   created_at: string;
 }
@@ -32,7 +33,7 @@ export async function getAllArticles(): Promise<AdminArticle[]> {
   const supabase = await getAdminSupabase();
   const { data, error } = await supabase
     .from("articles")
-    .select("id, title, content, media_type, media_url, is_published, created_at")
+    .select("id, title, content, media_type, media_url, link_thumbnail, is_published, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -48,6 +49,7 @@ export interface UpsertArticleInput {
   content?: string | null;
   media_type: ArticleMediaType;
   media_url: string;
+  link_thumbnail?: string | null;
   is_published: boolean;
 }
 
@@ -61,6 +63,10 @@ export async function upsertArticle(
     content: input.content?.trim() || null,
     media_type: input.media_type,
     media_url: input.media_url.trim(),
+    link_thumbnail:
+      input.media_type === "link"
+        ? (input.link_thumbnail?.trim() || null)
+        : null,
     is_published: !!input.is_published,
   };
 
@@ -88,7 +94,8 @@ export async function upsertArticle(
 
 /**
  * Server action that accepts FormData: uploads image if provided, then upserts article.
- * FormData fields: id (optional), title, content, media_type, media_url, is_published, media_file (optional File).
+ * FormData: id?, title, content, media_type, media_url, is_published,
+ * media_file (image), link_thumbnail (text URL for link type), link_thumbnail_file (optional image for link preview).
  */
 export async function upsertArticleWithFormData(
   formData: FormData
@@ -98,14 +105,23 @@ export async function upsertArticleWithFormData(
   const content = (formData.get("content") as string)?.trim() || null;
   const media_type = (formData.get("media_type") as string)?.trim() as
     | "video"
-    | "image";
+    | "image"
+    | "link";
   let media_url = (formData.get("media_url") as string)?.trim() || "";
   const is_published = formData.get("is_published") === "true";
   const media_file = formData.get("media_file") as File | null;
+  let link_thumbnail =
+    (formData.get("link_thumbnail") as string)?.trim() || "";
+  const link_thumbnail_file = formData.get("link_thumbnail_file") as File | null;
 
   if (!title) return { error: "כותרת חובה" };
-  if (!media_type || (media_type !== "video" && media_type !== "image")) {
-    return { error: "נא לבחור סוג מדיה: וידאו או תמונה" };
+  if (
+    !media_type ||
+    (media_type !== "video" &&
+      media_type !== "image" &&
+      media_type !== "link")
+  ) {
+    return { error: "נא לבחור סוג מדיה" };
   }
 
   if (media_type === "image" && media_file?.size) {
@@ -114,13 +130,45 @@ export async function upsertArticleWithFormData(
     if (url) media_url = url;
   }
 
+  if (media_type === "link" && link_thumbnail_file?.size) {
+    const { url, error } = await uploadPublicFile(
+      link_thumbnail_file,
+      "articles"
+    );
+    if (error) return { error };
+    if (url) link_thumbnail = url;
+  }
+
   if (!media_url) {
     return {
       error:
         media_type === "video"
           ? "קישור יוטיוב חובה"
-          : "נא להעלות תמונה או להזין כתובת תמונה",
+          : media_type === "link"
+            ? "נא להזין כתובת URL חיצונית"
+            : "נא להעלות תמונה או להזין כתובת תמונה",
     };
+  }
+
+  if (media_type === "link") {
+    try {
+      const u = new URL(media_url);
+      if (u.protocol !== "http:" && u.protocol !== "https:") {
+        return { error: "כתובת הקישור חייבת להתחיל ב-http או https" };
+      }
+    } catch {
+      return { error: "כתובת הקישור אינה תקינה" };
+    }
+    if (link_thumbnail) {
+      try {
+        const t = new URL(link_thumbnail);
+        if (t.protocol !== "http:" && t.protocol !== "https:") {
+          return { error: "כתובת תמונת התצוגה חייבת להתחיל ב-http או https" };
+        }
+      } catch {
+        return { error: "כתובת תמונת התצוגה אינה תקינה" };
+      }
+    }
   }
 
   return upsertArticle({
@@ -129,6 +177,7 @@ export async function upsertArticleWithFormData(
     content,
     media_type,
     media_url,
+    link_thumbnail: media_type === "link" ? link_thumbnail || null : null,
     is_published,
   });
 }

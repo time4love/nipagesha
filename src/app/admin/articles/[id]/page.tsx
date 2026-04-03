@@ -29,7 +29,7 @@ export default async function AdminArticleEditPage({
   if (!isNew) {
     const { data } = await supabase
       .from("articles")
-      .select("id, title, content, media_type, media_url, is_published, created_at")
+      .select("id, title, content, media_type, media_url, link_thumbnail, is_published, created_at")
       .eq("id", id)
       .single();
     if (data) initialArticle = data as AdminArticle;

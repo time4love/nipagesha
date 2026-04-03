@@ -5,14 +5,17 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export type ArticleMediaType = "video" | "image";
+export type ArticleMediaType = "video" | "image" | "link";
 
 export interface PublicArticle {
   id: string;
   title: string;
   content: string | null;
   media_type: ArticleMediaType;
+  /** Primary media: YouTube URL, image URL, or external page URL for `link`. */
   media_url: string;
+  /** Optional preview image URL when `media_type` is `link`. */
+  link_thumbnail: string | null;
   created_at: string;
 }
 
@@ -28,7 +31,7 @@ export async function getPublishedArticles(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("articles")
-    .select("id, title, content, media_type, media_url, created_at")
+    .select("id, title, content, media_type, media_url, link_thumbnail, created_at")
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
@@ -47,7 +50,7 @@ export async function getPublishedArticleById(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("articles")
-    .select("id, title, content, media_type, media_url, created_at")
+    .select("id, title, content, media_type, media_url, link_thumbnail, created_at")
     .eq("id", id)
     .eq("is_published", true)
     .single();
