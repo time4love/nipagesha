@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { HelpRequestRow } from "@/lib/supabase/types";
 import { getRequesterDisplay } from "@/lib/help";
-import { HELP_CATEGORIES } from "@/lib/constants";
+import { HELP_CATEGORIES, HELP_DEFAULT_CATEGORY } from "@/lib/constants";
 import { REGIONS, CITY_TO_REGION_MAP } from "@/lib/israel-cities";
 import { sendEmail } from "@/lib/email";
 
@@ -94,11 +94,12 @@ export async function submitHelpOffer(formData: FormData): Promise<SubmitHelpOff
 
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() ?? "";
-  const category = (formData.get("category") as string)?.trim();
+  const category =
+    (formData.get("category") as string)?.trim() || HELP_DEFAULT_CATEGORY;
   const city = (formData.get("city") as string)?.trim() ?? "";
 
-  if (!title || !category) {
-    return { success: false, error: "נא למלא כותרת וקטגוריה." };
+  if (!title) {
+    return { success: false, error: "נא למלא כותרת." };
   }
   if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
@@ -372,12 +373,13 @@ export async function createHelpRequest(formData: FormData): Promise<CreateHelpR
 
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() ?? "";
-  const category = (formData.get("category") as string)?.trim();
+  const category =
+    (formData.get("category") as string)?.trim() || HELP_DEFAULT_CATEGORY;
   const location = (formData.get("location") as string)?.trim() ?? "";
   const isAnonymous = formData.get("is_anonymous") === "true";
 
-  if (!title || !category) {
-    return { success: false, error: "נא למלא כותרת וקטגוריה." };
+  if (!title) {
+    return { success: false, error: "נא למלא כותרת." };
   }
   if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };

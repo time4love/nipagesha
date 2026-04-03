@@ -15,12 +15,12 @@ import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
 import { updateHelpRequest } from "./actions";
 import type { HelpRequestRow } from "@/lib/supabase/types";
+import { HELP_DEFAULT_CATEGORY } from "@/lib/constants";
 
 interface EditHelpRequestDialogProps {
   request: HelpRequestRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: string[];
   onSuccess: () => void;
   /** When true (editing an offer), hide anonymous option and use fixed title/description. */
   isOffer?: boolean;
@@ -30,7 +30,6 @@ export function EditHelpRequestDialog({
   request,
   open,
   onOpenChange,
-  categories,
   onSuccess,
   isOffer = false,
 }: EditHelpRequestDialogProps) {
@@ -53,6 +52,7 @@ export function EditHelpRequestDialog({
     setPending(true);
     const formData = new FormData(e.currentTarget);
     formData.set("is_anonymous", isOffer ? "false" : (isAnonymous ? "true" : "false"));
+    formData.set("category", HELP_DEFAULT_CATEGORY);
     const res = await updateHelpRequest(request.id, formData);
     setPending(false);
     if (res.error) {
@@ -98,24 +98,6 @@ export function EditHelpRequestDialog({
               placeholder="פרטים נוספים"
               defaultValue={request.description}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="edit_category">קטגוריה *</Label>
-            <select
-              id="edit_category"
-              name="category"
-              required
-              defaultValue={request.category}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="בחירת קטגוריה"
-            >
-              <option value="">בחרו קטגוריה</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
           </div>
           <div className="space-y-2">
             <CitySelect

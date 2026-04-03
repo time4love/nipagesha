@@ -28,9 +28,7 @@ interface HelpBoardClientProps {
   initialHasMore: boolean;
   initialOffers: HelpOfferWithOfferer[];
   initialOffersHasMore: boolean;
-  filterCategory: string | undefined;
   filterLocation: string | undefined;
-  categories: string[];
   defaultName: string;
   defaultContact: string;
   defaultIsAnonymous: boolean;
@@ -49,9 +47,7 @@ export function HelpBoardClient({
   initialHasMore,
   initialOffers,
   initialOffersHasMore,
-  filterCategory,
   filterLocation,
-  categories,
   defaultName,
   defaultContact,
   defaultIsAnonymous,
@@ -66,15 +62,14 @@ export function HelpBoardClient({
   const [createOfferDialogOpen, setCreateOfferDialogOpen] = useState(initialOpenCreateOffer);
   const [activeTab, setActiveTab] = useState<"requests" | "offers">(initialOpenCreateOffer ? "offers" : "requests");
 
-  const categoryParam = searchParams.get("category") ?? "";
   const locationParam = searchParams.get("location") ?? "";
-  const hasActiveFilters = Boolean(categoryParam || locationParam);
+  const hasActiveFilters = Boolean(locationParam);
 
-  function updateFilters(nextCategory: string, nextLocation: string) {
+  function updateLocationFilter(nextLocation: string) {
     const params = new URLSearchParams();
-    if (nextCategory) params.set("category", nextCategory);
     if (nextLocation) params.set("location", nextLocation);
-    router.push(`/help?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `/help?${qs}` : "/help");
   }
 
   function clearFilters() {
@@ -83,22 +78,14 @@ export function HelpBoardClient({
 
   const fetchRequests = useCallback(
     (offset: number, limit: number) =>
-      getHelpRequests(
-        { category: filterCategory, location: filterLocation },
-        offset,
-        limit
-      ),
-    [filterCategory, filterLocation]
+      getHelpRequests({ location: filterLocation }, offset, limit),
+    [filterLocation]
   );
 
   const fetchOffers = useCallback(
     (offset: number, limit: number) =>
-      getHelpOffers(
-        { category: filterCategory, location: filterLocation },
-        offset,
-        limit
-      ),
-    [filterCategory, filterLocation]
+      getHelpOffers({ location: filterLocation }, offset, limit),
+    [filterLocation]
   );
 
   const { items: requests, loadMore, hasMore, isLoading } = useInfiniteScroll({
@@ -131,35 +118,16 @@ export function HelpBoardClient({
 
   const loginUrl = "/login?redirect=" + encodeURIComponent("/help");
 
-  /** Shared filter controls: Category + City side-by-side. Wrapper is first flex child (right in RTL). */
+  /** Shared filter: City/Region only (category filter hidden for launch). */
   function FilterControls({ idPrefix }: { idPrefix: string }) {
     return (
-      <div className="flex flex-wrap items-end gap-2 w-full md:w-auto">
-        <div className="space-y-1">
-          <label htmlFor={`${idPrefix}_category`} className="text-sm font-medium">
-            קטגוריה
-          </label>
-          <select
-            id={`${idPrefix}_category`}
-            name="category"
-            className="flex h-10 w-full min-w-[140px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            value={categoryParam}
-            onChange={(e) => updateFilters(e.target.value, locationParam)}
-          >
-            <option value="">הכל</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-1 min-w-[160px]">
+      <div className="flex flex-wrap items-end gap-3 w-full md:w-auto md:flex-1 md:min-w-0 md:max-w-md">
+        <div className="space-y-1 min-w-[160px] flex-1 md:flex-initial md:min-w-[200px]">
           <CitySelect
             id={`${idPrefix}_location`}
             name="location"
             value={locationParam}
-            onChange={(value) => updateFilters(categoryParam, value)}
+            onChange={(value) => updateLocationFilter(value)}
             label="אזור"
             clearable
             className="min-w-0"
@@ -318,7 +286,6 @@ export function HelpBoardClient({
       <CreateHelpRequestDialog
         open={requestDialogOpen}
         onOpenChange={setRequestDialogOpen}
-        categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
         onSuccess={handleSuccess}
       />

@@ -10,8 +10,12 @@ export const OUTLINE_BUTTON_TEAL_CLASS =
 export const CHILD_PAGE_GRADIENT =
   "absolute inset-0 -z-10 bg-gradient-to-b from-amber-50/80 via-orange-50/50 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background";
 
-/** Help Board categories (Hebrew). Used for form dropdown and filter. */
+/** Default category when the category UI is hidden (e.g. launch phase). */
+export const HELP_DEFAULT_CATEGORY = "כללי" as const;
+
+/** Help Board categories (Hebrew). Used for validation; UI may hide selection and use {@link HELP_DEFAULT_CATEGORY}. */
 export const HELP_CATEGORIES = [
+  HELP_DEFAULT_CATEGORY,
   "סיוע משפטי/בירוקרטי",
   "לוגיסטיקה ומסירת מתנות",
   "תמיכה רגשית והקשבה",
@@ -28,6 +32,7 @@ const HELP_CATEGORY_VARIANTS: Record<
   HelpCategory,
   "default" | "secondary" | "success" | "outline"
 > = {
+  כללי: "outline",
   "סיוע משפטי/בירוקרטי": "default",
   "לוגיסטיקה ומסירת מתנות": "success",
   "תמיכה רגשית והקשבה": "secondary",

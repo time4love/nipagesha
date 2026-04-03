@@ -15,7 +15,6 @@ import type { HelpRequestRow } from "@/lib/supabase/types";
 
 interface HelpSectionClientProps {
   requests: HelpRequestRow[];
-  categories: string[];
   /** When false, new requests default to showing name (matches profile "not anonymous"). */
   defaultIsAnonymous: boolean;
   /** Unread help offer count per request id (for "הצעת עזרה חדשה!" badge). */
@@ -24,7 +23,6 @@ interface HelpSectionClientProps {
 
 export function HelpSectionClient({
   requests,
-  categories,
   defaultIsAnonymous,
   unreadByRequest,
 }: HelpSectionClientProps) {
@@ -44,7 +42,6 @@ export function HelpSectionClient({
       <CreateHelpRequestDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
         onSuccess={handleSuccess}
       />
@@ -59,7 +56,6 @@ export function HelpSectionClient({
         request={editingRequest}
         open={!!editingRequest}
         onOpenChange={(open) => !open && setEditingRequest(null)}
-        categories={categories}
         onSuccess={handleSuccess}
       />
 

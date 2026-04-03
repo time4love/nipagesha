@@ -8,12 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ReportDialog } from "@/components/common/ReportDialog";
 import { HandHeart, Flag } from "lucide-react";
-import { getHelpCategoryBadgeVariant } from "@/lib/constants";
 import type { HelpRequestWithRequester } from "./actions";
 
 interface HelpRequestCardProps {
@@ -42,9 +40,6 @@ export function HelpRequestCard({
     <Card className="flex flex-col h-full border-teal-100 dark:border-teal-900/50 hover:shadow-md transition-shadow" dir="rtl">
       <CardHeader className="pb-2">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <Badge variant={getHelpCategoryBadgeVariant(request.category)}>
-            {request.category}
-          </Badge>
           {request.location ? (
             <span className="text-sm text-muted-foreground">📍 {request.location}</span>
           ) : null}

@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid, MessageSquare, ChevronLeft } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
 import { getMyHelpRequests, getMyHelpOffers, getUnreadHelpOffersByRequest } from "./help/actions";
-import { getCategories } from "@/app/help/actions";
 import { getUserForumPosts } from "@/app/forum/actions";
 import { DashboardRequestsSection } from "./DashboardRequestsSection";
 import { DashboardOffersSection } from "./DashboardOffersSection";
@@ -42,7 +41,6 @@ export default async function DashboardPage() {
     myRequests,
     myOffers,
     unreadByRequest,
-    categories,
     profileRow,
     userForumPosts,
   ] = await Promise.all([
@@ -56,7 +54,6 @@ export default async function DashboardPage() {
     getMyHelpRequests(),
     getMyHelpOffers(),
     getUnreadHelpOffersByRequest(),
-    getCategories(),
     supabase.from("profiles").select("is_anonymous").eq("id", user.id).single(),
     getUserForumPosts(),
   ]);
@@ -141,13 +138,12 @@ export default async function DashboardPage() {
       {/* Section 2: My Help Requests — same structure as Child Cards */}
       <DashboardRequestsSection
         requests={myRequests}
-        categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
         unreadByRequest={unreadByRequest ?? {}}
       />
 
       {/* Section 3: My Help Offers — same structure as Child Cards */}
-      <DashboardOffersSection offers={myOffers} categories={categories} />
+      <DashboardOffersSection offers={myOffers} />
 
       {/* Section 4: My Community Forum Posts */}
       <div id="forum-posts" className="scroll-mt-24 space-y-4">

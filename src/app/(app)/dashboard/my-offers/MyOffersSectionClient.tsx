@@ -34,12 +34,10 @@ const STATUS_LABELS: Record<HelpRequestRow["status"], string> = {
 
 interface MyOffersSectionClientProps {
   offers: HelpRequestRow[];
-  categories: string[];
 }
 
 export function MyOffersSectionClient({
   offers,
-  categories,
 }: MyOffersSectionClientProps) {
   const router = useRouter();
   const [editingOffer, setEditingOffer] = useState<HelpRequestRow | null>(null);
@@ -163,7 +161,6 @@ export function MyOffersSectionClient({
         request={editingOffer}
         open={!!editingOffer}
         onOpenChange={(open) => !open && setEditingOffer(null)}
-        categories={categories}
         onSuccess={handleSuccess}
         isOffer
       />

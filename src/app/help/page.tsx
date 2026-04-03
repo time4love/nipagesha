@@ -1,21 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
-import { getHelpRequests, getHelpOffers, getCategories } from "./actions";
+import { getHelpRequests, getHelpOffers } from "./actions";
 import { HelpBoardClient } from "./HelpBoardClient";
 
 interface HelpPageProps {
-  searchParams: Promise<{ category?: string; location?: string; action?: string }>;
+  searchParams: Promise<{ location?: string; action?: string }>;
 }
 
 export default async function HelpPage({ searchParams }: HelpPageProps) {
   const params = await searchParams;
-  const category = params.category ?? undefined;
   const location = params.location ?? undefined;
   const openOfferForm = params.action === "offer";
 
-  const [helpResult, offersResult, categories] = await Promise.all([
-    getHelpRequests({ category, location }, 0, 10),
-    getHelpOffers({ category, location }, 0, 10),
-    getCategories(),
+  const [helpResult, offersResult] = await Promise.all([
+    getHelpRequests({ location }, 0, 10),
+    getHelpOffers({ location }, 0, 10),
   ]);
 
   const supabase = await createClient();
@@ -40,16 +38,14 @@ export default async function HelpPage({ searchParams }: HelpPageProps) {
   return (
     <section className="space-y-8" dir="rtl">
       <HelpBoardClient
-        key={`${category ?? ""}-${location ?? ""}-${openOfferForm}`}
+        key={`${location ?? ""}-${openOfferForm}`}
         title="לוח עזרה"
         subtitle="בקשות והצעות עזרה"
         initialRequests={helpResult.data}
         initialHasMore={helpResult.hasMore}
         initialOffers={offersResult.data}
         initialOffersHasMore={offersResult.hasMore}
-        filterCategory={category}
         filterLocation={location}
-        categories={categories}
         defaultName={defaultName}
         defaultContact={defaultContact}
         defaultIsAnonymous={defaultIsAnonymous}

@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
 import { submitHelpOffer, type SubmitHelpOfferResult } from "./actions";
-import { HELP_CATEGORIES } from "@/lib/constants";
+import { HELP_DEFAULT_CATEGORY } from "@/lib/constants";
 
 interface CreateOfferDialogProps {
   open: boolean;
@@ -37,6 +37,7 @@ export function CreateOfferDialog({
     setPending(true);
     const formData = new FormData(e.currentTarget);
     formData.set("city", city);
+    formData.set("category", HELP_DEFAULT_CATEGORY);
     const res = await submitHelpOffer(formData);
     setResult(res);
     setPending(false);
@@ -75,23 +76,6 @@ export function CreateOfferDialog({
               className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               placeholder="פרטים על סוג העזרה שאתם מציעים"
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="offer_category">קטגוריה *</Label>
-            <select
-              id="offer_category"
-              name="category"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="בחירת קטגוריה"
-            >
-              <option value="">בחרו קטגוריה</option>
-              {HELP_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
           </div>
           <div className="space-y-2 min-w-[180px]">
             <CitySelect

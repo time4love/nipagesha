@@ -36,12 +36,10 @@ const STATUS_LABELS: Record<HelpRequestRow["status"], string> = {
 
 interface DashboardOffersSectionProps {
   offers: HelpRequestRow[];
-  categories: string[];
 }
 
 export function DashboardOffersSection({
   offers,
-  categories,
 }: DashboardOffersSectionProps) {
   const router = useRouter();
   const [editingOffer, setEditingOffer] = useState<HelpRequestRow | null>(null);
@@ -190,7 +188,6 @@ export function DashboardOffersSection({
         request={editingOffer}
         open={!!editingOffer}
         onOpenChange={(open) => !open && setEditingOffer(null)}
-        categories={categories}
         onSuccess={handleSuccess}
         isOffer
       />

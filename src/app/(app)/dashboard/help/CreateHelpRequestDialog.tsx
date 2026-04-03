@@ -14,11 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
 import { createHelpRequest } from "@/app/help/actions";
+import { HELP_DEFAULT_CATEGORY } from "@/lib/constants";
 
 interface CreateHelpRequestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: string[];
   /** When true, new request will show your name if profile is visible. Matches profile "not anonymous" setting. */
   defaultIsAnonymous: boolean;
   onSuccess: () => void;
@@ -27,7 +27,6 @@ interface CreateHelpRequestDialogProps {
 export function CreateHelpRequestDialog({
   open,
   onOpenChange,
-  categories,
   defaultIsAnonymous,
   onSuccess,
 }: CreateHelpRequestDialogProps) {
@@ -48,6 +47,7 @@ export function CreateHelpRequestDialog({
     setPending(true);
     const formData = new FormData(e.currentTarget);
     formData.set("is_anonymous", isAnonymous ? "true" : "false");
+    formData.set("category", HELP_DEFAULT_CATEGORY);
     const res = await createHelpRequest(formData);
     setPending(false);
     if (res.error) {
@@ -89,23 +89,6 @@ export function CreateHelpRequestDialog({
               className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               placeholder="פרטים נוספים"
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="create_category">קטגוריה *</Label>
-            <select
-              id="create_category"
-              name="category"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="בחירת קטגוריה"
-            >
-              <option value="">בחרו קטגוריה</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
           </div>
           <div className="space-y-2">
             <CitySelect

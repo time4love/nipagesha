@@ -20,14 +20,12 @@ import type { HelpRequestRow } from "@/lib/supabase/types";
 
 interface DashboardRequestsSectionProps {
   requests: HelpRequestRow[];
-  categories: string[];
   defaultIsAnonymous: boolean;
   unreadByRequest: Record<string, number>;
 }
 
 export function DashboardRequestsSection({
   requests,
-  categories,
   defaultIsAnonymous,
   unreadByRequest,
 }: DashboardRequestsSectionProps) {
@@ -99,7 +97,6 @@ export function DashboardRequestsSection({
       <CreateHelpRequestDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        categories={categories}
         defaultIsAnonymous={defaultIsAnonymous}
         onSuccess={handleSuccess}
       />
@@ -108,7 +105,6 @@ export function DashboardRequestsSection({
         request={editingRequest}
         open={!!editingRequest}
         onOpenChange={(open) => !open && setEditingRequest(null)}
-        categories={categories}
         onSuccess={handleSuccess}
       />
     </div>

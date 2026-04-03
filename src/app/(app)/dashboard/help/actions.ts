@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { HelpRequestRow, HelpOfferRow } from "@/lib/supabase/types";
-import { HELP_CATEGORIES } from "@/lib/constants";
+import { HELP_CATEGORIES, HELP_DEFAULT_CATEGORY } from "@/lib/constants";
 
 export async function getMyHelpRequests(): Promise<HelpRequestRow[]> {
   const supabase = await createClient();
@@ -182,12 +182,13 @@ export async function updateHelpRequest(
 
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() ?? "";
-  const category = (formData.get("category") as string)?.trim();
+  const category =
+    (formData.get("category") as string)?.trim() || HELP_DEFAULT_CATEGORY;
   const location = (formData.get("location") as string)?.trim() ?? "";
   const isAnonymous = formData.get("is_anonymous") === "true";
 
-  if (!title || !category) {
-    return { success: false, error: "נא למלא כותרת וקטגוריה." };
+  if (!title) {
+    return { success: false, error: "נא למלא כותרת." };
   }
   if (!HELP_CATEGORIES.includes(category as (typeof HELP_CATEGORIES)[number])) {
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
