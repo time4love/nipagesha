@@ -12,8 +12,6 @@ const PAGE_SIZE = 10;
 interface ForumFeedClientProps {
   initialPosts: ForumPostListItem[];
   initialHasMore: boolean;
-  /** `null` = all categories */
-  category: string | null;
   currentUserId: string | null;
 }
 
@@ -44,7 +42,6 @@ function ForumFeedSkeletonRow() {
 export function ForumFeedClient({
   initialPosts,
   initialHasMore,
-  category,
   currentUserId,
 }: ForumFeedClientProps) {
   const [posts, setPosts] = useState<ForumPostListItem[]>(initialPosts);
@@ -56,7 +53,7 @@ export function ForumFeedClient({
     setPosts(initialPosts);
     setHasMore(initialHasMore);
     loadGuardRef.current = false;
-  }, [initialPosts, initialHasMore, category]);
+  }, [initialPosts, initialHasMore]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadGuardRef.current) return;
@@ -65,7 +62,7 @@ export function ForumFeedClient({
     const offset = posts.length;
     try {
       const { data, hasMore: nextHasMore } = await getForumPosts(
-        category,
+        null,
         offset,
         PAGE_SIZE
       );
@@ -82,7 +79,7 @@ export function ForumFeedClient({
       loadGuardRef.current = false;
       setIsLoading(false);
     }
-  }, [category, hasMore, posts.length]);
+  }, [hasMore, posts.length]);
 
   const { ref: loadMoreRef, inView } = useInView({
     rootMargin: "240px 0px",

@@ -31,14 +31,13 @@ export default async function EditForumPostPage({ params }: EditForumPostPagePro
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">עריכת פוסט</h1>
         <p className="text-muted-foreground text-sm">
-          עדכנו את הכותרת, הקטגוריה או התוכן. שינויים יישמרו בפוסט הקיים.
+          עדכנו את הכותרת או התוכן. שינויים יישמרו בפוסט הקיים.
         </p>
       </header>
       <ForumPostForm
         mode="edit"
         postId={id}
         initialTitle={post.title}
-        initialCategory={post.category}
         initialContent={post.content}
         backHref={`/forum/${id}`}
         backLabel="חזרה לפוסט"

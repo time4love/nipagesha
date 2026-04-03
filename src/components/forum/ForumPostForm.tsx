@@ -8,13 +8,6 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createForumPost, updateForumPost } from "@/app/forum/actions";
 
@@ -28,7 +21,7 @@ const RichTextEditor = dynamic(
     ),
   }
 );
-import { FORUM_CATEGORIES, DEFAULT_FORUM_CATEGORY } from "@/lib/constants";
+import { DEFAULT_FORUM_CATEGORY } from "@/lib/constants";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 
@@ -36,7 +29,6 @@ export interface ForumPostFormProps {
   mode: "create" | "edit";
   postId?: string;
   initialTitle?: string;
-  initialCategory?: string;
   initialContent?: string;
   backHref: string;
   backLabel: string;
@@ -46,14 +38,12 @@ export function ForumPostForm({
   mode,
   postId,
   initialTitle = "",
-  initialCategory = DEFAULT_FORUM_CATEGORY,
   initialContent = "",
   backHref,
   backLabel,
 }: ForumPostFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
-  const [category, setCategory] = useState<string>(initialCategory);
   const [content, setContent] = useState(initialContent);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +54,11 @@ export function ForumPostForm({
     setPending(true);
     try {
       if (mode === "create") {
-        const res = await createForumPost({ title, category, content });
+        const res = await createForumPost({
+          title,
+          category: DEFAULT_FORUM_CATEGORY,
+          content,
+        });
         if (!res.success) {
           setError(res.error ?? "שמירה נכשלה.");
         }
@@ -73,7 +67,11 @@ export function ForumPostForm({
           setError("מזהה פוסט חסר.");
           return;
         }
-        const res = await updateForumPost(postId, { title, category, content });
+        const res = await updateForumPost(postId, {
+          title,
+          category: DEFAULT_FORUM_CATEGORY,
+          content,
+        });
         if (!res.success) {
           setError(res.error ?? "שמירה נכשלה.");
           return;
@@ -121,22 +119,6 @@ export function ForumPostForm({
           disabled={pending}
           maxLength={500}
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="forum-category">קטגוריה *</Label>
-        <Select value={category} onValueChange={setCategory} disabled={pending}>
-          <SelectTrigger id="forum-category" className="w-full">
-            <SelectValue placeholder="בחרו קטגוריה" />
-          </SelectTrigger>
-          <SelectContent>
-            {FORUM_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="space-y-2">
