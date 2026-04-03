@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { notifyAdminOnNewUser } from "@/app/login/actions";
 import { Loader2 } from "lucide-react";
 
 /** Google "G" logo SVG for the sign-in button (RTL-safe). */
@@ -141,6 +142,7 @@ function LoginForm() {
           );
           return;
         }
+        void notifyAdminOnNewUser(email);
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
