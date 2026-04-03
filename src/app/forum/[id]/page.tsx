@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -6,14 +7,63 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ForumPostReportButton } from "@/components/forum/ForumPostReportButton";
 import { ForumCommentForm } from "@/components/forum/ForumCommentForm";
+import { PostActions } from "@/components/forum/PostActions";
 import { getForumCategoryBadgeVariant } from "@/lib/constants";
-import { formatForumRelativeTime, isForumPostEdited } from "@/lib/forum";
+import {
+  extractFirstImageUrlFromHtml,
+  formatForumRelativeTime,
+  isForumPostEdited,
+  resolveForumOgImageUrl,
+  stripHtmlToSnippet,
+} from "@/lib/forum";
 import { getForumPostById, getPostComments } from "../actions";
 import { ForumPostActionsMenu } from "@/components/forum/ForumPostActionsMenu";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nipagesha.co.il";
+
 interface ForumPostPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: ForumPostPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: post, error } = await supabase
+    .from("forum_posts")
+    .select("title, content, thumbnail_url")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !post) {
+    return { title: "פוסט בקהילה | ניפגשה" };
+  }
+
+  const row = post as { title: string; content: string; thumbnail_url: string | null };
+  const description = stripHtmlToSnippet(row.content, 120);
+  const imageCandidate = row.thumbnail_url?.trim() || extractFirstImageUrlFromHtml(row.content);
+  const ogImage = resolveForumOgImageUrl(imageCandidate, SITE_ORIGIN);
+  const pageUrl = `${SITE_ORIGIN}/forum/${id}`;
+
+  return {
+    title: `${row.title} | פורום ניפגשה`,
+    description,
+    openGraph: {
+      title: row.title,
+      description,
+      url: pageUrl,
+      type: "article",
+      locale: "he_IL",
+      siteName: "ניפגשה",
+      images: [{ url: ogImage, alt: row.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: row.title,
+      description,
+      images: [ogImage],
+    },
+  };
 }
 
 export default async function ForumPostPage({ params }: ForumPostPageProps) {
@@ -109,6 +159,15 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
         <div className="pt-2 border-t border-border/80">
           <ArticleContent html={post.content} className="prose-headings:scroll-mt-20" />
         </div>
+
+        <PostActions
+          postId={post.id}
+          postTitle={post.title}
+          shareUrl={`${SITE_ORIGIN}/forum/${post.id}`}
+          initialLikeCount={post.like_count}
+          initialLiked={post.liked_by_me}
+          isAuthenticated={Boolean(user)}
+        />
       </header>
 
       <section aria-labelledby="comments-heading" className="space-y-6">

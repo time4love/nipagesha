@@ -161,3 +161,11 @@ export interface ForumCommentRow {
   content: string;
   created_at: string;
 }
+
+/** One row from forum_post_likes. */
+export interface ForumPostLikeRow {
+  id: string;
+  post_id: string;
+  user_id: string;
+  created_at: string;
+}

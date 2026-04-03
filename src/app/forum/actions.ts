@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ForumCommentRow, ForumPostRow, HelpRequestRow } from "@/lib/supabase/types";
 import { FORUM_CATEGORIES } from "@/lib/constants";
+import { extractFirstImageUrlFromHtml } from "@/lib/forum";
 import { getRequesterDisplay } from "@/lib/help";
 import { sendEmail } from "@/lib/email";
 import { getAdminEmails } from "@/lib/admin";
@@ -51,6 +52,8 @@ export interface ForumPostListItem {
   author_display_name: string;
   author_avatar_url: string | null;
   comment_count: number;
+  like_count: number;
+  liked_by_me: boolean;
 }
 
 export interface ForumCommentWithAuthor extends ForumCommentRow {
@@ -70,14 +73,6 @@ export type UpdateForumPostInput = CreateForumPostInput;
 export interface GetForumPostsResult {
   data: ForumPostListItem[];
   hasMore: boolean;
-}
-
-function extractFirstImageUrlFromHtml(html: string): string | null {
-  const doubleQuote = html.match(/<img[^>]+src="([^">]+)"/i);
-  if (doubleQuote?.[1]?.trim()) return doubleQuote[1].trim();
-  const singleQuote = html.match(/<img[^>]+src='([^'>]+)'/i);
-  if (singleQuote?.[1]?.trim()) return singleQuote[1].trim();
-  return null;
 }
 
 function isForumCategory(value: string): value is (typeof FORUM_CATEGORIES)[number] {
@@ -122,6 +117,8 @@ function mapRowsToListItems(
       author_display_name: displayName,
       author_avatar_url: avatarUrl,
       comment_count: countMap.get(post.id) ?? 0,
+      like_count: 0,
+      liked_by_me: false,
     };
   });
 }
@@ -212,6 +209,24 @@ export async function getForumPostById(id: string): Promise<ForumPostListItem | 
 
   const commentCount = commentCountRaw ?? 0;
 
+  const { count: likeCountRaw } = await supabase
+    .from("forum_post_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("post_id", id);
+
+  const likeCount = likeCountRaw ?? 0;
+
+  let likedByMe = false;
+  if (user) {
+    const { data: likeRow } = await supabase
+      .from("forum_post_likes")
+      .select("id")
+      .eq("post_id", id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    likedByMe = Boolean(likeRow);
+  }
+
   const { displayName, avatarUrl } = resolveAuthor(profile as ProfileFields | null, !!user);
 
   const profileMap = new Map<string, ProfileFields>();
@@ -220,7 +235,62 @@ export async function getForumPostById(id: string): Promise<ForumPostListItem | 
   }
   const countMap = new Map([[row.id, commentCount]]);
   const [mapped] = mapRowsToListItems([row], user, profileMap, countMap);
-  return mapped ?? null;
+  if (!mapped) return null;
+  return { ...mapped, like_count: likeCount, liked_by_me: likedByMe };
+}
+
+export type TogglePostLikeResult =
+  | { ok: true; liked: boolean; likeCount: number }
+  | { ok: false; error: string };
+
+export async function togglePostLike(postId: string): Promise<TogglePostLikeResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: "יש להתחבר כדי לסמן לייק." };
+  }
+
+  const { data: existing } = await supabase
+    .from("forum_post_likes")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    const { error: delErr } = await supabase
+      .from("forum_post_likes")
+      .delete()
+      .eq("post_id", postId)
+      .eq("user_id", user.id);
+    if (delErr) {
+      return { ok: false, error: delErr.message };
+    }
+  } else {
+    const { error: insErr } = await supabase.from("forum_post_likes").insert({
+      post_id: postId,
+      user_id: user.id,
+    });
+    if (insErr) {
+      return { ok: false, error: insErr.message };
+    }
+  }
+
+  const { count: nextCount } = await supabase
+    .from("forum_post_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("post_id", postId);
+
+  const likeCount = nextCount ?? 0;
+  const liked = !existing;
+
+  revalidatePath("/forum");
+  revalidatePath(`/forum/${postId}`);
+  revalidatePath("/dashboard");
+
+  return { ok: true, liked, likeCount };
 }
 
 /** Current user's forum posts (dashboard); newest first, with comment counts. */

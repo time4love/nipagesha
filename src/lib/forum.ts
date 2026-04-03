@@ -11,6 +11,15 @@ export function isForumPostEdited(createdAt: string, updatedAt: string): boolean
   return updated - created > EDIT_THRESHOLD_MS;
 }
 
+/** First <img src> from HTML (forum thumbnails / OG image). */
+export function extractFirstImageUrlFromHtml(html: string): string | null {
+  const doubleQuote = html.match(/<img[^>]+src="([^">]+)"/i);
+  if (doubleQuote?.[1]?.trim()) return doubleQuote[1].trim();
+  const singleQuote = html.match(/<img[^>]+src='([^'>]+)'/i);
+  if (singleQuote?.[1]?.trim()) return singleQuote[1].trim();
+  return null;
+}
+
 /** Strip HTML for list snippets (server-safe). */
 export function stripHtmlToSnippet(html: string, maxLen = 180): string {
   const text = html
@@ -24,4 +33,18 @@ export function stripHtmlToSnippet(html: string, maxLen = 180): string {
 /** Relative time in Hebrew via date-fns (e.g. "לפני שעתיים"). */
 export function formatForumRelativeTime(iso: string): string {
   return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: he });
+}
+
+/** Absolute URL for Open Graph (site origin + default image path). */
+export function resolveForumOgImageUrl(
+  candidate: string | null | undefined,
+  siteOrigin: string
+): string {
+  const u = candidate?.trim();
+  const origin = siteOrigin.replace(/\/$/, "");
+  if (!u) return `${origin}/opengraph-image.png`;
+  if (u.startsWith("http://") || u.startsWith("https://")) return u;
+  if (u.startsWith("//")) return `https:${u}`;
+  if (u.startsWith("/")) return `${origin}${u}`;
+  return `${origin}/${u}`;
 }
