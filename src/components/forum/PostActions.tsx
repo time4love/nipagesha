@@ -135,6 +135,7 @@ export function PostActions({
             aria-label="שיתוף הפוסט"
             aria-expanded={shareOpen}
             aria-haspopup="dialog"
+            suppressHydrationWarning
           >
             <Share2 className="size-5 shrink-0" aria-hidden />
             שיתוף

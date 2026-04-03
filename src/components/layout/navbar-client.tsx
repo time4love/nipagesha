@@ -49,7 +49,14 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
         <div className="md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon"><Menu className="h-6 w-6" /></Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                // Radix Dialog sets aria-controls from useId; SSR + React 19 can diverge — suppress noise.
+                suppressHydrationWarning
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
             </SheetTrigger>
             <SheetContent side="right">
               <SheetTitle className="sr-only">תפריט ניווט</SheetTitle>
@@ -84,7 +91,11 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full p-0"
+                  suppressHydrationWarning
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={avatarUrl ?? undefined} alt="" />
                     <AvatarFallback className="bg-muted text-lg font-bold text-muted-foreground">
