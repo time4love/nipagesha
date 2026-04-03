@@ -2,7 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { OUTLINE_BUTTON_TEAL_CLASS } from "@/lib/constants";
-import { ChevronLeft, Music, BookOpen, LayoutDashboard } from "lucide-react";
+import {
+  ChevronLeft,
+  HeartHandshake,
+  MessageCircle,
+  Music,
+  BookOpen,
+  LayoutDashboard,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function HomePage() {
@@ -149,6 +156,55 @@ export default async function HomePage() {
                 <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
               </Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Section: Community — help board & forum */}
+      <section
+        className="border-t bg-slate-50 px-4 py-16 md:py-20"
+        aria-labelledby="community-heading"
+      >
+        <div className="container mx-auto max-w-3xl">
+          <div className="flex flex-col text-right">
+            <h2
+              id="community-heading"
+              className="text-3xl font-bold text-foreground sm:text-4xl"
+            >
+              קהילת ניפגשה
+            </h2>
+            <p className="mt-6 text-foreground/90 leading-relaxed">
+              הצטרפו לפורום ולוח העזרה שלנו. זהו מרחב לשתף, להתייעץ, ולבקש סיוע. בין אם אתם זקוקים לאוזן קשבת, עצה משפטית, או סיוע טכני – הקהילה כאן בשבילכם.
+            </p>
+            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:gap-4">
+              <Button
+                asChild
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
+              >
+                <Link
+                  href="/forum"
+                  className="inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+                >
+                  <MessageCircle className="size-4 shrink-0" aria-hidden />
+                  לפורום הקהילתי
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className={OUTLINE_BUTTON_TEAL_CLASS}
+              >
+                <Link
+                  href="/help"
+                  className="inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+                >
+                  <HeartHandshake className="size-4 shrink-0" aria-hidden />
+                  ללוח העזרה
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
