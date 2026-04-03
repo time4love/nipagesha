@@ -8,7 +8,7 @@
 
 const DEFAULT_ADMIN_EMAILS = ["jodagm@gmail.com"] as const;
 
-function getAdminEmails(): string[] {
+export function getAdminEmails(): string[] {
   const defaults = (DEFAULT_ADMIN_EMAILS as readonly string[]).map((e) => e.toLowerCase());
   const env = process.env.ADMIN_EMAILS;
   if (env && typeof env === "string") {

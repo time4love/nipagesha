@@ -6,6 +6,28 @@ import { redirect } from "next/navigation";
 import type { ForumCommentRow, ForumPostRow, HelpRequestRow } from "@/lib/supabase/types";
 import { FORUM_CATEGORIES } from "@/lib/constants";
 import { getRequesterDisplay } from "@/lib/help";
+import { sendEmail } from "@/lib/email";
+import { getAdminEmails } from "@/lib/admin";
+
+const FORUM_PUBLIC_BASE = "https://www.nipagesha.co.il/forum";
+
+function escapeHtmlForEmail(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function htmlToPlainSnippet(html: string, maxLen: number): string {
+  const stripped = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  if (stripped.length <= maxLen) return stripped;
+  return `${stripped.slice(0, maxLen)}…`;
+}
+
+function rtlEmailWrap(innerHtml: string): string {
+  return `<div dir="rtl" style="font-family: sans-serif;">${innerHtml}</div>`;
+}
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -309,16 +331,53 @@ export async function createForumPost(
 
   const thumbnailUrl = extractFirstImageUrlFromHtml(content);
 
-  const { error } = await supabase.from("forum_posts").insert({
-    user_id: user.id,
-    title,
-    content,
-    category,
-    thumbnail_url: thumbnailUrl,
-  });
+  const { data: inserted, error } = await supabase
+    .from("forum_posts")
+    .insert({
+      user_id: user.id,
+      title,
+      content,
+      category,
+      thumbnail_url: thumbnailUrl,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  const postId = inserted?.id as string | undefined;
+  if (postId) {
+    try {
+      const admins = getAdminEmails();
+      if (admins.length > 0) {
+        const { data: authorProfile } = await supabase
+          .from("profiles")
+          .select("id, display_name, avatar_url, is_anonymous, privacy_level")
+          .eq("id", user.id)
+          .maybeSingle();
+        const { displayName: authorName } = resolveAuthor(
+          authorProfile as ProfileFields | null,
+          true
+        );
+        const snippet = htmlToPlainSnippet(content, 220);
+        const postUrl = `${FORUM_PUBLIC_BASE}/${postId}`;
+        const subject = `[ניפגשה] פוסט חדש בקהילה: ${title}`;
+        const html = rtlEmailWrap(`
+    <p style="margin:0 0 14px; line-height:1.5;">פוסט חדש פורסם בקהילה.</p>
+    <p style="margin:0 0 8px; line-height:1.5;"><strong>מחבר/ת:</strong> ${escapeHtmlForEmail(authorName)}</p>
+    <p style="margin:0 0 8px; line-height:1.5;"><strong>כותרת:</strong> ${escapeHtmlForEmail(title)}</p>
+    <p style="margin:0 0 14px; line-height:1.5;"><strong>תצוגה מקדימה:</strong> ${escapeHtmlForEmail(snippet)}</p>
+    <p style="margin:0;"><a href="${escapeHtmlForEmail(postUrl)}" style="color:#2563eb;">צפייה בפוסט</a></p>
+  `);
+        await sendEmail({ to: admins, subject, html });
+      }
+    } catch {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[forum] Admin notification email failed after new post.");
+      }
+    }
   }
 
   revalidatePath("/forum");
@@ -351,6 +410,48 @@ export async function createForumComment(
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  try {
+    const admins = getAdminEmails();
+    if (admins.length > 0) {
+      const { data: postRow } = await supabase
+        .from("forum_posts")
+        .select("title, user_id")
+        .eq("id", postId)
+        .maybeSingle();
+
+      // TODO: In the future, send an email to the post author (post.user_id) if they opt-in to notifications.
+
+      const postTitle =
+        (postRow as { title: string } | null)?.title?.trim() || "פוסט ללא כותרת";
+
+      const { data: commenterProfile } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, is_anonymous, privacy_level")
+        .eq("id", user.id)
+        .maybeSingle();
+      const { displayName: commenterName } = resolveAuthor(
+        commenterProfile as ProfileFields | null,
+        true
+      );
+
+      const postUrl = `${FORUM_PUBLIC_BASE}/${postId}`;
+      const subject = "[ניפגשה] תגובה חדשה בקהילה";
+      const html = rtlEmailWrap(`
+    <p style="margin:0 0 12px; line-height:1.5;">תגובה חדשה פורסמה בקהילה.</p>
+    <p style="margin:0 0 8px; line-height:1.5;"><strong>פוסט:</strong> ${escapeHtmlForEmail(postTitle)}</p>
+    <p style="margin:0 0 8px; line-height:1.5;"><strong>מגיב/ה:</strong> ${escapeHtmlForEmail(commenterName)}</p>
+    <p style="margin:0 0 6px; line-height:1.5;"><strong>תוכן התגובה:</strong></p>
+    <p style="margin:0 0 14px; line-height:1.6; white-space:pre-wrap;">${escapeHtmlForEmail(text)}</p>
+    <p style="margin:0;"><a href="${escapeHtmlForEmail(postUrl)}" style="color:#2563eb;">צפייה בפוסט</a></p>
+  `);
+      await sendEmail({ to: admins, subject, html });
+    }
+  } catch {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[forum] Admin notification email failed after new comment.");
+    }
   }
 
   revalidatePath("/forum");

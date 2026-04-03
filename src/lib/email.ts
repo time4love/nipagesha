@@ -14,7 +14,8 @@ const DEFAULT_FROM =
   process.env.RESEND_FROM ?? "ניפגשה <no-reply@nipagesha.co.il>";
 
 export interface SendEmailParams {
-  to: string;
+  /** One or more recipient addresses (Resend supports multiple). */
+  to: string | string[];
   subject: string;
   html: string;
   /** Sender address; must be @nipagesha.co.il. Defaults to DEFAULT_FROM. */
