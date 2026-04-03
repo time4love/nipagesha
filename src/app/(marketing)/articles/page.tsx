@@ -9,6 +9,9 @@ export const metadata = {
 
 const INITIAL_LIMIT = 10;
 
+/** ISR: refresh list from Supabase at most once per hour (edge-friendly). */
+export const revalidate = 3600;
+
 export default async function ArticlesPage() {
   const { data: initialData, hasMore: initialHasMore } =
     await getPublishedArticles(0, INITIAL_LIMIT);

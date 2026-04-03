@@ -39,7 +39,8 @@ export default async function HomePage() {
             width={896}
             height={504}
             className="w-full max-w-3xl mx-auto object-contain"
-            priority
+            priority={true}
+            sizes="(max-width: 768px) 100vw, 896px"
           />
           <p className="mt-6 max-w-2xl mx-auto text-2xl text-muted-foreground sm:text-3xl md:text-4xl font-medium font-tagline tracking-tight">
             חיבור הורים וילדים

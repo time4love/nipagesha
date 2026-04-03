@@ -6,6 +6,9 @@ import { ArticleContent } from "@/components/articles/ArticleContent";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+/** ISR: article pages can be cached and revalidated hourly. */
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

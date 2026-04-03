@@ -18,12 +18,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { upsertArticleWithFormData } from "../actions";
 import type { AdminArticle } from "../actions";
-import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, ImageIcon, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+const RichTextEditor = dynamic(
+  () =>
+    import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="min-h-[220px] w-full rounded-md" aria-hidden />
+    ),
+  }
+);
 
 const articleSchema = z.object({
   title: z.string().min(1, "כותרת חובה"),
@@ -282,9 +295,12 @@ export function ArticleForm({ initialArticle, isNew }: ArticleFormProps) {
                 <p className="text-sm text-muted-foreground mb-2">
                   תצוגה מקדימה
                 </p>
-                <img
+                <Image
                   src={imagePreviewUrl ?? initialArticle!.media_url}
                   alt="תצוגה מקדימה"
+                  width={640}
+                  height={360}
+                  unoptimized
                   className="h-40 w-auto max-w-full rounded-md border object-cover"
                 />
               </div>

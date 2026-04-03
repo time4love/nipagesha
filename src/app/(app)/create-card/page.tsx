@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +34,18 @@ import {
 } from "@/components/ui/form";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { DateOfBirthPicker, toIsoDateString } from "@/components/ui/dob-picker";
-import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const RichTextEditor = dynamic(
+  () =>
+    import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="min-h-[180px] w-full rounded-md" aria-hidden />
+    ),
+  }
+);
 import { MessageCard } from "@/components/message/MessageCard";
 import { hasHtmlContent } from "@/lib/child-card";
 import { encryptMessage } from "@/lib/crypto";

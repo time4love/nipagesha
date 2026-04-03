@@ -68,7 +68,15 @@ export function NavbarClient({ user, avatarUrl }: { user: User | null; avatarUrl
 
         {/* לוגו */}
         <Link href="/" className="flex items-center">
-            <Image src="/logo.avif" alt="ניפגשה" width={160} height={50} className="h-10 w-auto object-contain" priority />
+            <Image
+              src="/logo.avif"
+              alt="ניפגשה"
+              width={160}
+              height={50}
+              className="h-10 w-auto object-contain"
+              priority={true}
+              sizes="160px"
+            />
         </Link>
 
         {/* אזור אישי - מבוסס נטו על ה-Prop שמגיע מהשרת */}

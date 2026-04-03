@@ -37,6 +37,9 @@ export const metadata = {
     "ניפגשה מאפשרת להורים שהקשר עם ילדיהם נותק להשאיר מסר מאובטח. למדו איך זה עובד ומדוע הפרטיות והאבטחה במרכז.",
 };
 
+/** Static marketing content; hourly revalidation keeps CDN payloads fresh. */
+export const revalidate = 3600;
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen" dir="rtl">

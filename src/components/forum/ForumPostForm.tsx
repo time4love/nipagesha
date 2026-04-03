@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -14,8 +15,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { Skeleton } from "@/components/ui/skeleton";
 import { createForumPost, updateForumPost } from "@/app/forum/actions";
+
+const RichTextEditor = dynamic(
+  () =>
+    import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="min-h-[200px] w-full rounded-md" aria-hidden />
+    ),
+  }
+);
 import { FORUM_CATEGORIES, DEFAULT_FORUM_CATEGORY } from "@/lib/constants";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";

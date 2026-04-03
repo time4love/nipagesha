@@ -19,6 +19,8 @@ export const metadata = {
 
 const INITIAL_LIMIT = 10;
 
+export const revalidate = 3600;
+
 export default async function SongsPage() {
   const { data: initialData, hasMore: initialHasMore } = await getSongs(
     0,
