@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ForumCommentRow, ForumPostRow, HelpRequestRow } from "@/lib/supabase/types";
 import { FORUM_CATEGORIES } from "@/lib/constants";
+import { hasHtmlContent } from "@/lib/child-card";
 import { extractFirstImageUrlFromHtml } from "@/lib/forum";
 import { parseOptionalFacebookLink } from "@/lib/forum/facebook-link";
 import { getRequesterDisplay } from "@/lib/help";
@@ -394,11 +395,11 @@ export async function createForumPost(
   }
 
   const title = data.title?.trim() ?? "";
-  const content = data.content?.trim() ?? "";
+  const content = data.content ?? "";
   const category = data.category?.trim() ?? "";
 
-  if (!title || !content) {
-    return { success: false, error: "נא למלא כותרת ותוכן." };
+  if (!title || title.length < 3) {
+    return { success: false, error: "נא למלא כותרת (לפחות 3 תווים)." };
   }
   if (!isForumCategory(category)) {
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
@@ -407,6 +408,10 @@ export async function createForumPost(
   const fbParsed = parseOptionalFacebookLink(data.facebook_link ?? null);
   if (!fbParsed.ok) {
     return { success: false, error: fbParsed.error };
+  }
+
+  if (!hasHtmlContent(content) && fbParsed.value === null) {
+    return { success: false, error: "נא להוסיף תוכן או קישור לפייסבוק." };
   }
 
   const thumbnailUrl = extractFirstImageUrlFromHtml(content);
@@ -442,7 +447,11 @@ export async function createForumPost(
           authorProfile as ProfileFields | null,
           true
         );
-        const snippet = htmlToPlainSnippet(content, 220);
+        const snippet = hasHtmlContent(content)
+          ? htmlToPlainSnippet(content, 220)
+          : fbParsed.value
+            ? "קישור לפוסט בפייסבוק"
+            : "";
         const postUrl = `${FORUM_PUBLIC_BASE}/${postId}`;
         const subject = `[ניפגשה] פוסט חדש בקהילה: ${title}`;
         const html = rtlEmailWrap(`
@@ -554,11 +563,11 @@ export async function updateForumPost(
   }
 
   const title = data.title?.trim() ?? "";
-  const content = data.content?.trim() ?? "";
+  const content = data.content ?? "";
   const category = data.category?.trim() ?? "";
 
-  if (!title || !content) {
-    return { success: false, error: "נא למלא כותרת ותוכן." };
+  if (!title || title.length < 3) {
+    return { success: false, error: "נא למלא כותרת (לפחות 3 תווים)." };
   }
   if (!isForumCategory(category)) {
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
@@ -567,6 +576,10 @@ export async function updateForumPost(
   const fbParsed = parseOptionalFacebookLink(data.facebook_link ?? null);
   if (!fbParsed.ok) {
     return { success: false, error: fbParsed.error };
+  }
+
+  if (!hasHtmlContent(content) && fbParsed.value === null) {
+    return { success: false, error: "נא להוסיף תוכן או קישור לפייסבוק." };
   }
 
   const thumbnailUrl = extractFirstImageUrlFromHtml(content);
