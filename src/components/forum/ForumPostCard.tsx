@@ -5,8 +5,8 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, ImageIcon } from "lucide-react";
-import { getForumCategoryBadgeVariant } from "@/lib/constants";
+import { MessageCircle } from "lucide-react";
+import { FORUM_POST_DEFAULT_THUMBNAIL, getForumCategoryBadgeVariant } from "@/lib/constants";
 import { stripHtmlToSnippet, formatForumRelativeTime, isForumPostEdited } from "@/lib/forum";
 import type { ForumPostListItem } from "@/app/forum/actions";
 import { RICH_TEXT_DISPLAY_PROSE_CLASS } from "@/components/editor/rich-text-display-prose";
@@ -21,7 +21,9 @@ interface ForumPostCardProps {
 export function ForumPostCard({ post, currentUserId }: ForumPostCardProps) {
   const initial = post.author_display_name.charAt(0) || "?";
   const snippet = stripHtmlToSnippet(post.content);
-  const thumb = post.thumbnail_url;
+  const thumb = post.thumbnail_url?.trim() || null;
+  const imageSrc = thumb || FORUM_POST_DEFAULT_THUMBNAIL;
+  const isDefaultImage = !thumb;
   const isOwner = Boolean(currentUserId && currentUserId === post.user_id);
   const showEdited = isForumPostEdited(post.created_at, post.updated_at);
 
@@ -54,27 +56,23 @@ export function ForumPostCard({ post, currentUserId }: ForumPostCardProps) {
       >
         <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-5 sm:p-5">
           <div className="flex justify-center sm:block sm:shrink-0">
-            {thumb ? (
-              <div className="relative h-28 w-28 overflow-hidden rounded-lg bg-muted ring-1 ring-black/5 dark:ring-white/10 sm:h-32 sm:w-32">
-                <Image
-                  src={thumb}
-                  alt=""
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 112px, 128px"
-                />
-              </div>
-            ) : (
-              <div
+            <div
+              className={cn(
+                "relative h-28 w-28 overflow-hidden rounded-lg ring-1 ring-black/5 dark:ring-white/10 sm:h-32 sm:w-32",
+                isDefaultImage ? "bg-muted/80" : "bg-muted"
+              )}
+            >
+              <Image
+                src={imageSrc}
+                alt=""
+                fill
                 className={cn(
-                  "flex h-28 w-28 items-center justify-center rounded-lg sm:h-32 sm:w-32",
-                  "bg-teal-100/80 text-teal-700/80 dark:bg-teal-950/50 dark:text-teal-300/80"
+                  "transition-transform duration-300 group-hover:scale-[1.03]",
+                  isDefaultImage ? "object-contain p-3" : "object-cover"
                 )}
-                aria-hidden
-              >
-                <ImageIcon className="size-10 opacity-80" />
-              </div>
-            )}
+                sizes="(max-width: 640px) 112px, 128px"
+              />
+            </div>
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-3 text-right">

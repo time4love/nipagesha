@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ForumPostReportButton } from "@/components/forum/ForumPostReportButton";
 import { ForumCommentForm } from "@/components/forum/ForumCommentForm";
 import { PostActions } from "@/components/forum/PostActions";
-import { getForumCategoryBadgeVariant } from "@/lib/constants";
+import { FORUM_POST_DEFAULT_THUMBNAIL, getForumCategoryBadgeVariant } from "@/lib/constants";
 import {
   extractFirstImageUrlFromHtml,
   formatForumRelativeTime,
@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: ForumPostPageProps): Promise<
 
   const row = post as { title: string; content: string; thumbnail_url: string | null };
   const description = stripHtmlToSnippet(row.content, 120);
-  const imageCandidate = row.thumbnail_url?.trim() || extractFirstImageUrlFromHtml(row.content);
+  const imageCandidate =
+    row.thumbnail_url?.trim() ||
+    extractFirstImageUrlFromHtml(row.content) ||
+    FORUM_POST_DEFAULT_THUMBNAIL;
   const ogImage = resolveForumOgImageUrl(imageCandidate, SITE_ORIGIN);
   const pageUrl = `${SITE_ORIGIN}/forum/${id}`;
 

@@ -61,6 +61,9 @@ export type ForumCategory = (typeof FORUM_CATEGORIES)[number];
 /** Default selection in the new-post form. */
 export const DEFAULT_FORUM_CATEGORY: ForumCategory = "כללי";
 
+/** Card + OG fallback when a forum post has no image in content or thumbnail. */
+export const FORUM_POST_DEFAULT_THUMBNAIL = "/logo.avif";
+
 const FORUM_CATEGORY_VARIANTS: Record<
   ForumCategory,
   "default" | "secondary" | "success" | "outline"
