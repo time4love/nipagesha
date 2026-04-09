@@ -5,24 +5,15 @@ import type { MessagePageCard } from "@/lib/supabase/types";
 import { CHILD_PAGE_GRADIENT } from "@/lib/constants";
 import { MessageUnlockClient } from "./MessageUnlockClient";
 
-/** Generic OG copy only — never include the child's name (scrapers/cache). */
-const MESSAGE_PAGE_TITLE = "מחכה לך מסר אישי 💌";
-const MESSAGE_PAGE_DESCRIPTION =
-  "מישהו השאיר עבורך הודעה מאובטחת. היכנס/י כדי לגלות ממי זה ולפתוח את המסר.";
-
 export const metadata: Metadata = {
-  title: MESSAGE_PAGE_TITLE,
-  description: MESSAGE_PAGE_DESCRIPTION,
+  title: "מחכה לך מסר אישי 💌",
+  description:
+    "מישהו השאיר עבורך הודעה מאובטחת. היכנס/י כדי לגלות ממי זה ולפתוח את המסר.",
   openGraph: {
-    title: MESSAGE_PAGE_TITLE,
-    description: MESSAGE_PAGE_DESCRIPTION,
-    locale: "he_IL",
-    type: "website",
-  },
-  twitter: {
-    card: "summary",
-    title: MESSAGE_PAGE_TITLE,
-    description: MESSAGE_PAGE_DESCRIPTION,
+    title: "מחכה לך מסר אישי 💌",
+    description:
+      "מישהו השאיר עבורך הודעה מאובטחת. היכנס/י כדי לגלות ממי זה ולפתוח את המסר.",
+    siteName: "ניפגשה",
   },
 };
 

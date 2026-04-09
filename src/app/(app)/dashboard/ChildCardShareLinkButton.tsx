@@ -8,14 +8,6 @@ const TOOLTIP_LABEL = "העתק קישור אישי לילד";
 const COPY_SUCCESS = "הקישור הועתק! כעת ניתן לשלוח אותו לילד.";
 const COPY_ERROR = "לא ניתן להעתיק את הקישור.";
 
-/** Pre-filled line for native share + clipboard (gentle, inviting). */
-const SHARE_MESSAGE_INTRO = "היי, מחכה לך מסר אישי ממני כאן:";
-
-function buildSharePayload(url: string): { textBlock: string } {
-  const textBlock = `${SHARE_MESSAGE_INTRO} \n${url}`;
-  return { textBlock };
-}
-
 export interface ChildCardShareLinkButtonProps {
   cardId: string;
 }
@@ -26,18 +18,13 @@ export function ChildCardShareLinkButton({ cardId }: ChildCardShareLinkButtonPro
       typeof window !== "undefined"
         ? `${window.location.origin}/message/${cardId}`
         : "";
-    const { textBlock } = buildSharePayload(url);
 
     const canShare =
       typeof navigator !== "undefined" && typeof navigator.share === "function";
 
     if (canShare && url) {
       try {
-        await navigator.share({
-          title: SHARE_MESSAGE_INTRO,
-          text: textBlock,
-          url,
-        });
+        await navigator.share({ url });
         return;
       } catch (err) {
         const e = err as { name?: string };
@@ -47,7 +34,7 @@ export function ChildCardShareLinkButton({ cardId }: ChildCardShareLinkButtonPro
     }
 
     try {
-      await navigator.clipboard.writeText(textBlock);
+      await navigator.clipboard.writeText(url);
       toast.success(COPY_SUCCESS);
     } catch {
       toast.error(COPY_ERROR);
