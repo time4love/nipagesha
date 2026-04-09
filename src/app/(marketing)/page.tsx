@@ -45,7 +45,15 @@ export default async function HomePage() {
           <p className="mt-6 max-w-2xl mx-auto text-2xl text-muted-foreground sm:text-3xl md:text-4xl font-medium font-tagline tracking-tight">
             חיבור הורים וילדים
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-4">
+          <div className="mt-10 flex w-full max-w-md mx-auto flex-col items-stretch gap-4 sm:max-w-lg">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className={OUTLINE_BUTTON_TEAL_CLASS}
+            >
+              <Link href="/search">אני מחפש מסר</Link>
+            </Button>
             {user ? (
               <Button
                 asChild
@@ -58,23 +66,13 @@ export default async function HomePage() {
                 </Link>
               </Button>
             ) : (
-              <>
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
-                >
-                  <Link href="/dashboard">אני הורה או מתנדב</Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className={OUTLINE_BUTTON_TEAL_CLASS}
-                >
-                  <Link href="/search">אני מחפש מסר</Link>
-                </Button>
-              </>
+              <Button
+                asChild
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-md"
+              >
+                <Link href="/dashboard">אני הורה או מתנדב</Link>
+              </Button>
             )}
           </div>
         </div>

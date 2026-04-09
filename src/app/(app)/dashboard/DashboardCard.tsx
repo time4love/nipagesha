@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, MessageSquare, Trash2 } from "lucide-react";
 import { CardActivityLog } from "./CardActivityLog";
+import { ChildCardShareLinkButton } from "./ChildCardShareLinkButton";
 import { markAllRepliesAsReadForCard } from "@/app/message/actions";
 import { deleteChildCard } from "./actions";
 
@@ -185,6 +186,7 @@ export function DashboardCard({
           <Button variant="outline" size="sm" asChild className="w-fit">
             <Link href={`/view/${card.id}`}>צפה במסר</Link>
           </Button>
+          <ChildCardShareLinkButton cardId={card.id} />
           <Button variant="outline" size="sm" asChild className="w-fit">
             <Link href={`/edit-card/${card.id}`} aria-label="ערוך כרטיס">
               <Pencil className="size-4 ml-1 rtl:ml-0 rtl:mr-1" aria-hidden />

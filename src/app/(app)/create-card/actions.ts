@@ -42,7 +42,7 @@ export async function createChildCard(
 
   const row: ChildCardInsert = {
     user_id: user.id,
-    child_first_name: payload.child_first_name.trim(),
+    child_first_name: payload.child_first_name.trim().normalize("NFC"),
     birth_date: payload.birth_date,
     security_question: payload.security_question.trim(),
     encrypted_message: payload.encrypted_message,
@@ -110,7 +110,7 @@ export async function updateChildCard(
   const { data: updated, error } = await supabase
     .from("child_cards")
     .update({
-      child_first_name: payload.child_first_name.trim(),
+      child_first_name: payload.child_first_name.trim().normalize("NFC"),
       birth_date: payload.birth_date,
       security_question: payload.security_question.trim(),
       encrypted_message: payload.encrypted_message,
