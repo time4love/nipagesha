@@ -9,6 +9,7 @@ import { MessageCircle, ImageIcon } from "lucide-react";
 import { getForumCategoryBadgeVariant } from "@/lib/constants";
 import { stripHtmlToSnippet, formatForumRelativeTime, isForumPostEdited } from "@/lib/forum";
 import type { ForumPostListItem } from "@/app/forum/actions";
+import { RICH_TEXT_DISPLAY_PROSE_CLASS } from "@/components/editor/rich-text-display-prose";
 import { cn } from "@/lib/utils";
 import { ForumPostActionsMenu } from "@/components/forum/ForumPostActionsMenu";
 
@@ -104,9 +105,14 @@ export function ForumPostCard({ post, currentUserId }: ForumPostCardProps) {
               {post.title}
             </h2>
 
-            <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-              {snippet}
-            </p>
+            <div
+              className={cn(
+                RICH_TEXT_DISPLAY_PROSE_CLASS,
+                "text-muted-foreground [&_p]:my-0"
+              )}
+            >
+              <p className="line-clamp-3 text-pretty m-0">{snippet}</p>
+            </div>
 
             <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border/50 pt-3">
               <div className="flex min-w-0 items-center gap-2">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ArticleContent } from "@/components/articles/ArticleContent";
+import { RichTextRenderer } from "@/components/editor/RichTextRenderer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ForumPostReportButton } from "@/components/forum/ForumPostReportButton";
@@ -158,7 +158,10 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
         </div>
 
         <div className="pt-2 border-t border-border/80">
-          <ArticleContent html={post.content} className="prose-headings:scroll-mt-20" />
+          <RichTextRenderer
+            content={post.content}
+            className="prose-headings:scroll-mt-20"
+          />
         </div>
 
         {post.facebook_link ? (

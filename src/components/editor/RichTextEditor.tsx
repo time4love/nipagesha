@@ -26,6 +26,7 @@ import { uploadImageViaApi, uploadPublicImageViaApi } from "@/app/(app)/create-c
 import { getSignedUrl } from "@/app/(app)/view/actions";
 import { cn } from "@/lib/utils";
 import { sanitizePastedHtml } from "@/lib/editor/sanitize-pasted-html";
+import { RICH_TEXT_DISPLAY_PROSE_CLASS } from "@/components/editor/rich-text-display-prose";
 
 const PRIVATE_PREFIX = "private://";
 
@@ -268,11 +269,7 @@ export function RichTextEditor({
       attributes: {
         class: cn(
           "min-h-[200px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none",
-          "prose prose-sm max-w-none dark:prose-invert",
-          /* Tighter paragraph rhythm than default typography (less stacked margin between pasted blocks) */
-          "[&_p]:my-1.5 [&_p]:leading-relaxed [&_p:first-child]:mt-0",
-          "prose-headings:mt-4 prose-headings:mb-2 prose-headings:first:mt-0",
-          "prose-li:my-0.5"
+          RICH_TEXT_DISPLAY_PROSE_CLASS
         ),
         dir: "rtl",
       },

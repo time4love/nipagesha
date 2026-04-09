@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createForumPost, updateForumPost } from "@/app/forum/actions";
-import { ArticleContent } from "@/components/articles/ArticleContent";
+import { RichTextRenderer } from "@/components/editor/RichTextRenderer";
 import { FacebookEmbed } from "@/components/forum/FacebookEmbed";
 import { hasHtmlContent } from "@/lib/child-card";
 import {
@@ -84,7 +84,10 @@ function ForumPostLivePreview({
         <h2 className="text-2xl font-bold leading-tight text-foreground">{title}</h2>
       ) : null}
       {hasHtmlContent(content) ? (
-        <ArticleContent html={content} className="prose-headings:scroll-mt-20" />
+        <RichTextRenderer
+          content={content}
+          className="prose-headings:scroll-mt-20"
+        />
       ) : null}
       {embedUrl ? <FacebookEmbed url={embedUrl} /> : null}
     </div>
