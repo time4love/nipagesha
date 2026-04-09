@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { uploadImageViaApi, uploadPublicImageViaApi } from "@/app/(app)/create-card/upload-api";
 import { getSignedUrl } from "@/app/(app)/view/actions";
 import { cn } from "@/lib/utils";
+import { sanitizePastedHtml } from "@/lib/editor/sanitize-pasted-html";
 
 const PRIVATE_PREFIX = "private://";
 
@@ -265,9 +266,21 @@ export function RichTextEditor({
     editable: !disabled,
     editorProps: {
       attributes: {
-        class:
-          "min-h-[200px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none prose prose-sm max-w-none dark:prose-invert",
+        class: cn(
+          "min-h-[200px] w-full rounded-b-md border border-input bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus:outline-none",
+          "prose prose-sm max-w-none dark:prose-invert",
+          /* Tighter paragraph rhythm than default typography (less stacked margin between pasted blocks) */
+          "[&_p]:my-1.5 [&_p]:leading-relaxed [&_p:first-child]:mt-0",
+          "prose-headings:mt-4 prose-headings:mb-2 prose-headings:first:mt-0",
+          "prose-li:my-0.5"
+        ),
         dir: "rtl",
+      },
+      transformPastedHTML(html) {
+        return sanitizePastedHtml(html);
+      },
+      transformPastedText(text) {
+        return text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
       },
       handleDrop(_view, event) {
         const files = event.dataTransfer?.files;
