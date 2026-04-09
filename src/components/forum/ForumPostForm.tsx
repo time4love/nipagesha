@@ -22,6 +22,7 @@ const RichTextEditor = dynamic(
   }
 );
 import { DEFAULT_FORUM_CATEGORY } from "@/lib/constants";
+import { forumPostFacebookLinkFieldSchema } from "@/lib/forum/facebook-link";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 
@@ -30,6 +31,7 @@ export interface ForumPostFormProps {
   postId?: string;
   initialTitle?: string;
   initialContent?: string;
+  initialFacebookLink?: string;
   backHref: string;
   backLabel: string;
 }
@@ -39,18 +41,28 @@ export function ForumPostForm({
   postId,
   initialTitle = "",
   initialContent = "",
+  initialFacebookLink = "",
   backHref,
   backLabel,
 }: ForumPostFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
+  const [facebookLink, setFacebookLink] = useState(initialFacebookLink);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const fbParsed = forumPostFacebookLinkFieldSchema.safeParse(facebookLink);
+    if (!fbParsed.success) {
+      const msg = fbParsed.error.issues[0]?.message ?? "קישור פייסבוק לא תקין.";
+      setError(msg);
+      return;
+    }
+    const facebookLinkValue = fbParsed.data;
+
     setPending(true);
     try {
       if (mode === "create") {
@@ -58,6 +70,7 @@ export function ForumPostForm({
           title,
           category: DEFAULT_FORUM_CATEGORY,
           content,
+          facebook_link: facebookLinkValue,
         });
         if (!res.success) {
           setError(res.error ?? "שמירה נכשלה.");
@@ -71,6 +84,7 @@ export function ForumPostForm({
           title,
           category: DEFAULT_FORUM_CATEGORY,
           content,
+          facebook_link: facebookLinkValue,
         });
         if (!res.success) {
           setError(res.error ?? "שמירה נכשלה.");
@@ -130,6 +144,22 @@ export function ForumPostForm({
           disabled={pending}
           placeholder="שתפו את הסיפור שלכם. ניתן להוסיף עיצוב, רשימות ותמונות."
           onUploadError={(msg) => toast.error(msg)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="forum-facebook-link">קישור לפוסט בפייסבוק (אופציונלי)</Label>
+        <Input
+          id="forum-facebook-link"
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          value={facebookLink}
+          onChange={(e) => setFacebookLink(e.target.value)}
+          placeholder="https://www.facebook.com/..."
+          disabled={pending}
+          className="text-left"
+          dir="ltr"
         />
       </div>
 

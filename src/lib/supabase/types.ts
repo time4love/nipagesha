@@ -149,6 +149,8 @@ export interface ForumPostRow {
   category: string;
   /** Set at insert; may be null for legacy rows until backfilled. */
   thumbnail_url?: string | null;
+  /** Optional Facebook post URL for embedded preview. */
+  facebook_link?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -84,6 +84,12 @@ export function ForumPostCard({ post, currentUserId }: ForumPostCardProps) {
               >
                 {post.category}
               </Badge>
+              {post.facebook_link ? (
+                <Badge variant="secondary" className="font-normal gap-1 text-xs">
+                  <span aria-hidden>🔗</span>
+                  מכיל פוסט פייסבוק
+                </Badge>
+              ) : null}
               <span className="text-xs text-muted-foreground tabular-nums ms-auto sm:ms-0 flex flex-wrap items-center justify-end gap-1.5">
                 <time dateTime={post.created_at}>
                   {formatForumRelativeTime(post.created_at)}

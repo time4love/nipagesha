@@ -18,6 +18,7 @@ import {
 } from "@/lib/forum";
 import { getForumPostById, getPostComments } from "../actions";
 import { ForumPostActionsMenu } from "@/components/forum/ForumPostActionsMenu";
+import { FacebookEmbed } from "@/components/forum/FacebookEmbed";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nipagesha.co.il";
@@ -159,6 +160,12 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
         <div className="pt-2 border-t border-border/80">
           <ArticleContent html={post.content} className="prose-headings:scroll-mt-20" />
         </div>
+
+        {post.facebook_link ? (
+          <div className="border-t border-border/80 pt-4">
+            <FacebookEmbed url={post.facebook_link} />
+          </div>
+        ) : null}
 
         <PostActions
           postId={post.id}

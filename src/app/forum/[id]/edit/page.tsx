@@ -39,6 +39,7 @@ export default async function EditForumPostPage({ params }: EditForumPostPagePro
         postId={id}
         initialTitle={post.title}
         initialContent={post.content}
+        initialFacebookLink={post.facebook_link ?? ""}
         backHref={`/forum/${id}`}
         backLabel="חזרה לפוסט"
       />

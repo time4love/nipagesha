@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import type { ForumCommentRow, ForumPostRow, HelpRequestRow } from "@/lib/supabase/types";
 import { FORUM_CATEGORIES } from "@/lib/constants";
 import { extractFirstImageUrlFromHtml } from "@/lib/forum";
+import { parseOptionalFacebookLink } from "@/lib/forum/facebook-link";
 import { getRequesterDisplay } from "@/lib/help";
 import { sendEmail } from "@/lib/email";
 import { getAdminEmails } from "@/lib/admin";
@@ -47,6 +48,7 @@ export interface ForumPostListItem {
   content: string;
   category: string;
   thumbnail_url: string | null;
+  facebook_link: string | null;
   created_at: string;
   updated_at: string;
   author_display_name: string;
@@ -65,6 +67,8 @@ export interface CreateForumPostInput {
   title: string;
   category: string;
   content: string;
+  /** Optional; validated as Facebook post URL when set. */
+  facebook_link?: string | null;
 }
 
 /** Same shape as create; used for updates. */
@@ -112,6 +116,7 @@ function mapRowsToListItems(
       content: post.content,
       category: post.category,
       thumbnail_url: thumbnail,
+      facebook_link: post.facebook_link ?? null,
       created_at: post.created_at,
       updated_at: post.updated_at,
       author_display_name: displayName,
@@ -399,6 +404,11 @@ export async function createForumPost(
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
   }
 
+  const fbParsed = parseOptionalFacebookLink(data.facebook_link ?? null);
+  if (!fbParsed.ok) {
+    return { success: false, error: fbParsed.error };
+  }
+
   const thumbnailUrl = extractFirstImageUrlFromHtml(content);
 
   const { data: inserted, error } = await supabase
@@ -409,6 +419,7 @@ export async function createForumPost(
       content,
       category,
       thumbnail_url: thumbnailUrl,
+      facebook_link: fbParsed.value,
     })
     .select("id")
     .single();
@@ -553,6 +564,11 @@ export async function updateForumPost(
     return { success: false, error: "נא לבחור קטגוריה מהרשימה." };
   }
 
+  const fbParsed = parseOptionalFacebookLink(data.facebook_link ?? null);
+  if (!fbParsed.ok) {
+    return { success: false, error: fbParsed.error };
+  }
+
   const thumbnailUrl = extractFirstImageUrlFromHtml(content);
 
   const { data: updated, error } = await supabase
@@ -562,6 +578,7 @@ export async function updateForumPost(
       content,
       category,
       thumbnail_url: thumbnailUrl,
+      facebook_link: fbParsed.value,
     })
     .eq("id", postId)
     .eq("user_id", user.id)
