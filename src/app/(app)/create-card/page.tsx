@@ -203,9 +203,11 @@ export default function CreateCardPage() {
                     <FormLabel>{t("createCard.securityAnswerLabel")}</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
+                        type="text"
+                        lang="he"
                         placeholder={t("createCard.securityAnswerPlaceholder")}
                         autoComplete="off"
+                        spellCheck={false}
                         {...field}
                       />
                     </FormControl>

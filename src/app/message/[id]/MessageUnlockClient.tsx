@@ -6,6 +6,7 @@ import { formatChildName } from "@/lib/child-card";
 import { MessageCard } from "@/components/message/MessageCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MaskedSecretInput } from "@/components/ui/masked-secret-input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { logAccessAttempt, sendReply } from "@/app/message/actions";
@@ -179,12 +180,10 @@ export function MessageUnlockClient({
             {error && <ErrorMessage message={error} />}
             <label className="block text-sm font-medium text-right">
               התשובה שלך
-              <Input
-                type="password"
+              <MaskedSecretInput
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="••••••••"
-                autoComplete="off"
                 className="mt-2 text-right"
                 aria-label="התשובה שלך"
               />

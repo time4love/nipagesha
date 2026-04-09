@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MaskedSecretInput } from "@/components/ui/masked-secret-input";
 import {
   Form,
   FormControl,
@@ -226,9 +227,11 @@ function EditForm({
                     <FormLabel>{t("createCard.securityAnswerLabel")}</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
+                        type="text"
+                        lang="he"
                         placeholder={t("createCard.securityAnswerPlaceholder")}
                         autoComplete="off"
+                        spellCheck={false}
                         {...field}
                       />
                     </FormControl>
@@ -323,12 +326,10 @@ export function EditCardClient({ card }: EditCardClientProps) {
               {unlockError && <ErrorMessage message={unlockError} />}
               <label className="block text-sm font-medium text-right">
                 {t("editCard.securityAnswerLabel")}
-                <Input
-                  type="password"
+                <MaskedSecretInput
                   value={unlockAnswer}
                   onChange={(e) => setUnlockAnswer(e.target.value)}
                   placeholder={t("createCard.securityAnswerPlaceholder")}
-                  autoComplete="off"
                   className="mt-2 text-right"
                   aria-label={t("editCard.securityAnswerLabel")}
                   disabled={isUnlocking}

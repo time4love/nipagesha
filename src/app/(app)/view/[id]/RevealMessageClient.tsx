@@ -5,7 +5,7 @@ import Link from "next/link";
 import { decryptMessage } from "@/lib/crypto";
 import { MessageCard } from "@/components/message/MessageCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { MaskedSecretInput } from "@/components/ui/masked-secret-input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorMessage } from "@/components/ui/error-message";
 
@@ -58,13 +58,12 @@ export function RevealMessageClient({
             {error && <ErrorMessage message={error} />}
             <label className="block text-sm font-medium">
               התשובה
-              <Input
-                type="password"
+              <MaskedSecretInput
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="••••••••"
-                autoComplete="off"
-                className="mt-2"
+                className="mt-2 text-right"
+                aria-label="התשובה"
               />
             </label>
             <Button type="submit" className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white">
