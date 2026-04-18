@@ -10,7 +10,8 @@ import { extractFirstImageUrlFromHtml } from "@/lib/forum";
 import { parseOptionalFacebookLink } from "@/lib/forum/facebook-link";
 import { getRequesterDisplay } from "@/lib/help";
 import { sendEmail } from "@/lib/email";
-import { getAdminEmails } from "@/lib/admin";
+import { getAdminEmails, isAdmin } from "@/lib/admin";
+import { adminClient } from "@/lib/supabase/admin";
 
 const FORUM_PUBLIC_BASE = "https://www.nipagesha.co.il/forum";
 
@@ -700,6 +701,27 @@ export async function deleteForumComment(
   } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, error: "יש להתחבר כדי למחוק תגובה." };
+  }
+
+  if (isAdmin(user.email)) {
+    const { data: deletedRows, error } = await adminClient
+      .from("forum_comments")
+      .delete()
+      .eq("id", commentId)
+      .eq("post_id", postId)
+      .select("id");
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    if (!deletedRows?.length) {
+      return { success: false, error: "לא נמצאה תגובה בפוסט זה." };
+    }
+
+    revalidatePath("/forum");
+    revalidatePath(`/forum/${postId}`);
+    revalidatePath("/dashboard");
+    return { success: true };
   }
 
   const { data: deletedRows, error } = await supabase

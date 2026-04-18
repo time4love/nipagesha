@@ -20,11 +20,14 @@ import { toast } from "sonner";
 interface ForumCommentDeleteButtonProps {
   commentId: string;
   postId: string;
+  /** Admin deleting someone else's comment — copy reflects moderation. */
+  moderation?: boolean;
 }
 
 export function ForumCommentDeleteButton({
   commentId,
   postId,
+  moderation,
 }: ForumCommentDeleteButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -38,7 +41,7 @@ export function ForumCommentDeleteButton({
       toast.error(res.error ?? "לא ניתן למחוק את התגובה.");
       return;
     }
-    toast.success("התגובה נמחקה.");
+    toast.success(moderation ? "התגובה נמחקה (ניהול)." : "התגובה נמחקה.");
     setOpen(false);
     router.refresh();
   }
@@ -51,17 +54,21 @@ export function ForumCommentDeleteButton({
           variant="ghost"
           size="icon"
           className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
-          aria-label="מחק תגובה"
-          title="מחק תגובה"
+          aria-label={moderation ? "מחק תגובה כמנהל" : "מחק תגובה"}
+          title={moderation ? "מחק תגובה (ניהול)" : "מחק תגובה"}
         >
           <Trash2 className="size-4" aria-hidden />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent dir="rtl">
         <AlertDialogHeader>
-          <AlertDialogTitle>מחיקת תגובה</AlertDialogTitle>
+          <AlertDialogTitle>
+            {moderation ? "מחיקת תגובה (ניהול)" : "מחיקת תגובה"}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            למחוק את התגובה שלך? לא ניתן לשחזר אותה.
+            {moderation
+              ? "למחוק תגובה זו כמנהל? לא ניתן לשחזר אותה."
+              : "למחוק את התגובה שלך? לא ניתן לשחזר אותה."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

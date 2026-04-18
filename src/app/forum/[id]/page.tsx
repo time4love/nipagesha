@@ -22,6 +22,7 @@ import { getForumPostById, getPostComments } from "../actions";
 import { ForumPostActionsMenu } from "@/components/forum/ForumPostActionsMenu";
 import { FacebookEmbed } from "@/components/forum/FacebookEmbed";
 import { ArrowRight, MessageCircle } from "lucide-react";
+import { isAdmin } from "@/lib/admin";
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nipagesha.co.il";
 
@@ -104,6 +105,7 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
   const isOwner = Boolean(user && user.id === post.user_id);
   const showEdited = isForumPostEdited(post.created_at, post.updated_at);
   const { roots, repliesByParentId } = groupForumCommentsByParent(comments);
+  const isAdminViewer = isAdmin(user?.email);
 
   return (
     <article className="space-y-8" dir="rtl">
@@ -202,6 +204,7 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
                   replies={repliesByParentId.get(root.id) ?? []}
                   postId={post.id}
                   currentUserId={user?.id}
+                  isAdminViewer={isAdminViewer}
                 />
               </li>
             ))}

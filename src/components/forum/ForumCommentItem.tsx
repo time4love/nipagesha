@@ -11,6 +11,8 @@ interface ForumCommentItemProps {
   postId: string;
   currentUserId: string | undefined;
   isReply: boolean;
+  /** Logged-in viewer is a site admin (may delete any comment on this post). */
+  isAdminViewer?: boolean;
 }
 
 export function ForumCommentItem({
@@ -18,9 +20,13 @@ export function ForumCommentItem({
   postId,
   currentUserId,
   isReply,
+  isAdminViewer,
 }: ForumCommentItemProps) {
   const initial = c.author_display_name.charAt(0) || "?";
   const isOwner = Boolean(currentUserId && currentUserId === c.user_id);
+  const showEdit = isOwner;
+  const showDelete = isOwner || Boolean(isAdminViewer);
+  const moderationDelete = Boolean(isAdminViewer && !isOwner);
 
   return (
     <div className="flex gap-3">
@@ -52,14 +58,22 @@ export function ForumCommentItem({
               <span className="text-[11px] text-muted-foreground/90">(נערך)</span>
             ) : null}
           </div>
-          {isOwner ? (
+          {showEdit || showDelete ? (
             <div className="flex shrink-0 items-center gap-0.5">
-              <ForumCommentEditDialog
-                commentId={c.id}
-                postId={postId}
-                initialContent={c.content}
-              />
-              <ForumCommentDeleteButton commentId={c.id} postId={postId} />
+              {showEdit ? (
+                <ForumCommentEditDialog
+                  commentId={c.id}
+                  postId={postId}
+                  initialContent={c.content}
+                />
+              ) : null}
+              {showDelete ? (
+                <ForumCommentDeleteButton
+                  commentId={c.id}
+                  postId={postId}
+                  moderation={moderationDelete}
+                />
+              ) : null}
             </div>
           ) : null}
         </div>

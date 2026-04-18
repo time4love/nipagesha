@@ -11,6 +11,7 @@ interface ForumCommentBlockProps {
   replies: ForumCommentWithAuthor[];
   postId: string;
   currentUserId: string | undefined;
+  isAdminViewer?: boolean;
 }
 
 export function ForumCommentBlock({
@@ -18,6 +19,7 @@ export function ForumCommentBlock({
   replies,
   postId,
   currentUserId,
+  isAdminViewer,
 }: ForumCommentBlockProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const canReply = Boolean(currentUserId);
@@ -29,6 +31,7 @@ export function ForumCommentBlock({
         postId={postId}
         currentUserId={currentUserId}
         isReply={false}
+        isAdminViewer={isAdminViewer}
       />
       {replies.length > 0 ? (
         <div className="border-s-2 border-border/70 ps-3 space-y-3">
@@ -39,6 +42,7 @@ export function ForumCommentBlock({
               postId={postId}
               currentUserId={currentUserId}
               isReply
+              isAdminViewer={isAdminViewer}
             />
           ))}
         </div>
