@@ -7,14 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ForumPostReportButton } from "@/components/forum/ForumPostReportButton";
 import { ForumCommentForm } from "@/components/forum/ForumCommentForm";
-import { ForumCommentDeleteButton } from "@/components/forum/ForumCommentDeleteButton";
-import { ForumCommentEditDialog } from "@/components/forum/ForumCommentEditDialog";
+import { ForumCommentBlock } from "@/components/forum/ForumCommentBlock";
 import { PostActions } from "@/components/forum/PostActions";
 import { FORUM_POST_DEFAULT_THUMBNAIL, getForumCategoryBadgeVariant } from "@/lib/constants";
 import {
   extractFirstImageUrlFromHtml,
   formatForumRelativeTime,
-  isForumCommentEdited,
+  groupForumCommentsByParent,
   isForumPostEdited,
   resolveForumOgImageUrl,
   stripHtmlToSnippet,
@@ -104,6 +103,7 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
   const titleInitial = post.author_display_name.charAt(0) || "?";
   const isOwner = Boolean(user && user.id === post.user_id);
   const showEdited = isForumPostEdited(post.created_at, post.updated_at);
+  const { roots, repliesByParentId } = groupForumCommentsByParent(comments);
 
   return (
     <article className="space-y-8" dir="rtl">
@@ -195,53 +195,16 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
           <p className="text-muted-foreground text-sm">אין תגובות עדיין — התחילו את הדיון.</p>
         ) : (
           <ul className="space-y-0 list-none p-0 m-0 divide-y divide-border rounded-xl border bg-muted/20">
-            {comments.map((c) => {
-              const initial = c.author_display_name.charAt(0) || "?";
-              return (
-                <li key={c.id} className="p-4 md:p-5">
-                  <div className="flex gap-3">
-                    <Avatar className="h-9 w-9 shrink-0 mt-0.5">
-                      <AvatarImage src={c.author_avatar_url ?? undefined} alt="" />
-                      <AvatarFallback className="text-xs">{initial}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex flex-wrap items-baseline gap-2 min-w-0">
-                          <span className="font-medium text-sm">{c.author_display_name}</span>
-                          <time
-                            dateTime={c.created_at}
-                            className="text-xs text-muted-foreground tabular-nums"
-                          >
-                            {formatForumRelativeTime(c.created_at)}
-                          </time>
-                          {isForumCommentEdited(c.created_at, c.updated_at) ? (
-                            <span className="text-[11px] text-muted-foreground/90">
-                              (נערך)
-                            </span>
-                          ) : null}
-                        </div>
-                        {user?.id === c.user_id ? (
-                          <div className="flex shrink-0 items-center gap-0.5">
-                            <ForumCommentEditDialog
-                              commentId={c.id}
-                              postId={post.id}
-                              initialContent={c.content}
-                            />
-                            <ForumCommentDeleteButton
-                              commentId={c.id}
-                              postId={post.id}
-                            />
-                          </div>
-                        ) : null}
-                      </div>
-                      <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                        {c.content}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
+            {roots.map((root) => (
+              <li key={root.id} className="p-4 md:p-5">
+                <ForumCommentBlock
+                  root={root}
+                  replies={repliesByParentId.get(root.id) ?? []}
+                  postId={post.id}
+                  currentUserId={user?.id}
+                />
+              </li>
+            ))}
           </ul>
         )}
 

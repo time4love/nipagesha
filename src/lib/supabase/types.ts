@@ -160,6 +160,8 @@ export interface ForumCommentRow {
   id: string;
   post_id: string;
   user_id: string;
+  /** Null = top-level comment on the post; set = reply to that top-level comment only. */
+  parent_id: string | null;
   content: string;
   created_at: string;
   updated_at: string;

@@ -17,6 +17,33 @@ export function isForumCommentEdited(createdAt: string, updatedAt: string | unde
   return isForumPostEdited(createdAt, updatedAt);
 }
 
+/**
+ * Split flat comment list into roots and replies (single depth).
+ * Roots and each reply list are sorted by `created_at` ascending.
+ */
+export function groupForumCommentsByParent<
+  T extends { parent_id: string | null; created_at: string; id: string },
+>(comments: T[]): { roots: T[]; repliesByParentId: Map<string, T[]> } {
+  const roots: T[] = [];
+  const repliesByParentId = new Map<string, T[]>();
+  for (const c of comments) {
+    if (!c.parent_id) {
+      roots.push(c);
+    } else {
+      const list = repliesByParentId.get(c.parent_id) ?? [];
+      list.push(c);
+      repliesByParentId.set(c.parent_id, list);
+    }
+  }
+  const byTime = (a: T, b: T) =>
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  roots.sort(byTime);
+  for (const [, list] of repliesByParentId) {
+    list.sort(byTime);
+  }
+  return { roots, repliesByParentId };
+}
+
 /** First <img src> from HTML (forum thumbnails / OG image). */
 export function extractFirstImageUrlFromHtml(html: string): string | null {
   const doubleQuote = html.match(/<img[^>]+src="([^">]+)"/i);

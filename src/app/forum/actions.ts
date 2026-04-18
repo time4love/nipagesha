@@ -62,6 +62,8 @@ export interface ForumPostListItem {
 export interface ForumCommentWithAuthor extends ForumCommentRow {
   author_display_name: string;
   author_avatar_url: string | null;
+  /** For nested replies: author name of the parent top-level comment (for "בתשובה ל־…"). */
+  parent_author_display_name: string | null;
 }
 
 export interface CreateForumPostInput {
@@ -372,13 +374,29 @@ export async function getPostComments(postId: string): Promise<ForumCommentWithA
 
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p as ProfileFields]));
 
-  return comments.map((c) => {
+  const enriched = comments.map((c) => {
     const profile = profileMap.get(c.user_id);
     const { displayName, avatarUrl } = resolveAuthor(profile, !!user);
     return {
       ...c,
       author_display_name: displayName,
       author_avatar_url: avatarUrl,
+    };
+  });
+
+  const byId = new Map(enriched.map((c) => [c.id, c]));
+
+  return enriched.map((c) => {
+    let parent_author_display_name: string | null = null;
+    if (c.parent_id) {
+      const parent = byId.get(c.parent_id);
+      if (parent) {
+        parent_author_display_name = parent.author_display_name;
+      }
+    }
+    return {
+      ...c,
+      parent_author_display_name,
     };
   });
 }
@@ -477,7 +495,8 @@ export async function createForumPost(
 
 export async function createForumComment(
   postId: string,
-  content: string
+  content: string,
+  options?: { parentCommentId?: string | null }
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
   const {
@@ -492,10 +511,31 @@ export async function createForumComment(
     return { success: false, error: "נא לכתוב תוכן להערה." };
   }
 
+  const parentCommentId = options?.parentCommentId?.trim() || null;
+  if (parentCommentId) {
+    const { data: parentRow, error: parentErr } = await supabase
+      .from("forum_comments")
+      .select("id, post_id, parent_id")
+      .eq("id", parentCommentId)
+      .maybeSingle();
+
+    if (parentErr || !parentRow) {
+      return { success: false, error: "לא נמצאה תגובה להשיב לה." };
+    }
+    const pr = parentRow as { post_id: string; parent_id: string | null };
+    if (pr.post_id !== postId || pr.parent_id !== null) {
+      return {
+        success: false,
+        error: "ניתן להגיב רק לתגובה ראשית בפוסט זה.",
+      };
+    }
+  }
+
   const { error } = await supabase.from("forum_comments").insert({
     post_id: postId,
     user_id: user.id,
     content: text,
+    parent_id: parentCommentId,
   });
 
   if (error) {
