@@ -550,6 +550,45 @@ export async function createForumComment(
   return { success: true };
 }
 
+export async function updateForumComment(
+  commentId: string,
+  postId: string,
+  content: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "יש להתחבר כדי לערוך תגובה." };
+  }
+
+  const text = content?.trim() ?? "";
+  if (!text) {
+    return { success: false, error: "נא לכתוב תוכן לתגובה." };
+  }
+
+  const { data: updated, error } = await supabase
+    .from("forum_comments")
+    .update({ content: text })
+    .eq("id", commentId)
+    .eq("user_id", user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  if (!updated) {
+    return { success: false, error: "לא נמצאה תגובה או שאין הרשאה לעריכה." };
+  }
+
+  revalidatePath("/forum");
+  revalidatePath(`/forum/${postId}`);
+  revalidatePath("/dashboard");
+  return { success: true };
+}
+
 export async function updateForumPost(
   postId: string,
   data: UpdateForumPostInput
@@ -603,6 +642,38 @@ export async function updateForumPost(
   }
   if (!updated) {
     return { success: false, error: "לא נמצא פוסט או שאין הרשאה לעריכה." };
+  }
+
+  revalidatePath("/forum");
+  revalidatePath(`/forum/${postId}`);
+  revalidatePath("/dashboard");
+  return { success: true };
+}
+
+export async function deleteForumComment(
+  commentId: string,
+  postId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "יש להתחבר כדי למחוק תגובה." };
+  }
+
+  const { data: deletedRows, error } = await supabase
+    .from("forum_comments")
+    .delete()
+    .eq("id", commentId)
+    .eq("user_id", user.id)
+    .select("id");
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  if (!deletedRows?.length) {
+    return { success: false, error: "לא נמצאה תגובה או שאין הרשאה למחיקה." };
   }
 
   revalidatePath("/forum");

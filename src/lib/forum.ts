@@ -11,6 +11,12 @@ export function isForumPostEdited(createdAt: string, updatedAt: string): boolean
   return updated - created > EDIT_THRESHOLD_MS;
 }
 
+/** Same rule as posts — for forum comment "(נערך)" when {@link ForumCommentRow#updated_at} exists. */
+export function isForumCommentEdited(createdAt: string, updatedAt: string | undefined): boolean {
+  if (!updatedAt) return false;
+  return isForumPostEdited(createdAt, updatedAt);
+}
+
 /** First <img src> from HTML (forum thumbnails / OG image). */
 export function extractFirstImageUrlFromHtml(html: string): string | null {
   const doubleQuote = html.match(/<img[^>]+src="([^">]+)"/i);

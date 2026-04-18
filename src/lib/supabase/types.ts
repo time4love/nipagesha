@@ -162,6 +162,7 @@ export interface ForumCommentRow {
   user_id: string;
   content: string;
   created_at: string;
+  updated_at: string;
 }
 
 /** One row from forum_post_likes. */

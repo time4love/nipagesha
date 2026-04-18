@@ -7,11 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ForumPostReportButton } from "@/components/forum/ForumPostReportButton";
 import { ForumCommentForm } from "@/components/forum/ForumCommentForm";
+import { ForumCommentDeleteButton } from "@/components/forum/ForumCommentDeleteButton";
+import { ForumCommentEditDialog } from "@/components/forum/ForumCommentEditDialog";
 import { PostActions } from "@/components/forum/PostActions";
 import { FORUM_POST_DEFAULT_THUMBNAIL, getForumCategoryBadgeVariant } from "@/lib/constants";
 import {
   extractFirstImageUrlFromHtml,
   formatForumRelativeTime,
+  isForumCommentEdited,
   isForumPostEdited,
   resolveForumOgImageUrl,
   stripHtmlToSnippet,
@@ -202,14 +205,34 @@ export default async function ForumPostPage({ params }: ForumPostPageProps) {
                       <AvatarFallback className="text-xs">{initial}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-baseline gap-2">
-                        <span className="font-medium text-sm">{c.author_display_name}</span>
-                        <time
-                          dateTime={c.created_at}
-                          className="text-xs text-muted-foreground tabular-nums"
-                        >
-                          {formatForumRelativeTime(c.created_at)}
-                        </time>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex flex-wrap items-baseline gap-2 min-w-0">
+                          <span className="font-medium text-sm">{c.author_display_name}</span>
+                          <time
+                            dateTime={c.created_at}
+                            className="text-xs text-muted-foreground tabular-nums"
+                          >
+                            {formatForumRelativeTime(c.created_at)}
+                          </time>
+                          {isForumCommentEdited(c.created_at, c.updated_at) ? (
+                            <span className="text-[11px] text-muted-foreground/90">
+                              (נערך)
+                            </span>
+                          ) : null}
+                        </div>
+                        {user?.id === c.user_id ? (
+                          <div className="flex shrink-0 items-center gap-0.5">
+                            <ForumCommentEditDialog
+                              commentId={c.id}
+                              postId={post.id}
+                              initialContent={c.content}
+                            />
+                            <ForumCommentDeleteButton
+                              commentId={c.id}
+                              postId={post.id}
+                            />
+                          </div>
+                        ) : null}
                       </div>
                       <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
                         {c.content}
