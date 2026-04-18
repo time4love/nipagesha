@@ -23,6 +23,12 @@ const initialProfileActionState: UpdateProfileResult = { success: false };
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(profile.is_anonymous);
+  const [forumEmailPostReply, setForumEmailPostReply] = useState(
+    profile.forum_email_notify_post_reply
+  );
+  const [forumEmailCommentReply, setForumEmailCommentReply] = useState(
+    profile.forum_email_notify_comment_reply
+  );
   const [state, formAction] = useActionState(
     async (_prev: UpdateProfileResult, formData: FormData) => {
       return updateProfile(formData);
@@ -99,6 +105,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </div>
 
       <input type="hidden" name="is_anonymous" value={isAnonymous ? "true" : "false"} />
+      <input
+        type="hidden"
+        name="forum_email_notify_post_reply"
+        value={forumEmailPostReply ? "true" : "false"}
+      />
+      <input
+        type="hidden"
+        name="forum_email_notify_comment_reply"
+        value={forumEmailCommentReply ? "true" : "false"}
+      />
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Switch
@@ -111,6 +127,41 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </div>
         <p id="is_anonymous_desc" className="text-sm text-muted-foreground">
           כשמופעל, יוצג &quot;הורה אנונימי&quot; במקום השם והתמונה.
+        </p>
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-border/80 bg-muted/30 p-4">
+        <p className="text-sm font-medium text-foreground">התראות במייל (פורום)</p>
+        <p className="text-sm text-muted-foreground">
+          שליחה לכתובת האימייל של חשבונך כשמגיבים לתכנים בפורום הקהילה. ניתן לשנות בכל עת.
+        </p>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="forum_email_notify_post_reply"
+            checked={forumEmailPostReply}
+            onCheckedChange={setForumEmailPostReply}
+            aria-describedby="forum_email_post_desc"
+          />
+          <Label htmlFor="forum_email_notify_post_reply">
+            תגובה חדשה לפוסט שפרסמתי
+          </Label>
+        </div>
+        <p id="forum_email_post_desc" className="text-sm text-muted-foreground -mt-1">
+          כשמישהו מוסיף תגובה ראשית לפוסט שלך.
+        </p>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="forum_email_notify_comment_reply"
+            checked={forumEmailCommentReply}
+            onCheckedChange={setForumEmailCommentReply}
+            aria-describedby="forum_email_comment_desc"
+          />
+          <Label htmlFor="forum_email_notify_comment_reply">
+            תגובה לתגובה שכתבתי
+          </Label>
+        </div>
+        <p id="forum_email_comment_desc" className="text-sm text-muted-foreground -mt-1">
+          כשמישהו משיב לתגובה שלך בשרשור.
         </p>
       </div>
 

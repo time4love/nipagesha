@@ -64,6 +64,10 @@ export interface ProfileRow {
   is_anonymous: boolean;
   privacy_level: PrivacyLevel;
   role: ProfileRole;
+  /** Email when a user comments on this member's forum post. */
+  forum_email_notify_post_reply: boolean;
+  /** Email when a user replies to this member's forum comment. */
+  forum_email_notify_comment_reply: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -75,6 +79,8 @@ export interface ProfileUpdate {
   is_anonymous?: boolean;
   privacy_level?: PrivacyLevel;
   role?: ProfileRole;
+  forum_email_notify_post_reply?: boolean;
+  forum_email_notify_comment_reply?: boolean;
 }
 
 /** Help request status (moderation: pending → approved/rejected; owner can close). */

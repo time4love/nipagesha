@@ -33,6 +33,29 @@ function rtlEmailWrap(innerHtml: string): string {
   return `<div dir="rtl" style="font-family: sans-serif;">${innerHtml}</div>`;
 }
 
+/** Recipient prefs for forum emails; defaults true if row missing (e.g. pre-migration). */
+async function getForumEmailNotificationPrefs(userId: string): Promise<{
+  notifyPostReply: boolean;
+  notifyCommentReply: boolean;
+}> {
+  const { data, error } = await adminClient
+    .from("profiles")
+    .select("forum_email_notify_post_reply, forum_email_notify_comment_reply")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error || !data) {
+    return { notifyPostReply: true, notifyCommentReply: true };
+  }
+  const row = data as {
+    forum_email_notify_post_reply: boolean;
+    forum_email_notify_comment_reply: boolean;
+  };
+  return {
+    notifyPostReply: row.forum_email_notify_post_reply,
+    notifyCommentReply: row.forum_email_notify_comment_reply,
+  };
+}
+
 const DEFAULT_PAGE_SIZE = 10;
 
 type ProfileFields = {
@@ -513,23 +536,29 @@ export async function createForumComment(
   }
 
   const parentCommentId = options?.parentCommentId?.trim() || null;
+  let parentAuthorUserId: string | null = null;
   if (parentCommentId) {
     const { data: parentRow, error: parentErr } = await supabase
       .from("forum_comments")
-      .select("id, post_id, parent_id")
+      .select("id, post_id, parent_id, user_id")
       .eq("id", parentCommentId)
       .maybeSingle();
 
     if (parentErr || !parentRow) {
       return { success: false, error: "לא נמצאה תגובה להשיב לה." };
     }
-    const pr = parentRow as { post_id: string; parent_id: string | null };
+    const pr = parentRow as {
+      post_id: string;
+      parent_id: string | null;
+      user_id: string;
+    };
     if (pr.post_id !== postId || pr.parent_id !== null) {
       return {
         success: false,
         error: "ניתן להגיב רק לתגובה ראשית בפוסט זה.",
       };
     }
+    parentAuthorUserId = pr.user_id;
   }
 
   const { error } = await supabase.from("forum_comments").insert({
@@ -544,30 +573,87 @@ export async function createForumComment(
   }
 
   try {
+    const { data: postRow } = await supabase
+      .from("forum_posts")
+      .select("title, user_id")
+      .eq("id", postId)
+      .maybeSingle();
+
+    const postTitle =
+      (postRow as { title: string; user_id: string } | null)?.title?.trim() ||
+      "פוסט ללא כותרת";
+    const postAuthorId = (postRow as { user_id: string } | null)?.user_id;
+
+    const { data: commenterProfile } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url, is_anonymous, privacy_level")
+      .eq("id", user.id)
+      .maybeSingle();
+    const { displayName: commenterName } = resolveAuthor(
+      commenterProfile as ProfileFields | null,
+      true
+    );
+
+    const postUrl = `${FORUM_PUBLIC_BASE}/${postId}`;
+
+    if (parentCommentId && parentAuthorUserId && parentAuthorUserId !== user.id) {
+      try {
+        const prefs = await getForumEmailNotificationPrefs(parentAuthorUserId);
+        if (prefs.notifyCommentReply) {
+          const {
+            data: { user: recipient },
+          } = await adminClient.auth.admin.getUserById(parentAuthorUserId);
+          const to = recipient?.email;
+          if (to) {
+            await sendEmail({
+              to,
+              subject: "[ניפגשה] מישהו הגיב לתגובה שלך בפורום",
+              html: rtlEmailWrap(`
+    <p style="margin:0 0 12px; line-height:1.5;">שלום,</p>
+    <p style="margin:0 0 12px; line-height:1.5;">${escapeHtmlForEmail(commenterName)} הגיב/ה לתגובה שלך בפוסט &quot;${escapeHtmlForEmail(postTitle)}&quot;.</p>
+    <p style="margin:0 0 6px; line-height:1.5;"><strong>תוכן התגובה:</strong></p>
+    <p style="margin:0 0 14px; line-height:1.6; white-space:pre-wrap;">${escapeHtmlForEmail(text)}</p>
+    <p style="margin:0;"><a href="${escapeHtmlForEmail(postUrl)}" style="color:#2563eb;">צפייה בפוסט</a></p>
+  `),
+            });
+          }
+        }
+      } catch {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[forum] Parent-comment author notification email failed.");
+        }
+      }
+    } else if (!parentCommentId && postAuthorId && postAuthorId !== user.id) {
+      try {
+        const prefs = await getForumEmailNotificationPrefs(postAuthorId);
+        if (prefs.notifyPostReply) {
+          const {
+            data: { user: recipient },
+          } = await adminClient.auth.admin.getUserById(postAuthorId);
+          const to = recipient?.email;
+          if (to) {
+            await sendEmail({
+              to,
+              subject: "[ניפגשה] תגובה חדשה לפוסט שלך בפורום",
+              html: rtlEmailWrap(`
+    <p style="margin:0 0 12px; line-height:1.5;">שלום,</p>
+    <p style="margin:0 0 12px; line-height:1.5;">${escapeHtmlForEmail(commenterName)} הגיב/ה לפוסט שלך &quot;${escapeHtmlForEmail(postTitle)}&quot;.</p>
+    <p style="margin:0 0 6px; line-height:1.5;"><strong>תוכן התגובה:</strong></p>
+    <p style="margin:0 0 14px; line-height:1.6; white-space:pre-wrap;">${escapeHtmlForEmail(text)}</p>
+    <p style="margin:0;"><a href="${escapeHtmlForEmail(postUrl)}" style="color:#2563eb;">צפייה בפוסט</a></p>
+  `),
+            });
+          }
+        }
+      } catch {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[forum] Post author notification email failed.");
+        }
+      }
+    }
+
     const admins = getAdminEmails();
     if (admins.length > 0) {
-      const { data: postRow } = await supabase
-        .from("forum_posts")
-        .select("title, user_id")
-        .eq("id", postId)
-        .maybeSingle();
-
-      // TODO: In the future, send an email to the post author (post.user_id) if they opt-in to notifications.
-
-      const postTitle =
-        (postRow as { title: string } | null)?.title?.trim() || "פוסט ללא כותרת";
-
-      const { data: commenterProfile } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url, is_anonymous, privacy_level")
-        .eq("id", user.id)
-        .maybeSingle();
-      const { displayName: commenterName } = resolveAuthor(
-        commenterProfile as ProfileFields | null,
-        true
-      );
-
-      const postUrl = `${FORUM_PUBLIC_BASE}/${postId}`;
       const subject = "[ניפגשה] תגובה חדשה בקהילה";
       const html = rtlEmailWrap(`
     <p style="margin:0 0 12px; line-height:1.5;">תגובה חדשה פורסמה בקהילה.</p>
@@ -581,7 +667,7 @@ export async function createForumComment(
     }
   } catch {
     if (process.env.NODE_ENV === "development") {
-      console.warn("[forum] Admin notification email failed after new comment.");
+      console.warn("[forum] Notification email failed after new comment.");
     }
   }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות | ניפגשה",
@@ -50,6 +51,15 @@ export default function PrivacyPage() {
         <h2>5. עוגיות (Cookies)</h2>
         <p>
           האתר משתמש ב-Cookies לצורך זיהוי המשתמש המחובר ותפעול תקין.
+        </p>
+
+        <h2>6. התראות במייל (פורום הקהילה)</h2>
+        <p>
+          באפשרותך לקבל הודעות לכתובת האימייל הרשומה בחשבון כאשר משתמשים מגיבים לפוסט שפרסמת או לתגובה שכתבת בפורום הקהילה. ברירת המחדל היא להפעיל התראות אלו; ניתן לכבות או להדליק כל סוג התראה בנפרד בכל עת דרך{" "}
+          <Link href="/profile" className="text-primary underline underline-offset-2 hover:no-underline">
+            הגדרות פרופיל
+          </Link>
+          .
         </p>
       </article>
     </main>

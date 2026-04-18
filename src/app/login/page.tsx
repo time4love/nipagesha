@@ -298,6 +298,25 @@ function LoginForm() {
                         </Label>
                       </div>
                     )}
+                    {isSignUp && (
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        לאחר ההרשמה ניתן לנהל התראות מייל לפורום (תגובות לפוסט שלך ולתגובותיך) ב־
+                        <Link
+                          href="/profile"
+                          className="text-primary underline underline-offset-2 hover:no-underline"
+                        >
+                          הגדרות הפרופיל
+                        </Link>
+                        . פירוט ב
+                        <Link
+                          href="/privacy"
+                          className="text-primary underline underline-offset-2 hover:no-underline mx-0.5"
+                        >
+                          מדיניות הפרטיות
+                        </Link>
+                        .
+                      </p>
+                    )}
                     <Button
                       type="submit"
                       className="w-full bg-teal-600 hover:bg-teal-700 text-white sm:w-auto"

@@ -30,6 +30,9 @@ export async function updateProfile(formData: FormData): Promise<UpdateProfileRe
   const bio = (formData.get("bio") as string)?.trim() ?? null;
   const isAnonymous = formData.get("is_anonymous") === "true";
   const privacyLevel = (formData.get("privacy_level") as PrivacyLevel) ?? "registered_only";
+  const forumEmailNotifyPostReply = formData.get("forum_email_notify_post_reply") === "true";
+  const forumEmailNotifyCommentReply =
+    formData.get("forum_email_notify_comment_reply") === "true";
   const avatarFile = formData.get("avatar") as File | null;
 
   let avatarUrl: string | null = null;
@@ -47,6 +50,8 @@ export async function updateProfile(formData: FormData): Promise<UpdateProfileRe
     bio: bio || null,
     is_anonymous: isAnonymous,
     privacy_level: privacyLevel,
+    forum_email_notify_post_reply: forumEmailNotifyPostReply,
+    forum_email_notify_comment_reply: forumEmailNotifyCommentReply,
   };
   if (avatarUrl !== null) {
     update.avatar_url = avatarUrl;
