@@ -2,23 +2,23 @@
  * Admin authorization. Application-level check only.
  * RLS allows all authenticated users; this restricts admin actions to listed emails.
  *
- * Default admin is always included. Set ADMIN_EMAILS in .env (comma-separated) to add more, e.g.:
- * ADMIN_EMAILS=other@example.com
+ * Set `ADMIN_EMAILS` in the deployment environment (comma-separated, case-insensitive).
+ * There are no hardcoded defaults in the repository — set admins only via env/secrets.
  */
 
-const DEFAULT_ADMIN_EMAILS = ["jodagm@gmail.com"] as const;
-
 export function getAdminEmails(): string[] {
-  const defaults = (DEFAULT_ADMIN_EMAILS as readonly string[]).map((e) => e.toLowerCase());
   const env = process.env.ADMIN_EMAILS;
-  if (env && typeof env === "string") {
-    const fromEnv = env
-      .split(",")
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-    return [...new Set([...defaults, ...fromEnv])];
+  if (!env || typeof env !== "string") {
+    return [];
   }
-  return defaults;
+  return [
+    ...new Set(
+      env
+        .split(",")
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
 }
 
 export function isAdmin(userEmail: string | undefined): boolean {
