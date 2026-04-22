@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { SongsSectionBackgroundVideo } from "@/components/marketing/SongsSectionBackgroundVideo";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -83,16 +84,7 @@ export default async function HomePage() {
         className="relative min-h-[28rem] sm:min-h-[32rem] md:min-h-[36rem] flex items-center justify-center overflow-hidden bg-gradient-to-b from-amber-950/90 to-slate-950"
         aria-labelledby="songs-section-heading"
       >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="object-cover w-full h-full absolute inset-0 z-0"
-          aria-hidden
-        >
-          <source src="/videos/songs-bg.mp4" type="video/mp4" />
-        </video>
+        <SongsSectionBackgroundVideo />
         <div className="absolute inset-0 z-[1] bg-black/50" aria-hidden />
         <div className="relative z-10 container mx-auto px-4 py-16 text-center">
           <h2
