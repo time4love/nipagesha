@@ -1,12 +1,12 @@
 "use client";
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { getSongs, type Song } from "@/app/(marketing)/songs/actions";
+import { getSongs, type SongListItem } from "@/app/(marketing)/songs/actions";
 import { SongCard } from "./SongCard";
 import { InfiniteScrollTrigger } from "@/components/ui/infinite-scroll-trigger";
 
 interface SongListProps {
-  initialData: Song[];
+  initialData: SongListItem[];
   initialHasMore: boolean;
 }
 

@@ -11,6 +11,8 @@ export interface ShareButtonProps {
   title: string;
   text: string;
   url: string;
+  /** Optional preview (e.g. YouTube thumbnail) — shown in the share menu; link previews use page OG tags. */
+  previewImageUrl?: string | null;
   /** Visible label (Hebrew UI). */
   label?: string;
   variant?: "ghost" | "outline";
@@ -22,6 +24,7 @@ export function ShareButton({
   title,
   text,
   url,
+  previewImageUrl,
   label = "שיתוף",
   variant = "ghost",
   size = "sm",
@@ -86,10 +89,25 @@ export function ShareButton({
       <PopoverContent
         dir="rtl"
         align="end"
-        className="w-56 p-2 space-y-0.5"
+        className="w-64 p-0 overflow-hidden"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
+        {previewImageUrl ? (
+          <div className="relative aspect-video w-full bg-muted">
+            <img
+              src={previewImageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : null}
+        <div className="p-2 space-y-0.5">
         <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">שיתוף</p>
+        {previewImageUrl ? (
+          <p className="px-2 pb-1 text-[11px] leading-snug text-muted-foreground">
+            תמונת יוטיוב: מוצגת לעיתים כתצוגה מקדימה בוואטסאפ/פייסבוק.
+          </p>
+        ) : null}
         <button
           type="button"
           className="flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-accent text-start"
@@ -112,6 +130,7 @@ export function ShareButton({
           <Link2 className="size-4 shrink-0 opacity-70" aria-hidden />
           העתקת קישור
         </button>
+        </div>
       </PopoverContent>
     </Popover>
   );

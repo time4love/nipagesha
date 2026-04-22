@@ -65,11 +65,19 @@ export async function upsertSong(input: UpsertSongInput): Promise<{ error?: stri
       console.error("upsertSong update error:", error.message);
       return { error: error.message };
     }
+    revalidatePath(`/songs/${input.id}`);
   } else {
-    const { error } = await supabase.from("songs").insert(row);
+    const { data: inserted, error } = await supabase
+      .from("songs")
+      .insert(row)
+      .select("id")
+      .single();
     if (error) {
       console.error("upsertSong insert error:", error.message);
       return { error: error.message };
+    }
+    if (inserted?.id) {
+      revalidatePath(`/songs/${inserted.id as string}`);
     }
   }
 
@@ -85,6 +93,7 @@ export async function deleteSong(id: string): Promise<{ error?: string }> {
     console.error("deleteSong error:", error.message);
     return { error: error.message };
   }
+  revalidatePath(`/songs/${id}`);
   revalidatePath("/admin/songs");
   revalidatePath("/songs");
   return {};
